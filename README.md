@@ -6,11 +6,11 @@
   </a>
 
   <h3 align="center">
-    🔵 The poker game 🔵
+    🔵 Pok'help 🔵
   </h3>
 
   <p align="center">
-    Un jeu de poker online.
+    A poker game online for french people.
   </p>
 </div>
 
@@ -48,6 +48,10 @@
 - <ins>Website:</ins> [azerty.tk][Website-url]
 - <ins>Github:</ins> [@14personne14][Github-url]
 
+#### kohibachiden
+- <ins>Discord:</ins> `kohibachiden#9256`
+- <ins>Github:</ins> [@kohibachiden][Github-url-2]
+
 
 <!-- LICENCE -->
 ## ➤ License
@@ -58,6 +62,7 @@ Distributed under the <ins>*MIT License*</ins>. See [LICENSE][Licence-url] for m
 <!-- https://shields.io/ -->
 [Website-url]: https://azerty.tk/
 [Github-url]: https://github.com/14personne14
+[Github-url-2]: https://github.com/kohibachiden
 [Licence-url]: https://en.wikipedia.org/wiki/MIT_License
 [screenshot]: images/screenshot.png
 [Python]: https://img.shields.io/badge/python-346E9E?style=for-the-badge&logo=python&logoColor=white
