@@ -2,7 +2,7 @@
 <br/>
 <div align="center">
   <a href="https://github.com/14personne14/poker_projet_nsi">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="files/images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">
@@ -64,7 +64,7 @@ Distributed under the <ins>*MIT License*</ins>. See [LICENSE][Licence-url] for m
 [Github-url]: https://github.com/14personne14
 [Github-url-2]: https://github.com/kohibachiden
 [Licence-url]: https://en.wikipedia.org/wiki/MIT_License
-[screenshot]: images/screenshot.png
+[screenshot]: files/images/screenshot.png
 [Python]: https://img.shields.io/badge/python-346E9E?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://python.org/
 [Php]: https://img.shields.io/badge/PHP-20232A?style=for-the-badge&logo=php&logoColor=white
