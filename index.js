@@ -11,7 +11,7 @@ const app = express();
 const server = http.createServer(app);
 const port = 8101;
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
-const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,16}$/;
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -30,6 +30,28 @@ app.use(
 app.set('view engine', 'ejs');
 
 // Fonctions :
+function verif_regex(chaine, regex) {
+	/**
+	 * Vérifie si la chaine passe bien la regex.
+	 *
+	 * [entrée] chaine: la chaine à vérifier (string)
+	 * 			regex:  la regex à tester sur la chaine (regex)
+	 * [sortie] Boolean
+	 */
+
+	return Boolean(regex.exec(chaine));
+}
+
+function encode_sha256(chaine) {
+	/**
+	 * Encode la chaine avec MD5 puis renvoie cette chaine.
+	 *
+	 * [entrée] chaine: la chaine à encoder (string)
+	 * [sortie] string
+	 */
+
+	return crypto.createHash('sha256').update(chaine).digest('hex');
+}
 
 /*
  *
@@ -42,40 +64,42 @@ app.set('view engine', 'ejs');
  *
  */
 
-// Pour la connexion
 app.post('/connexion', (req, res) => {
-	// Récupérer les données
+	// Récupérer les données du POST
 	const data = req.body;
 
-	// Verification information
-	var password_md5 = crypto.createHash('md5').update(data.password).digest('hex');
+	// Préparation des informations
+	var correct = verif_regex(data.username, regex_username) //&& verif_regex(data.password, regex_password);
+	var password_sha256 = encode_sha256(data.password);
 
-	// Requete
-	database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}' AND password = '${password_md5}'; `, (err, rows) => {
-		if (err) {
-			console.log(err);
-			res.send('Erreur lors de la connexion.');
-		} else if (rows.length > 0) {
-			res.send(`Connexion Réussie : ${rows[0].username}`);
-		} else {
-			res.send("Nom d'utilisateur ou mot de passe incorrect !");
-		}
-	});
+	// Exécute les requetes
+	if (correct) {
+		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}' AND password = '${password_sha256}'; `, (err, rows) => {
+			if (err) {
+				console.log(err);
+				res.send('Erreur lors de la connexion.');
+			} else if (rows.length > 0) {
+				console.log(`Connexion:`.bgWhite.black + ` ${data.username} `.white)
+				res.send(`Connexion Réussie : ${rows[0].username}`);
+			} else {
+				res.send("Nom d'utilisateur ou mot de passe incorrect !");
+			}
+		});
+	} else {
+		res.send("Nom d'utilisateur ou mot de passe incorrect !");
+	}
 });
 
-// Pour l'inscription
 app.post('/inscription', (req, res) => {
-	// Récupérer les données
+	// Récupérer les données du POST
 	const data = req.body;
 
-	// Verif des regex
-	var correct = Boolean(regex_username.exec(data.username)) && Boolean(regex_password.exec(data.password));
+	// Préparation des informations
+	var correct = verif_regex(data.username, regex_username) && verif_regex(data.password, regex_password);
+	var password_sha256 = encode_sha256(data.password);
 
-	// Hash du mot de passe
-	var password_md5 = crypto.createHash('md5').update(data.password).digest('hex');
-
+	// Exécute les requetes
 	if (correct) {
-		// Requete de vérification
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}'; `, (err, rows) => {
 			if (err) {
 				console.log(err);
@@ -84,11 +108,12 @@ app.post('/inscription', (req, res) => {
 				res.send(`Nom d'utilisateur deja prit !`);
 			} else {
 				// Insertion dans la base de donnée
-				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_md5}'); `, (err, rows) => {
+				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
 					if (err) {
 						console.log(err);
 						res.send("Erreur lors de l'insertion.");
 					} else {
+						console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${password_sha256} `.white)
 						res.send(`Inscription Réussie !`);
 					}
 				});
@@ -103,7 +128,8 @@ app.post('/inscription', (req, res) => {
 app.get('/', (req, res) => {
 	res.render('connexion');
 });
-// Quand le client demande '/'
+
+// Quand le client demande '/i'
 app.get('/i', (req, res) => {
 	res.render('inscription');
 });
