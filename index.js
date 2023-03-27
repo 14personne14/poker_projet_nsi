@@ -1,5 +1,6 @@
 // Require
 const express = require('express');
+const sessions = require('express-session');
 const http = require('http');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
@@ -26,6 +27,19 @@ app.use(
 	})
 );
 
+// Pour les sessions des utilisateurs
+app.use(
+	sessions({
+		secret: 'ce-texte-doit-rester-secret',
+		resave: false,
+		saveUninitialized: true,
+		cookie: {
+			maxAge: 1000 * 60 * 60 * 24 * 10,
+			sameSite: 'strict',
+		},
+	})
+);
+
 // Gère le language EJS
 app.set('view engine', 'ejs');
 
@@ -44,10 +58,10 @@ function verif_regex(chaine, regex) {
 
 function encode_sha256(chaine) {
 	/**
-	 * Encode la chaine avec MD5 puis renvoie cette chaine.
+	 * Encode la chaine avec SHA256 puis renvoie cette chaine.
 	 *
 	 * [entrée] chaine: la chaine à encoder (string)
-	 * [sortie] string
+	 * [sortie] String
 	 */
 
 	return crypto.createHash('sha256').update(chaine).digest('hex');
@@ -68,20 +82,29 @@ app.post('/connexion', (req, res) => {
 	// Récupérer les données du POST
 	const data = req.body;
 
+	// Récupère les données de session
+	var session = req.session;
+
 	// Préparation des informations
-	var correct = verif_regex(data.username, regex_username) //&& verif_regex(data.password, regex_password);
+	var correct = verif_regex(data.username, regex_username); //&& verif_regex(data.password, regex_password);
 	var password_sha256 = encode_sha256(data.password);
 
 	// Exécute les requetes
 	if (correct) {
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}' AND password = '${password_sha256}'; `, (err, rows) => {
+			// Erreur
 			if (err) {
 				console.log(err);
 				res.send('Erreur lors de la connexion.');
-			} else if (rows.length > 0) {
-				console.log(`Connexion:`.bgWhite.black + ` ${data.username} `.white)
+			}
+			// Connexion validé
+			else if (rows.length > 0) {
+				console.log(`Connexion:`.bgWhite.black + ` ${data.username} `.white);
+				session.connected = true;
 				res.send(`Connexion Réussie : ${rows[0].username}`);
-			} else {
+			}
+			// Mauvais username or password
+			else {
 				res.send("Nom d'utilisateur ou mot de passe incorrect !");
 			}
 		});
@@ -93,6 +116,9 @@ app.post('/connexion', (req, res) => {
 app.post('/inscription', (req, res) => {
 	// Récupérer les données du POST
 	const data = req.body;
+
+	// Récupère les données de session
+	var session = req.session;
 
 	// Préparation des informations
 	var correct = verif_regex(data.username, regex_username) && verif_regex(data.password, regex_password);
@@ -113,7 +139,7 @@ app.post('/inscription', (req, res) => {
 						console.log(err);
 						res.send("Erreur lors de l'insertion.");
 					} else {
-						console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${password_sha256} `.white)
+						console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${password_sha256} `.white);
 						res.send(`Inscription Réussie !`);
 					}
 				});
@@ -126,12 +152,49 @@ app.post('/inscription', (req, res) => {
 
 // Quand le client demande '/'
 app.get('/', (req, res) => {
-	res.render('connexion');
+	// Récupère les données de session
+	var session = req.session;
+
+	// Le joueur est deja connecter ?
+	var connected = false;
+	if (session.connected) {
+		connected = true;
+	}
+
+	// Send la page
+	res.render('index', {
+		connected: connected,
+	});
+});
+
+// Quand le client demande '/c'
+app.get('/c', (req, res) => {
+	// Récupère les données de session
+	var session = req.session;
+
+	// Le joueur est deja connecter ?
+	if (session.connected) {
+		res.render('index', {
+			connected: true,
+		});
+	} else {
+		res.render('connexion');
+	}
 });
 
 // Quand le client demande '/i'
 app.get('/i', (req, res) => {
-	res.render('inscription');
+	// Récupère les données de session
+	var session = req.session;
+
+	// Le joueur est deja connecter ?
+	if (session.connected) {
+		res.render('index', {
+			connected: true,
+		});
+	} else {
+		res.render('inscription');
+	}
 });
 
 // Démarre le serveur (ecoute)
