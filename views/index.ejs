@@ -4,16 +4,35 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+		<!-- Style -->
+		<link href="public/style/style.css" rel="stylesheet" />
+
 		<title>Acceuil</title>
 
 	</head>
 	<body>
-		<h1>Acceuil du site web !</h1>
+		<h1>Acceuil du site web ! </h1>
 		<h2>Connected : </h2>
 		<% if (connected) { %> 
 		<p>oui</p>
 		<% } else { %> 
 		<p>non</p>
+		<% } %>
+		<a href="connexion">  
+			<button>connexion</button>  
+		</a><br>
+		<a href="inscription">  
+			<button>inscription</button>  
+		</a><br>
+		<a href="deconnexion">  
+			<button>deconnexion</button> 
+		</a>
+
+		<!-- ALERT BLOCK -->
+		<% if (alert) { %> 
+		<p class="alert"><%= alert.message %></p>
+		<% } else { %> 
+		<p>pas d'alert en cour !</p>
 		<% } %>
 	</body>
 </html>

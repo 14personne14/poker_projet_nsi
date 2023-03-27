@@ -4,6 +4,9 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+		<!-- Style -->
+		<link href="public/style/style.css" rel="stylesheet" />
+
 		<title>Inscription</title>
 
 	</head>
@@ -17,6 +20,22 @@
 			<input type="password" id="password" name="password" required>
 			<br>
 			<input type="submit" value="S'inscrire">
-		</form>
+		</form><br><br>
+		<a href="connexion">  
+			<button>connexion</button>  
+		</a><br>
+		<a href="">  
+			<button>acceuil</button>  
+		</a><br>
+		<a href="deconnexion">  
+			<button>deconnexion</button>  
+		</a>
+
+		<!-- ALERT BLOCK -->
+		<% if (alert) { %> 
+		<p class="alert"><%= alert.message %></p>
+		<% } else { %> 
+		<p>pas d'alert en cour !</p>
+		<% } %>
 	</body>
 </html>

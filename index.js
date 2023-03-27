@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const sqlite3 = require('sqlite3').verbose();
 const colors = require('colors');
+const { markAsUntransferable } = require('worker_threads');
 
 // Vaiables constantes
 const app = express();
@@ -86,7 +87,7 @@ app.post('/connexion', (req, res) => {
 	var session = req.session;
 
 	// Préparation des informations
-	var correct = verif_regex(data.username, regex_username); //&& verif_regex(data.password, regex_password);
+	var correct = verif_regex(data.username, regex_username) && verif_regex(data.password, regex_password);
 	var password_sha256 = encode_sha256(data.password);
 
 	// Exécute les requetes
@@ -95,21 +96,38 @@ app.post('/connexion', (req, res) => {
 			// Erreur
 			if (err) {
 				console.log(err);
-				res.send('Erreur lors de la connexion.');
+				res.render('connexion', {
+					alert: {
+						message: `Erreur lors de la connexion à la base de données.`,
+					},
+				});
 			}
 			// Connexion validé
 			else if (rows.length > 0) {
 				console.log(`Connexion:`.bgWhite.black + ` ${data.username} `.white);
 				session.connected = true;
-				res.send(`Connexion Réussie : ${rows[0].username}`);
+				res.render('index', {
+					connected: true,
+					alert: {
+						message: `connexion ok ${data.username}`,
+					},
+				});
 			}
 			// Mauvais username or password
 			else {
-				res.send("Nom d'utilisateur ou mot de passe incorrect !");
+				res.render('connexion', {
+					alert: {
+						message: `Nom d'utilisateur ou mot de passe incorrect !`,
+					},
+				});
 			}
 		});
 	} else {
-		res.send("Nom d'utilisateur ou mot de passe incorrect !");
+		res.render('connexion', {
+			alert: {
+				message: `Nom d'utilisateur ou mot de passe incorrect !`,
+			},
+		});
 	}
 });
 
@@ -129,24 +147,44 @@ app.post('/inscription', (req, res) => {
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}'; `, (err, rows) => {
 			if (err) {
 				console.log(err);
-				res.send('Erreur lors de la connexion.');
+				res.render('inscription', {
+					alert: {
+						message: `Erreur lors de la connexion à la base de données.`,
+					},
+				});
 			} else if (rows.length > 0) {
-				res.send(`Nom d'utilisateur deja prit !`);
+				res.render('inscription', {
+					alert: {
+						message: `Nom d'utilisateur deja prit !`,
+					},
+				});
 			} else {
 				// Insertion dans la base de donnée
 				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
 					if (err) {
 						console.log(err);
-						res.send("Erreur lors de l'insertion.");
+						res.render('inscription', {
+							alert: {
+								message: `Erreur lors de l'insertion dans la base de données.`,
+							},
+						});
 					} else {
 						console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${password_sha256} `.white);
-						res.send(`Inscription Réussie !`);
+						res.render('connexion', {
+							alert: {
+								message: `Ok vous êtes bien inscrit avec l'username : ${data.username}.`,
+							},
+						});
 					}
 				});
 			}
 		});
 	} else {
-		res.send("Mauvais mot de passe ou nom d'utilisateur ");
+		res.render('inscription', {
+			alert: {
+				message: `Mauvais mot de passe ou nom d'utilisateur.`,
+			},
+		});
 	}
 });
 
@@ -164,11 +202,12 @@ app.get('/', (req, res) => {
 	// Send la page
 	res.render('index', {
 		connected: connected,
+		alert: undefined,
 	});
 });
 
 // Quand le client demande '/c'
-app.get('/c', (req, res) => {
+app.get('/connexion', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
 
@@ -176,14 +215,19 @@ app.get('/c', (req, res) => {
 	if (session.connected) {
 		res.render('index', {
 			connected: true,
+			alert: {
+				message: `vous etes deja connecter`,
+			},
 		});
 	} else {
-		res.render('connexion');
+		res.render('connexion', {
+			alert: undefined,
+		});
 	}
 });
 
 // Quand le client demande '/i'
-app.get('/i', (req, res) => {
+app.get('/inscription', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
 
@@ -191,10 +235,31 @@ app.get('/i', (req, res) => {
 	if (session.connected) {
 		res.render('index', {
 			connected: true,
+			alert: {
+				message: `vous etes deja inscrit`,
+			},
 		});
 	} else {
-		res.render('inscription');
+		res.render('inscription', {
+			alert: undefined,
+		});
 	}
+});
+
+// Quand le client demande '/i'
+app.get('/deconnexion', (req, res) => {
+	// Récupère les données de session
+	var session = req.session;
+
+	// Le joueur est deja connecter ?
+	session.connected = false;
+
+	res.render('index', {
+		connected: false,
+		alert: {
+			message: `deconnexion réussie`,
+		},
+	});
 });
 
 // Démarre le serveur (ecoute)
