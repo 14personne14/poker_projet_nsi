@@ -117,7 +117,7 @@ function affiche_log(data) {
 	 */
 	// Nouvelle inscription
 	if (data.type == 'inscription') {
-		console.log(`Nouveau joueur:`.bgWhite.black + ` ${data.username} `.white);
+		console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${data.password} `.white);
 	}
 	// Connexion
 	else if (data.type == 'connexion') {
@@ -212,7 +212,7 @@ function create_embed(data) {
 	}
 	// Autre cas (donc erreur de log)
 	else {
-		embed.setTitle("Erreur lors de la création de l'embed");
+		embed.setTitle("Erreur lors de la création de l'embed.");
 		embed.setColor('#ff0000');
 	}
 
@@ -268,7 +268,7 @@ app.post('/connexion', (req, res) => {
 				res.render('index', {
 					connected: true,
 					alert: {
-						message: `connexion ok ${data.username}`,
+						message: `Bonjour '${data.username}', vous êtes connecté.`,
 					},
 				});
 			}
@@ -276,7 +276,7 @@ app.post('/connexion', (req, res) => {
 			else {
 				res.render('connexion', {
 					alert: {
-						message: `Nom d'utilisateur ou mot de passe incorrect !`,
+						message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
 					},
 				});
 			}
@@ -284,20 +284,18 @@ app.post('/connexion', (req, res) => {
 	} else {
 		res.render('connexion', {
 			alert: {
-				message: `Nom d'utilisateur ou mot de passe incorrect !`,
+				message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
 			},
 		});
 	}
 });
 
 app.post('/inscription', (req, res) => {
-	// Récupérer les données du POST
+	// Récupérer les données
 	const data = req.body;
-
-	// Récupère les données de session
 	var session = req.session;
 
-	// Préparation des informations
+	// Préparation
 	var correct = verif_regex(data.username, regex_username) && verif_regex(data.password, regex_password);
 	var password_sha256 = encode_sha256(data.password);
 
@@ -305,27 +303,30 @@ app.post('/inscription', (req, res) => {
 	if (correct) {
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}'; `, (err, rows) => {
 			if (err) {
-				console.log(err);
+				send_log({
+					type: 'erreur_bdd',
+					erreur: err,
+				});
 
 				res.render('inscription', {
 					alert: {
-						message: `Erreur lors de la connexion à la base de données.`,
+						message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
 					},
 				});
 			} else if (rows.length > 0) {
 				res.render('inscription', {
 					alert: {
-						message: `Nom d'utilisateur deja prit !`,
+						message: `Le nom d'utilisateur est deja utilisé par une autre personne !`,
 					},
 				});
 			} else {
 				// Insertion dans la base de donnée
 				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
 					if (err) {
-						send_log({
-							type: 'erreur_bdd',
-							erreur: err,
-						});
+                        send_log({
+                            type: 'erreur_bdd',
+                            erreur: err,
+                        });
 
 						res.render('inscription', {
 							alert: {
@@ -333,16 +334,15 @@ app.post('/inscription', (req, res) => {
 							},
 						});
 					} else {
-						console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${password_sha256} `.white);
-
 						send_log({
 							type: 'inscription',
 							username: data.username,
+                            password: password_sha256, 
 						});
 
 						res.render('connexion', {
 							alert: {
-								message: `Ok vous êtes bien inscrit avec l'username : ${data.username}.`,
+								message: `Vous avez bien été inscrit avec l'username : '${data.username}'.`,
 							},
 						});
 					}
@@ -352,7 +352,7 @@ app.post('/inscription', (req, res) => {
 	} else {
 		res.render('inscription', {
 			alert: {
-				message: `Mauvais mot de passe ou nom d'utilisateur.`,
+				message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
 			},
 		});
 	}
