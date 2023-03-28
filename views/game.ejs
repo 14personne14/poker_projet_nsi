@@ -8,14 +8,26 @@
 		<link href="public/style/style.css" rel="stylesheet" />
 
 		<title>Pok'help</title>
-
 	</head>
 	<body>
 		<h1>Page du jeu</h1>
 		<h2>Joueur 1</h2>
-        <h2>Joueur 2</h2>
-        <h2>Joueur 3</h2>
-        <h2>Joueur 4</h2>
-        <h1>Fin des joueurs</h1>
+		<h2>Joueur 2</h2>
+		<h2>Joueur 3</h2>
+		<h2>Joueur 4</h2>
+		<h1>Fin des joueurs</h1>
+		<a href="connexion"> <button>connexion</button> </a><br />
+		<a href="inscription"> <button>inscription</button> </a><br />
+		<a href="deconnexion"> <button>deconnexion</button> </a><br />
+		<a href="">
+			<button>Accueil</button>
+		</a>
+
+		<!-- ALERT BLOCK -->
+		<% if (alert) { %>
+		<p class="alert"><%= alert.message %></p>
+		<% } else { %>
+		<p>pas d'alert en cour !</p>
+		<% } %>
 	</body>
 </html>

@@ -411,9 +411,7 @@ app.get('/inscription', (req, res) => {
 		});
 	} else {
 		res.render('inscription', {
-			alert: {
-				message: `Tu doit te connecter avant d'accèder au jeu !`,
-			},
+			alert: undefined,
 		});
 	}
 });
@@ -433,7 +431,9 @@ app.get('/game', (req, res) => {
 	} else {
 		res.render('connexion', {
 			connected: connected,
-			alert: undefined,
+			alert: {
+				message: `Tu doit te connecter avant d'accèder au jeu !`,
+			},
 		});
 	}
 
