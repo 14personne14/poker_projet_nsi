@@ -12,7 +12,7 @@ const { markAsUntransferable } = require('worker_threads');
 // Vaiables constantes
 const app = express();
 const server = http.createServer(app);
-const port = 8101;
+const port = 8101; // default: [8101]
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
@@ -323,10 +323,10 @@ app.post('/inscription', (req, res) => {
 				// Insertion dans la base de donnée
 				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
 					if (err) {
-                        send_log({
-                            type: 'erreur_bdd',
-                            erreur: err,
-                        });
+						send_log({
+							type: 'erreur_bdd',
+							erreur: err,
+						});
 
 						res.render('inscription', {
 							alert: {
@@ -337,7 +337,7 @@ app.post('/inscription', (req, res) => {
 						send_log({
 							type: 'inscription',
 							username: data.username,
-                            password: password_sha256, 
+							password: password_sha256,
 						});
 
 						res.render('connexion', {
@@ -376,7 +376,7 @@ app.get('/', (req, res) => {
 	});
 });
 
-// Quand le client demande '/c'
+// Quand le client demande '/connexion'
 app.get('/connexion', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
@@ -386,7 +386,7 @@ app.get('/connexion', (req, res) => {
 		res.render('index', {
 			connected: true,
 			alert: {
-				message: `vous etes deja connecter`,
+				message: `Vous êtes déjà connecté !`,
 			},
 		});
 	} else {
@@ -396,7 +396,7 @@ app.get('/connexion', (req, res) => {
 	}
 });
 
-// Quand le client demande '/i'
+// Quand le client demande '/inscription'
 app.get('/inscription', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
@@ -406,17 +406,41 @@ app.get('/inscription', (req, res) => {
 		res.render('index', {
 			connected: true,
 			alert: {
-				message: `vous etes deja inscrit`,
+				message: `Vous êtes déjà connecté !`,
 			},
 		});
 	} else {
 		res.render('inscription', {
-			alert: undefined,
+			alert: {
+				message: `Tu doit te connecter avant d'accèder au jeu !`,
+			},
 		});
 	}
 });
 
-// Quand le client demande '/i'
+// Quand le client demande '/game'
+app.get('/game', (req, res) => {
+	// Récupère les données de session
+	var session = req.session;
+
+	// Le joueur est deja connecter ?
+	var connected = false;
+	if (session.connected) {
+		res.render('game', {
+			connected: true,
+			alert: undefined,
+		});
+	} else {
+		res.render('connexion', {
+			connected: connected,
+			alert: undefined,
+		});
+	}
+
+	// Send la page
+});
+
+// Quand le client demande '/deconnexion'
 app.get('/deconnexion', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
@@ -427,14 +451,12 @@ app.get('/deconnexion', (req, res) => {
 	res.render('index', {
 		connected: false,
 		alert: {
-			message: `deconnexion réussie`,
+			message: `Déconnexion réussie !`,
 		},
 	});
 });
 
 // Démarre le serveur (ecoute)
 server.listen(port, () => {
-    console.log('');
-	console.log(`L'application a démarré au port ${port}.`.bgYellow.black);
-	console.log('');
+	console.log('\n' + `L'application a démarré au port :`.blue + ' ' + `${port}`.bgWhite.black + '\n');
 });
