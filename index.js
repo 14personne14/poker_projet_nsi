@@ -124,6 +124,7 @@ function affiche_log_console(data) {
 	 * [entrée] data: les données pour l'affichage dans la console (object)
 	 * [sortie] xxx
 	 */
+
 	// Nouvelle inscription
 	if (data.type == 'inscription') {
 		console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${data.password} `.white);
