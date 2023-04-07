@@ -15,6 +15,14 @@ const server = http.createServer(app);
 const port = 8101; // default: [8101]
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
+const webhook_url = {
+    inscription: 'https://discord.com/api/webhooks/1089945104409690172/jo0OVgmwrrSV02DFbxkSrpE1TSJekFxN7yHVHiVSByR3wMhY7XzvWoJxsqIbLeh-RXw-', 
+    connexion: 'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si', 
+    erreur: 'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD', 
+    erreur_bdd: 'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD',
+    test: 'https://discord.com/api/webhooks/1089953770005344266/iyjl46ua89Aj0aJAf_BgJcZIVu4OZyIye5ZDOT53XAcwewICcDcoVK2C9RMJ5h8bz9jK', 
+    autre_cas: 'https://discord.com/api/webhooks/1089953870853197834/Pg_C6lS6IezQm4xNMlL5H1vxZ9YcVuxAntRtYs3wgrYdNeWjRh2DwQCkN7cLljCfmbUW'
+}
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -77,9 +85,7 @@ function error_message_urgence() {
 	 * [entrée] xxx
 	 * [sortie] xxx
 	 */
-	const webhook = create_webhook({
-		type: 'erreur',
-	});
+	const webhook = new Webhook(webhook_url.erreur);
 	webhook.setUsername('Fatal Error');
 	webhook.setAvatar('https://eloilag.tk/images/error.png');
 
@@ -92,29 +98,33 @@ function send_log(data) {
 	/**
 	 * Envoie un webhook sur le serveur discord des log de @personne14 avec un embed selon les données de 'data'.
 	 *
-	 * [entrée] data: les données pour la fonction 'create_embed()' appelée (object)
+	 * [entrée] data: les données concernant le webhook à envoyer (object)
 	 * [sortie] xxx
 	 */
-
-	const webhook = create_webhook(data);
+    
+    // Webhook
+	const webhook = new Webhook(webhook_url[data.type]);
 	webhook.setUsername('Poker log');
 	webhook.setAvatar('https://eloilag.tk/images/poker.png');
 
 	// Embed
 	var embed = create_embed(data);
+    
+    // Send Webhook 
 	webhook.send(embed);
 
-	// Log d'affichage dans la console :
-	affiche_log(data);
+	// Log d'affichage dans la console 
+	affiche_log_console(data);
 }
 
-function affiche_log(data) {
+function affiche_log_console(data) {
 	/**
 	 * Affiche les logs dans la console en fonction des données de 'data'.
 	 *
 	 * [entrée] data: les données pour l'affichage dans la console (object)
 	 * [sortie] xxx
 	 */
+    
 	// Nouvelle inscription
 	if (data.type == 'inscription') {
 		console.log(`Inscription:`.bgWhite.black + ` ${data.username} | ${data.password} `.white);
@@ -126,46 +136,6 @@ function affiche_log(data) {
 	// Erreur BDD
 	else if (data.type == 'erreur_bdd') {
 		console.log(`Erreur base de données:`.bgRed + ' ' + data.erreur);
-	}
-}
-
-function create_webhook(data) {
-	/**
-	 * Créé le webhook avec le bon lien en fonction des données de data.
-	 *
-	 * [entrée] data: les données pour la création personnalisé du webhook (object)
-	 * [sortie] object (webhook)
-	 */
-
-	// Inscription
-	if (data.type == 'inscription') {
-		return new Webhook(
-			'https://discord.com/api/webhooks/1089945104409690172/jo0OVgmwrrSV02DFbxkSrpE1TSJekFxN7yHVHiVSByR3wMhY7XzvWoJxsqIbLeh-RXw-'
-		);
-	}
-	// Connexion
-	else if (data.type == 'connexion') {
-		return new Webhook(
-			'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si'
-		);
-	}
-	// Fatal error
-	else if (data.type == 'erreur_bdd' || data.type == 'erreur') {
-		return new Webhook(
-			'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD'
-		);
-	}
-	// Autre test
-	else if (data.type == 'test') {
-		return new Webhook(
-			'https://discord.com/api/webhooks/1089953770005344266/iyjl46ua89Aj0aJAf_BgJcZIVu4OZyIye5ZDOT53XAcwewICcDcoVK2C9RMJ5h8bz9jK'
-		);
-	}
-	// Autre cas
-	else if (data.type == 'test') {
-		return new Webhook(
-			'https://discord.com/api/webhooks/1089953870853197834/Pg_C6lS6IezQm4xNMlL5H1vxZ9YcVuxAntRtYs3wgrYdNeWjRh2DwQCkN7cLljCfmbUW'
-		);
 	}
 }
 
