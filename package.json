@@ -1,38 +1,38 @@
 {
-  "name": "poker_projet_nsi",
-  "version": "1.0.0",
-  "description": "Un jeu de poker en français en ligne.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "index": "./node_modules/nodemon/bin/nodemon.js index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/14personne14/poker_projet_nsi.git"
-  },
-  "keywords": [
-    "nodejs",
-    "poker",
-    "game",
-    "nsi"
-  ],
-  "author": "personne14 & kohibachiden",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/14personne14/poker_projet_nsi/issues"
-  },
-  "homepage": "https://github.com/14personne14/poker_projet_nsi#readme",
-  "private": true,
-  "dependencies": {
-    "body-parser": "^1.20.2",
-    "colors": "^1.4.0",
-    "discord-webhook-node": "^1.1.8",
-    "ejs": "^3.1.9",
-    "express": "^4.18.2",
-    "express-session": "^1.17.3",
-    "nodemon": "^2.0.22",
-    "sqlite3": "^5.1.6",
-    "ws": "^8.13.0"
-  }
+	"name": "poker_projet_nsi",
+	"version": "1.0.0",
+	"description": "Un jeu de poker en français en ligne.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"index": "nodemon index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/14personne14/poker_projet_nsi.git"
+	},
+	"keywords": [
+		"nodejs",
+		"poker",
+		"game",
+		"nsi"
+	],
+	"author": "personne14 & kohibachiden",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/14personne14/poker_projet_nsi/issues"
+	},
+	"homepage": "https://github.com/14personne14/poker_projet_nsi#readme",
+	"private": true,
+	"dependencies": {
+		"body-parser": "^1.20.2",
+		"colors": "^1.4.0",
+		"discord-webhook-node": "^1.1.8",
+		"ejs": "^3.1.9",
+		"express": "^4.18.2",
+		"express-session": "^1.17.3",
+		"nodemon": "^2.0.22",
+		"sqlite3": "^5.1.6",
+		"ws": "^8.13.0"
+	}
 }
