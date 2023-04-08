@@ -55,7 +55,26 @@ app.use(
 // Gère le language EJS
 app.set('view engine', 'ejs');
 
-// Fonctions :
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+wss.on('connection', (ws, req) => {
+	console.log('Utilisateur connecté en WebSocket.')
+
+	const data = JSON.stringify({
+		type: 'connected', 
+		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.'
+	})
+	ws.send(data)
+})
 
 /*
  *
