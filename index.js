@@ -9,7 +9,20 @@ const colors = require('colors'); // For color console
 
 // My module (all function)
 const { verif_regex, encode_sha256 } = require('./functions/functions');
-const { error_message_urgence, send_log } = require('./functions/log');
+const { error_message_urgence, log_discord, log } = require('./functions/log');
+const get_error = require('./functions/get_error')
+
+setTimeout(() => { console.log(get_error()) }, 1000);
+//error_message_urgence('test')
+//log_discord('coucou')
+
+//log_discord('error texte', 'error'); // good
+//log_discord('Nouveau joueur: `michel`');
+log_discord('Connexion d\'un joueur: `michel`');
+
+log('Connexion', 'michel');
+log('Connexion', 'michel', 'erreur');
+//log_discord('Nouveau joueur : `michel` ');
 
 // Vaiables for server
 const app = express();
