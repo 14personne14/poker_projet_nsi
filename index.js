@@ -7,22 +7,10 @@ const sqlite3 = require('sqlite3').verbose();
 const WebSocket = require('ws');
 const colors = require('colors'); // For color console
 
-// My module (all function)
+// My modules (functions)
 const { verif_regex, encode_sha256 } = require('./functions/functions');
-const { error_message_urgence, log_discord, log } = require('./functions/log');
-const get_error = require('./functions/get_error')
-
-setTimeout(() => { console.log(get_error()) }, 1000);
-//error_message_urgence('test')
-//log_discord('coucou')
-
-//log_discord('error texte', 'error'); // good
-//log_discord('Nouveau joueur: `michel`');
-log_discord('Connexion d\'un joueur: `michel`');
-
-log('Connexion', 'michel');
-log('Connexion', 'michel', 'erreur');
-//log_discord('Nouveau joueur : `michel` ');
+const { log, log_discord } = require('./functions/log');
+const get_error = require('./functions/get_error');
 
 // Vaiables for server
 const app = express();
@@ -80,7 +68,7 @@ app.set('view engine', 'ejs');
  */
 
 wss.on('connection', (ws, req) => {
-	console.log('Utilisateur connecté en WebSocket.')
+	log('WebSocket', 'Utilisateur connecté en WebSocket.')
 
 	const data = JSON.stringify({
 		type: 'connected', 
@@ -113,12 +101,8 @@ app.post('/connexion', (req, res) => {
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}' AND password = '${password_sha256}'; `, (err, rows) => {
 			// Erreur
 			if (err) {
-				console.log(`Erreur BDD:`.bgRed + ' ' + err);
-
-				send_log({
-					type: 'erreur_bdd',
-					erreur: err,
-				});
+				log('database', err, 'erreur');
+				log_discord(err, 'erreur')
 
 				res.render('connexion', {
 					alert: {
@@ -130,10 +114,8 @@ app.post('/connexion', (req, res) => {
 			else if (rows.length > 0) {
 				session.connected = true;
 
-				send_log({
-					type: 'connexion',
-					username: data.username,
-				});
+				log('Connexion', data.username, 'info')
+				log_discord(data.username, 'connexion')
 
 				res.render('game', {
 					connected: true,
@@ -163,7 +145,6 @@ app.post('/connexion', (req, res) => {
 app.post('/inscription', (req, res) => {
 	// Récupérer les données
 	const data = req.body;
-	var session = req.session;
 
 	// Préparation
 	var correct = verif_regex(data.username, regex_username) && verif_regex(data.password, regex_password);
@@ -173,10 +154,8 @@ app.post('/inscription', (req, res) => {
 	if (correct) {
 		database.all(`SELECT * FROM utilisateur WHERE username = '${data.username}'; `, (err, rows) => {
 			if (err) {
-				send_log({
-					type: 'erreur_bdd',
-					erreur: err,
-				});
+				log('database', err, 'erreur');
+				log_discord(err, 'erreur');
 
 				res.render('inscription', {
 					alert: {
@@ -193,10 +172,8 @@ app.post('/inscription', (req, res) => {
 				// Insertion dans la base de donnée
 				database.all(`INSERT INTO utilisateur (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
 					if (err) {
-						send_log({
-							type: 'erreur_bdd',
-							erreur: err,
-						});
+						log('database', err, 'erreur');
+						log_discord(err, 'erreur');
 
 						res.render('inscription', {
 							alert: {
@@ -204,11 +181,8 @@ app.post('/inscription', (req, res) => {
 							},
 						});
 					} else {
-						send_log({
-							type: 'inscription',
-							username: data.username,
-							password: password_sha256,
-						});
+						log('Inscription', `${data.username} | ${password_sha256}`, 'info');
+						log_discord(data.username, 'incription');
 
 						res.render('connexion', {
 							alert: {
@@ -326,5 +300,5 @@ app.get('/deconnexion', (req, res) => {
 
 // Démarre le serveur (ecoute)
 server.listen(port, () => {
-	console.log('\n' + `L'application a démarré au port :`.blue + ' ' + `${port}`.bgWhite.black + '\n');
+	console.log('\n' + `L'application a démarré au port :`.blue + ' ' + `${port}`.bgWhite.black);
 });

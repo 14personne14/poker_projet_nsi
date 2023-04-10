@@ -2,17 +2,7 @@ const { Webhook, MessageBuilder } = require('discord-webhook-node');
 const colors = require('colors');
 const get_error = require('./get_error');
 
-console.log(get_error());
-
-const webhook_url = {
-	inscription: 'https://discord.com/api/webhooks/1089945104409690172/jo0OVgmwrrSV02DFbxkSrpE1TSJekFxN7yHVHiVSByR3wMhY7XzvWoJxsqIbLeh-RXw-',
-	connexion: 'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si',
-	error: 'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD',
-	test: 'https://discord.com/api/webhooks/1089953770005344266/iyjl46ua89Aj0aJAf_BgJcZIVu4OZyIye5ZDOT53XAcwewICcDcoVK2C9RMJ5h8bz9jK',
-	default: 'https://discord.com/api/webhooks/1089953870853197834/Pg_C6lS6IezQm4xNMlL5H1vxZ9YcVuxAntRtYs3wgrYdNeWjRh2DwQCkN7cLljCfmbUW',
-};
-
-function log(titre, message, type = '') {
+function log(titre, message = '', type = '') {
 	/**
 	 * Affiche des log dans la console avec les données spécifier.
 	 *
@@ -24,12 +14,16 @@ function log(titre, message, type = '') {
 	 */
 
 	// Erreur
-	if (type == 'error') {
-		console.log(`${titre}:`.bgRed.black + ` ${message} `.red);
+	if (type == 'erreur' || type == 'error') {
+		console.log('\n' + `Error`.bgRed.black + ` ${titre}:`.red + ` ${message} `.white);
+	}
+	// Info
+	else if (type == 'info') {
+		console.log('\n' + `${titre}:`.bgWhite.black + ` ${message} `.white);
 	}
 	// Cas de base
 	else {
-		console.log(`${titre}:`.bgWhite.black + ` ${message} `.white);
+		console.log('\n' + `${titre}:`.underline.white + ` ${message} `.white);
 	}
 }
 
@@ -37,49 +31,48 @@ function log_discord(message, type = '') {
 	/**
 	 * Envoie un webhook sur le serveur discord des log de @personne14 avec un embed en fonction du type et du message.
 	 *
-	 * [entrée] message: le message à envoyer [cas error: l'erreur à envoyer] (string)
-	 * 			^type: Le type du message pour préciser son affichage à envoyer (string)
-	 * 				∈ {'', 'erreur', 'connexion' }
+	 * [entrée] message: le message à envoyer (string)
+	 * 					 	- [type = 'error' -> l'erreur à envoyer]
+	 * 					 	- [type = 'connexion' -> username du joueur]
+	 * 					 	- [type = 'incription' -> username du joueur]
+	 * 			^type:   Le type du message pour préciser son affichage à envoyer (string)
+	 * 					 ∈ {'', 'erreur', 'connexion', 'incription'}
 	 * [sortie] xxx
 	 */
 
-	var data;
+	// Valeur par default
+	var data = {
+		message: message,
+		color: '#00ff00',
+		ping: false,
+		error: undefined,
+		username: 'Poker log',
+		avatar: 'https://eloilag.tk/images/poker.png',
+		webhook_url: 'https://discord.com/api/webhooks/1089953770005344266/iyjl46ua89Aj0aJAf_BgJcZIVu4OZyIye5ZDOT53XAcwewICcDcoVK2C9RMJ5h8bz9jK',
+	};
+
 	// Error
-	if (type == 'erreur') {
-		data = {
-			message: `Une erreur necessitant une __intervention__ de votre part viens d'être detecté sur le jeu.`,
-			message_error: `\`${message}\``,
-			color: '#ff0000',
-			ping: true,
-			error: true,
-			username: 'Poker probleme',
-			avatar: 'https://eloilag.tk/images/error.png',
-			webhook_url: 'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD',
-		};
+	if (type == 'erreur' || type == 'error') {
+		data.message = `Une erreur necessitant une __intervention__ de votre part viens d'être detecté sur le jeu.`;
+		data.color = '#ff0000';
+		data.ping = true;
+		data.error = `\`${message}\``;
+		data.username = 'Fatal Error';
+		data.avatar = 'https://eloilag.tk/images/error.png';
+		data.webhook_url =
+			'https://discord.com/api/webhooks/1089956012993302538/vOpKkV7VkQpHqHKKsz02_0dEKk-jg1E1ng3zO5BZE8GSfzkzYO_cJRcmD4xl1ZoQlEZD';
 	}
 	// Connexion
-	if (type == 'connexion') {
-		data = {
-			message: `:white_medium_small_square: ccConnexion d\'un joueur \`${message}\``,
-			color: '#00ff00',
-			ping: false,
-			error: false,
-			username: 'Poker log',
-			avatar: 'https://eloilag.tk/images/poker.png',
-			webhook_url: 'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si',
-		};
+	else if (type == 'connexion') {
+		data.message = `:white_medium_small_square: Connexion d\'un joueur: \`${message}\``;
+		data.webhook_url =
+			'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si';
 	}
-	// Default
-	else {
-		data = {
-			message: message,
-			color: '#00ff00',
-			ping: false,
-			error: false,
-			username: 'Poker log',
-			avatar: 'https://eloilag.tk/images/poker.png',
-			webhook_url: 'https://discord.com/api/webhooks/1089953870853197834/Pg_C6lS6IezQm4xNMlL5H1vxZ9YcVuxAntRtYs3wgrYdNeWjRh2DwQCkN7cLljCfmbUW',
-		};
+	// Inscription
+	else if (type == 'inscription') {
+		data.message = `:white_medium_small_square: Nouveau joueur: \`${message}\``;
+		data.webhook_url =
+			'https://discord.com/api/webhooks/1089945104409690172/jo0OVgmwrrSV02DFbxkSrpE1TSJekFxN7yHVHiVSByR3wMhY7XzvWoJxsqIbLeh-RXw-';
 	}
 
 	// Webhook
@@ -94,9 +87,9 @@ function log_discord(message, type = '') {
 	if (data.ping) {
 		embed.setText('|| <@689064395501994018> <@771730567670005760-> ||');
 	}
-	if (data.error) {
+	if (data.error != undefined) {
 		var info = get_error(1);
-		embed.addField('*error:*', `\`${data.message_error}\``);
+		embed.addField('*error:*', `\`${data.error}\``);
 		embed.addField('*line:*', `\`${info.line}\``);
 		embed.addField('*file:*', `\`${info.file}\``);
 	}
