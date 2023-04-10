@@ -1,3 +1,7 @@
+$.getJSON('/get_user_info', function (data) {
+	console.log(data);
+});
+
 // Websocket
 var socket = new WebSocket(`ws://${window.location.host}/`);
 
@@ -8,4 +12,5 @@ socket.addEventListener('message', (event) => {
 	if (data.type == 'connected') {
 		console.log(data.message);
 	}
+	console.log(data);
 });

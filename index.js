@@ -44,7 +44,7 @@ app.use(
 app.use(
 	sessions({
 		secret: 'ce-texte-doit-rester-secret',
-		resave: false,
+		resave: true,
 		saveUninitialized: true,
 		cookie: {
 			maxAge: 1000 * 60 * 60 * 24 * 10,
@@ -68,14 +68,14 @@ app.set('view engine', 'ejs');
  */
 
 wss.on('connection', (ws, req) => {
-	log('WebSocket', 'Utilisateur connecté en WebSocket.')
+	log('WebSocket', 'Utilisateur connecté en WebSocket.');
 
 	const data = JSON.stringify({
-		type: 'connected', 
-		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.'
-	})
-	ws.send(data)
-})
+		type: 'connected',
+		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.',
+	});
+	ws.send(data);
+});
 
 /*
  *
@@ -102,7 +102,7 @@ app.post('/connexion', (req, res) => {
 			// Erreur
 			if (err) {
 				log('database', err, 'erreur');
-				log_discord(err, 'erreur')
+				log_discord(err, 'erreur');
 
 				res.render('connexion', {
 					alert: {
@@ -114,8 +114,8 @@ app.post('/connexion', (req, res) => {
 			else if (rows.length > 0) {
 				session.connected = true;
 
-				log('Connexion', data.username, 'info')
-				log_discord(data.username, 'connexion')
+				log('Connexion', data.username, 'info');
+				log_discord(data.username, 'connexion');
 
 				res.render('game', {
 					connected: true,
@@ -266,7 +266,6 @@ app.get('/game', (req, res) => {
 	var session = req.session;
 
 	// Le joueur est deja connecter ?
-	var connected = false;
 	if (session.connected) {
 		res.render('game', {
 			connected: true,
@@ -274,7 +273,7 @@ app.get('/game', (req, res) => {
 		});
 	} else {
 		res.render('connexion', {
-			connected: connected,
+			connected: false,
 			alert: {
 				message: `Tu doit te connecter avant d'accèder au jeu !`,
 			},
@@ -287,7 +286,7 @@ app.get('/deconnexion', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
 
-	// Le joueur est deja connecter ?
+	// Deconnect le joueur
 	session.connected = false;
 
 	res.render('index', {
@@ -296,6 +295,29 @@ app.get('/deconnexion', (req, res) => {
 			message: `Déconnexion réussie !`,
 		},
 	});
+});
+
+// Donne les informations de session de l'utilisateur
+app.get('/get_user_info', (req, res) => {
+	// Récupère les données de session
+	var session = req.session;
+
+	console.log('req on get_user_info'); // temp
+
+	if (session.connected) {
+		res.json({
+			connected: true,
+		});
+	} else {
+		res.json({
+			connected: false,
+		});
+	}
+});
+
+// 404 page
+app.get('*', (req, res) => {
+	res.render('404');
 });
 
 // Démarre le serveur (ecoute)
