@@ -1,6 +1,40 @@
 const { Webhook, MessageBuilder } = require('discord-webhook-node');
 const colors = require('colors');
 const get_error = require('./get_error');
+const fs = require('fs');
+const util = require('util');
+
+// Pour fichier log
+var log_file = fs.createWriteStream('./logs/console.log', { flags: 'a' });
+var log_stdout = process.stdout;
+
+// Change la fonction console.log pour enregistré chaque log.
+console.log = function (d) {
+	// Date
+	var date_object = new Date();
+	var date =
+		date_object.getFullYear() +
+		'-' +
+		('0' + (date_object.getMonth() + 1)).slice(-2) +
+		'-' +
+		('0' + date_object.getDate()).slice(-2) +
+		' ' +
+		('0' + date_object.getHours()).slice(-2) +
+		':' +
+		('0' + date_object.getMinutes()).slice(-2) +
+		':' +
+		('0' + date_object.getSeconds()).slice(-2);
+
+	// Ecrire dans le fichier
+	log_file.write(
+		util.format(
+			`${date}  > ` + d.replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '').replace('\n', '') + '\n'
+		)
+	);
+
+	// Ecrire dans la console
+	log_stdout.write(util.format(d) + '\n');
+};
 
 function log(titre, message = '', type = '') {
 	/**

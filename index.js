@@ -12,7 +12,7 @@ const { verif_regex, encode_sha256 } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
 const get_error = require('./functions/get_error');
 
-// Vaiables for server
+// Variables for server
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({
@@ -113,6 +113,10 @@ app.post('/connexion', (req, res) => {
 			// Connexion validé
 			else if (rows.length > 0) {
 				session.connected = true;
+				session.player = {
+					username: data.username,
+					id: rows[0].id,
+				};
 
 				log('Connexion', data.username, 'info');
 				log_discord(data.username, 'connexion');
