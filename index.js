@@ -292,6 +292,7 @@ app.get('/deconnexion', (req, res) => {
 
 	// Deconnect le joueur
 	session.connected = false;
+	session.player = undefined;
 
 	res.render('index', {
 		connected: false,
@@ -311,6 +312,8 @@ app.get('/get_user_info', (req, res) => {
 	if (session.connected) {
 		res.json({
 			connected: true,
+			username: session.username,
+			id: session.id,
 		});
 	} else {
 		res.json({
