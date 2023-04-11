@@ -9,7 +9,7 @@ var log_file = fs.createWriteStream('./logs/console.log', { flags: 'a' });
 var log_stdout = process.stdout;
 
 // Change la fonction console.log pour enregistré chaque log.
-console.log = function (d) {
+/*console.log = function (d) {
 	// Date
 	var date_object = new Date();
 	var date =
@@ -34,7 +34,7 @@ console.log = function (d) {
 
 	// Ecrire dans la console
 	log_stdout.write(util.format(d) + '\n');
-};
+};*/
 
 function log(titre, message = '', type = '') {
 	/**

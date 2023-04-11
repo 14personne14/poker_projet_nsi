@@ -10,3 +10,22 @@
 2023-04-11 08:40:17  > L'application a démarré au port : 8101
 2023-04-11 08:41:05  > L'application a démarré au port : 8101
 2023-04-11 08:41:38  > L'application a démarré au port : 8101
+2023-04-11 18:03:43  > L'application a démarré au port : 8101
+2023-04-11 18:27:46  > L'application a démarré au port : 8101
+2023-04-11 18:31:51  > L'application a démarré au port : 8101
+2023-04-11 18:31:56  > L'application a démarré au port : 8101
+2023-04-11 18:32:45  > L'application a démarré au port : 8101
+2023-04-11 18:33:05  > L'application a démarré au port : 8101
+2023-04-11 18:34:25  > L'application a démarré au port : 8101
+2023-04-11 18:34:27  > L'application a démarré au port : 8101
+2023-04-11 18:34:42  > L'application a démarré au port : 8101
+2023-04-11 18:36:27  > Connexion: cc 
+2023-04-11 18:36:27  > WebSocket: Utilisateur connecté en WebSocket. 
+2023-04-11 18:36:27  > req on get_user_info
+2023-04-11 18:44:48  > L'application a démarré au port : 8101
+2023-04-11 18:45:07  > Error database: Error: SQLITE_ERROR: near "SELECTt": syntax error 
+2023-04-11 18:45:20  > L'application a démarré au port : 8101
+2023-04-11 18:46:08  > L'application a démarré au port : 8101
+2023-04-11 18:46:20  > L'application a démarré au port : 8101
+2023-04-11 18:47:16  > L'application a démarré au port : 8101
+2023-04-11 18:47:41  > L'application a démarré au port : 8101

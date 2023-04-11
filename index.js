@@ -311,8 +311,8 @@ app.get('/get_user_info', (req, res) => {
 	if (session.connected) {
 		res.json({
 			connected: true,
-			username: session.username,
-			id: session.id,
+			username: session.player.username,
+			id: session.player.id,
 		});
 	} else {
 		res.json({
