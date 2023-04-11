@@ -10,7 +10,6 @@ const colors = require('colors'); // For color console
 // My modules (functions)
 const { verif_regex, encode_sha256 } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
-const get_error = require('./functions/get_error');
 
 // Variables for server
 const app = express();
