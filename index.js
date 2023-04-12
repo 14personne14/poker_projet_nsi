@@ -10,6 +10,7 @@ const colors = require('colors'); // For color console
 // My modules (functions)
 const { verif_regex, encode_sha256 } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
+const JeuCartes = require('./functions/card');
 
 // Variables for server
 const app = express();
@@ -24,30 +25,9 @@ const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
 // Variables for game
-function suffle_liste(liste) {
-    for (var i = liste.length - 1; i > 0; i--) {
-        // Position aléa 
-        const j = Math.floor(Math.random() * (i + 1)); 
-        // Echange les positions 
-        [liste[i], liste[j]] = [liste[j], liste[i]];
-    }
-}
+var jeu_cartes = new JeuCartes();
 var PLAYERS = [];
-var symboles = ['carreau', 'pique', 'trefle', 'coeur'];
-var numeros = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']; 
-var JEUCARTE = []; 
-for (symbole of symboles) {
-    for (numero of numeros) {
-        JEUCARTE.push({
-            numero: numero,
-            symbole: symbole, 
-            path: `public/images/cards/classic/${numero}_${symbole}.svg`
-        })
-    }
-}
-suffle_liste(JEUCARTE)
-
-
+console.log(jeu_cartes);
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -95,6 +75,7 @@ wss.on('connection', (ws, req) => {
 	const data = JSON.stringify({
 		type: 'connected',
 		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.',
+		test: jeu_cartes,
 	});
 	ws.send(data);
 });
