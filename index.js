@@ -23,8 +23,31 @@ const port = 8101; // default: [8101]
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
-// Variables
+// Variables for game
+function suffle_liste(liste) {
+    for (var i = liste.length - 1; i > 0; i--) {
+        // Position aléa 
+        const j = Math.floor(Math.random() * (i + 1)); 
+        // Echange les positions 
+        [liste[i], liste[j]] = [liste[j], liste[i]];
+    }
+}
 var PLAYERS = [];
+var symboles = ['carreau', 'pique', 'trefle', 'coeur'];
+var numeros = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']; 
+var JEUCARTE = []; 
+for (symbole of symboles) {
+    for (numero of numeros) {
+        JEUCARTE.push({
+            numero: numero,
+            symbole: symbole, 
+            path: `public/images/cards/classic/${numero}_${symbole}.svg`
+        })
+    }
+}
+suffle_liste(JEUCARTE)
+
+
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -211,16 +234,19 @@ app.get('/', (req, res) => {
 	var session = req.session;
 
 	// Le joueur est deja connecter ?
-	var connected = false;
 	if (session.connected) {
-		connected = true;
+		res.render('game', {
+			connected: true,
+			alert: {
+				message: `Vous êtes déjà connecté !`,
+			},
+		});
+	} else {
+        res.render('index', {
+            connected: false,
+            alert: undefined,
+        });
 	}
-
-	// Send la page
-	res.render('index', {
-		connected: connected,
-		alert: undefined,
-	});
 });
 
 // Quand le client demande '/connexion'
@@ -230,7 +256,7 @@ app.get('/connexion', (req, res) => {
 
 	// Le joueur est deja connecter ?
 	if (session.connected) {
-		res.render('index', {
+		res.render('game', {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
@@ -250,7 +276,7 @@ app.get('/inscription', (req, res) => {
 
 	// Le joueur est deja connecter ?
 	if (session.connected) {
-		res.render('index', {
+		res.render('game', {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
@@ -311,8 +337,8 @@ app.get('/get_user_info', (req, res) => {
 	if (session.connected) {
 		res.json({
 			connected: true,
-			username: session.player.username,
-			id: session.player.id,
+			username: session.username,
+			id: session.id,
 		});
 	} else {
 		res.json({

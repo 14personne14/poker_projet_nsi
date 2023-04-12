@@ -1,3 +1,18 @@
+h1 {
+    font-family: 'Audiowide', cursive;
+    font-size:165px;
+    margin:20px;
+}
+
+.main_button{
+    font-family: 'Audiowide', cursive;
+    font-size: 35px;
+    border-radius: 10px;
+    padding:50px;
+    margin:100px;
+}
+
 .alert {
     color: #ff0000;
 }
+
