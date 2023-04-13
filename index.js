@@ -71,13 +71,19 @@ app.set('view engine', 'ejs');
 
 wss.on('connection', (ws, req) => {
 	log('WebSocket', 'Utilisateur connecté en WebSocket.');
-
+    
 	const data = JSON.stringify({
 		type: 'connected',
 		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.',
 		test: jeu_cartes,
 	});
 	ws.send(data);
+    
+    
+    PLAYERS.push({ player: 'test', websocket: ws});
+    console.log(PLAYERS); 
+    
+
 });
 
 /*
@@ -326,6 +332,34 @@ app.get('/get_user_info', (req, res) => {
 			connected: false,
 		});
 	}
+});
+
+app.get('/get_user_info', (req, res) => {
+	// Récupère les données de session
+	var session = req.session;
+
+	console.log('req on get_user_info'); // temp
+
+	if (session.connected) {
+		res.json({
+			connected: true,
+			username: session.username,
+			id: session.id,
+		});
+	} else {
+		res.json({
+			connected: false,
+		});
+	}
+});
+
+app.get('/test', (req, res) => {
+    const data = JSON.stringify({
+		type: 'test',
+		message: 'test',
+	});
+    console.log(PLAYERS);
+	PLAYERS[0].websocket.send(data); 
 });
 
 // 404 page
