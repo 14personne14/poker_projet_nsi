@@ -354,12 +354,31 @@ app.get('/get_user_info', (req, res) => {
 });
 
 app.get('/test', (req, res) => {
-    const data = JSON.stringify({
+	async function envoyerEtAttendreReponse(ws) {
+		console.log('Demande envoyer !');
+		// Envoi du message "repond moi"
+		ws.send('repond moi');
+
+		// Mettre le programme en pause pendant l'attente de la réponse
+		await new Promise((resolve) => {
+			ws.once('message', (message) => {
+				// Renvoie la réponse du client
+				console.log('Reponse donné !');
+				resolve(message);
+			});
+		});
+	}
+
+	var test = envoyerEtAttendreReponse(PLAYERS[0].websocket);
+	console.log('test' + test);
+});
+app.get('/test2', (req, res) => {
+	const data = JSON.stringify({
 		type: 'test',
 		message: 'test',
 	});
-    console.log(PLAYERS);
-	PLAYERS[0].websocket.send(data); 
+	console.log(PLAYERS);
+	PLAYERS[0].websocket.send(data);
 });
 
 // 404 page
