@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"type":"text","text":"1","id":"777b67e1f714110a","x":-140,"y":-200,"width":60,"height":50,"color":"6"},
+		{"type":"text","text":"- Distribuer 2 cartes à chaque joueurs (send ws)\n- Démarrer la phase de mise : `MISE` = true","id":"fca20c427d814511","x":-40,"y":-200,"width":460,"height":80,"color":"6"},
+		{"type":"text","text":"0","id":"3d5b00b50d3b19ca","x":-140,"y":-480,"width":60,"height":50,"color":"4"},
+		{"type":"text","text":"Init variable : `liste_joueur_playing` + `nbr_players`","id":"0e1926810d3389d0","x":-40,"y":-480,"width":460,"height":50,"color":"4"},
+		{"type":"text","text":"3","id":"9e1ddc88727216b3","x":-140,"y":60,"width":60,"height":50,"color":"6"},
+		{"type":"text","text":"...","id":"0aae6c17c854a0c3","x":-40,"y":60,"width":460,"height":50,"color":"6"}
+	],
+	"edges":[
+		{"id":"fdb4bfe39dfece52","fromNode":"3d5b00b50d3b19ca","fromSide":"bottom","toNode":"777b67e1f714110a","toSide":"top","label":"start = true 🔲 nbr_players != 4"},
+		{"id":"53310d34deedc3ee","fromNode":"3d5b00b50d3b19ca","fromSide":"right","toNode":"0e1926810d3389d0","toSide":"left","toEnd":"none","color":"4"},
+		{"id":"c6d70e043eeff9d7","fromNode":"777b67e1f714110a","fromSide":"right","toNode":"fca20c427d814511","toSide":"left","toEnd":"none","color":"6"},
+		{"id":"c251a9e81ad634c4","fromNode":"9e1ddc88727216b3","fromSide":"right","toNode":"0aae6c17c854a0c3","toSide":"left","toEnd":"none","color":"6"},
+		{"id":"9d34429eec9ffd54","fromNode":"777b67e1f714110a","fromSide":"bottom","toNode":"9e1ddc88727216b3","toSide":"top","label":"MISE = false"}
+	]
+}

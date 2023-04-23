@@ -1,115 +1,142 @@
+/* --- FOND --- */
 body {
-    background: #fc0505;
-    background: -webkit-linear-gradient(0deg, #fc0505 0%, #ffea00 100%);
-    background: linear-gradient(0deg, #fc0505 0%, #ffea00 100%);
-    background-attachment: fixed;
-}
-h1 {
-    font-family: 'Audiowide', cursive;
-    color: #ffffff;
-    font-size:135px;
-    margin: 50px 0px;
+	background: linear-gradient(0deg, #fc0505 0%, #ffea00 100%);
+	background-attachment: fixed;
 }
 
-.main_button{
-    font-family: 'Audiowide', cursive;
-    font-size: 40px;
-    transition: all 0.3s;
-        border-radius: 30px;
-        padding: 20px 50px 20px 50px;
-        margin: 70px 25px;
-        background-color: #ff0000;
-        color: #ffffff;
-        border: 5px;
-        border-color: #000000;
-        border-style: outset;
-    }
-    
-    .main_button:hover {
-        transform: scale(1.05);
-        border-color: #000000;
-        border-style: outset;
-        background-color: #a60303;
-    }
-    
-    .trait_dessus {
-        color: rgba(0, 0, 255, 0);
-        border-top: 1px solid #000;
-        width: 2000px;
-        }
-        
-        .secondary_button {
-            font-family: 'Audiowide', cursive;
-            font-size: 30px;
-            transition: all 0.3s;
-            width: 350px;
-            height: 130px;
-            border-radius: 30px;
-            margin: 40px 25px;
-            background-color: #00F7FF;
-            color: #ffffff;
-            border: 5px;
-            border-color: #000000;
-            border-style: outset;
-        }
-        
-        .secondary_button:hover {
-            transform: scale(1.05);
-            border-color: #000000;
-            border-style: outset;
-            background-color: #01B1B7;
-        }
-        
-        .texte_defilant {
-            display: block;
-            margin: 3em auto;
-            overflow: hidden;
-            position: relative;
-            table-layout: fixed;
-            width: 700px;
-        }
+/* --- TITRE --- */
+h1 {
+	font-family: 'Audiowide', cursive;
+	color: #ffffff;
+	font-size: 135px;
+	margin: 50px 0px;
+}
+
+/* --- BOUTON --- */
+.main_button {
+	font-family: 'Audiowide', cursive;
+	font-size: 40px;
+	color: #ffffff;
+	background-color: #ff0000;
+
+	width: 350px;
+	height: 110px;
+	margin: 70px 25px;
+
+	border: 5px;
+	border-style: outset;
+	border-color: #000000;
+	border-radius: 30px;
+
+	transition: all 0.3s;
+}
+
+.main_button:hover,
+.main_button:active {
+	border-color: #000000;
+	background-color: #a60303;
+	transform: scale(1.05);
+}
+
+.secondary_button {
+	font-family: 'Audiowide', cursive;
+	font-size: 20px;
+	color: #0056ff;
+	background-color: #00f7ff;
+
+	width: 250px;
+	height: 100px;
+	margin: 40px 25px;
+
+	border: 5px;
+	border-style: outset;
+	border-color: #000000;
+	border-radius: 30px;
+
+	transition: all 0.3s;
+}
+
+.secondary_button:hover,
+.secondary_button:active {
+	border-color: #000000;
+	background-color: #01b1b7;
+	transform: scale(1.05);
+}
+
+/* --- LIGNE --- */
+.line_separation {
+	color: rgba(0, 0, 0, 0);
+	border-top: 1px solid #000;
+	width: 2000px;
+	margin-bottom: 20px;
+}
+
+/* --- ALERT --- */
+.texte_defilant {
+	display: block;
+	margin: 0 auto;
+	overflow: hidden;
+	position: relative;
+	table-layout: fixed;
+	width: 700px;
+}
 
 .alert {
-    color: #ffea00;
-        display: block;
-        margin-left: -100%;
-        padding: 0 5px;
-        font-size: 2rem;
-        text-align: left;
-        animation: defilement 20s infinite linear;
+	color: #ffffff;
+	display: block;
+	margin-left: -100%;
+	padding: 0 5px;
+	font-size: 2rem;
+	text-align: left;
+	animation: defilement 20s infinite linear;
 }
 
 .alert:after {
-    content: attr(data-text);
-    position: absolute;
-    white-space: nowrap;
-    padding-left: 10px;
+	content: attr(data-text);
+	position: absolute;
+	white-space: nowrap;
+	padding-left: 10px;
 }
 
 @keyframes defilement {
+	0%,
+	100% {
+		margin-left: 53%;
+	}
 
-    0%,
-        100% {
-            margin-left: 53%;
-        }
-    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                99.99% {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    margin-left: -50%;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+	99.99% {
+		margin-left: -50%;
+	}
+}
 
-@media only screen and (max-width: 1000px) {
-    h1{
-        margin: 50px 30px;
-        font-size: 15vw;
-}
-    .main_button{
-        border-radius: 20px;
-        font-size: 5vw;
-        padding: 20px 30px;
-        margin: 15px 10px;
-        border: 3px;
-        border-style: outset;
-        border-color: #A4A4A4;
-}
+/* --- FOR TELEPHONE --- */
+@media only screen and (max-width: 992px) {
+	h1 {
+		margin: 50px 30px;
+		font-size: 15vw;
+	}
+
+	.main_button {
+		font-size: 30px;
+
+		width: 300px;
+		height: 100px;
+		margin: 10px auto;
+
+		border-width: 3px;
+	}
+
+	.line_separation {
+		margin: 40px auto 40px auto;
+	}
+
+	.secondary_button {
+		font-size: 20px;
+
+		width: 250px;
+		height: 80px;
+		margin: 0 auto;
+
+		border-width: 4px;
+	}
 }

@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"type":"text","text":"1","id":"b5d5e0b5827a14f8","x":-130,"y":115,"width":60,"height":50,"color":"6"},
+		{"type":"text","text":"0","id":"2fff2357109e57fb","x":-130,"y":-165,"width":60,"height":50,"color":"4"},
+		{"type":"text","text":"Init variable : `i`","id":"3fd004d276ec714e","x":-30,"y":-165,"width":460,"height":50,"color":"4"},
+		{"type":"text","text":"- Envoyer ws au joueur `i` pour lui demander de choisir\n- Démarrer `timer_choix`","id":"3917d7bef3164608","x":-30,"y":115,"width":460,"height":105,"color":"6"},
+		{"type":"text","text":"2","id":"55ee364a65a9345a","x":-130,"y":360,"width":60,"height":50,"color":"6"},
+		{"type":"text","text":"...","id":"6a5fe04579a00a58","x":-30,"y":360,"width":460,"height":50,"color":"6"}
+	],
+	"edges":[
+		{"id":"3d31174875a2fae7","fromNode":"b5d5e0b5827a14f8","fromSide":"right","toNode":"3917d7bef3164608","toSide":"left","toEnd":"none","color":"6"},
+		{"id":"f9ee6c4da2f15279","fromNode":"2fff2357109e57fb","fromSide":"bottom","toNode":"b5d5e0b5827a14f8","toSide":"top","label":"MISE = true"},
+		{"id":"7fcfe90d838959cc","fromNode":"2fff2357109e57fb","fromSide":"right","toNode":"3fd004d276ec714e","toSide":"left","toEnd":"none","color":"4"},
+		{"id":"ec2da7c881542522","fromNode":"55ee364a65a9345a","fromSide":"right","toNode":"6a5fe04579a00a58","toSide":"left","toEnd":"none","color":"6"},
+		{"id":"6eb0a26b647e1202","fromNode":"b5d5e0b5827a14f8","fromSide":"bottom","toNode":"55ee364a65a9345a","toSide":"top","label":"player_choice != undefined"}
+	]
+}

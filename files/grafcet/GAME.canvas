@@ -1,0 +1,8 @@
+{
+	"nodes":[
+		{"id":"89d2257b96ca2e90","x":-820,"y":-360,"width":600,"height":420,"color":"#ffffff","type":"file","file":"files/variables.md"},
+		{"id":"56bded40f9f0ba7f","x":60,"y":-360,"width":400,"height":400,"type":"file","file":"grafcet/GLOBAL.canvas"},
+		{"id":"d64abb8a3df57978","x":500,"y":-360,"width":400,"height":400,"type":"file","file":"grafcet/MISE.canvas"}
+	],
+	"edges":[]
+}
