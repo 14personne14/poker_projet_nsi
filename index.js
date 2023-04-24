@@ -11,6 +11,7 @@ const colors = require('colors'); // For color console
 const { verif_regex, encode_sha256 } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
 const JeuCartes = require('./functions/card');
+const { start } = require('repl');
 
 // Variables for server
 const app = express();
@@ -24,10 +25,55 @@ const port = 8101; // default: [8101]
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
-// Variables for game
-var jeu_cartes = new JeuCartes();
-var PLAYERS = [];
-console.log(jeu_cartes);
+// Variable true/false (for game)
+var GRAFCET_MISE = false; // Si le Graph MISE doit être executé (bool)
+var etape_global = 0; // Le numéro de l'étape en grafcet GLOBAL (int)
+var etape_mise = 0; // Le numéro de l'étape en grafcet MISE (int)
+
+// Constante (for game)
+const argent_min_require = 1000; // Argent minimal requit pour jouer une partie (int)
+const valeur_blind = { petite: 100, grosse: 200 }; // Valeurs de la petite et la grosse blind
+
+// Variables (for game)
+var PLAYERS = []; // Liste des joueurs avec leurs ws associé (list)
+var jeu_cartes = new JeuCartes(); // Jeu de cartes (object)
+var cartes_communes = []; // Les cartes du centre de la table (list)
+var nbr_joueur = 0; // Nombre de joueur (int)
+var liste_joueur_playing = []; // liste des joueurs qui ont commencés à miser (list)
+var player_choice = undefined; // Le choix du joueur (obj)
+var pot = 0; // Argent total mit en jeu par les joueurs (int)
+var mise_actuelle = 0; // Argent minimum à mettre en jeu pour continuer de jouer (int)
+var who_start = 1; // Le joueur qui commence à jouer en premier (int)
+var try_start = false; // Si un joueur veut lancer le jeu (bool)
+
+// Function game
+function sleep(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function action_global() {
+	// Etape 0
+	if (etape_global == 0) {
+		liste_joueur_playing = [];
+		who_start = 1;
+	}
+	// Etape 1
+	else if (etape_global == 1) {
+		console.log('etape 1111');
+	}
+}
+function transition_global() {
+	if (etape_global == 0 && try_start == true && nbr_joueur == 4) {
+		etape_global += 1;
+	}
+}
+async function global() {
+	while (true) {
+		await transition_global();
+		await action_global();
+		await sleep(1000);
+	}
+}
+global();
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -43,17 +89,16 @@ app.use(
 );
 
 // Pour les sessions des utilisateurs
-app.use(
-	sessions({
-		secret: 'ce-texte-doit-rester-secret',
-		resave: true,
-		saveUninitialized: true,
-		cookie: {
-			maxAge: 1000 * 60 * 60 * 24 * 10,
-			sameSite: 'strict',
-		},
-	})
-);
+var sessionParser = sessions({
+	secret: 'ce-texte-doit-rester-secret',
+	resave: true,
+	saveUninitialized: true,
+	cookie: {
+		maxAge: 1000 * 60 * 60 * 24 * 10,
+		sameSite: 'strict',
+	},
+});
+app.use(sessionParser);
 
 // Gère le language EJS
 app.set('view engine', 'ejs');
@@ -71,19 +116,33 @@ app.set('view engine', 'ejs');
 
 wss.on('connection', (ws, req) => {
 	log('WebSocket', 'Utilisateur connecté en WebSocket.');
-    
+
+	sessionParser(req, {}, function () {
+		console.log('Session is ok');
+		console.log(req.session); // Yesssssssssssss
+	});
+
 	const data = JSON.stringify({
 		type: 'connected',
-		message: 'Bienvenue, vous êtes connecté en websocket avec le serveur.',
-		test: jeu_cartes,
+		message: `Bienvenue, vous êtes connecté en websocket avec le serveur.`,
 	});
 	ws.send(data);
-    
-    
-    PLAYERS.push({ player: 'test', websocket: ws});
-    console.log(PLAYERS); 
-    
 
+	PLAYERS.push({ player: 'session.player.username', websocket: ws });
+	console.log(PLAYERS);
+
+	// On message
+	ws.on('message', function newMessage(message_encode) {
+		// Recupère le message
+		const message = JSON.parse(message_encode);
+		console.log(message);
+
+		// Type start
+		if (message.type == 'start') {
+			try_start = true;
+			console.log(req.session);
+		}
+	});
 });
 
 /*
@@ -229,10 +288,10 @@ app.get('/', (req, res) => {
 			},
 		});
 	} else {
-        res.render('index', {
-            connected: false,
-            alert: undefined,
-        });
+		res.render('index', {
+			connected: false,
+			alert: undefined,
+		});
 	}
 });
 
@@ -282,6 +341,14 @@ app.get('/game', (req, res) => {
 	var session = req.session;
 
 	// Le joueur est deja connecter ?
+	// temp delete connexion
+	session.connected = true;
+	session.player = {
+		username: 'Michel',
+		id: 1,
+	}; // temp
+	res.render('game', { connected: true, alert: undefined }); //temp
+	/*
 	if (session.connected) {
 		res.render('game', {
 			connected: true,
@@ -295,6 +362,7 @@ app.get('/game', (req, res) => {
 			},
 		});
 	}
+	*/
 });
 
 // Quand le client demande '/deconnexion'
@@ -319,66 +387,25 @@ app.get('/get_user_info', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
 
-	console.log('req on get_user_info'); // temp
-
-	if (session.connected) {
-		res.json({
-			connected: true,
-			username: session.username,
-			id: session.id,
-		});
-	} else {
-		res.json({
-			connected: false,
-		});
-	}
-});
-
-app.get('/get_user_info', (req, res) => {
-	// Récupère les données de session
-	var session = req.session;
-
-	console.log('req on get_user_info'); // temp
-
-	if (session.connected) {
-		res.json({
-			connected: true,
-			username: session.username,
-			id: session.id,
-		});
-	} else {
-		res.json({
-			connected: false,
-		});
-	}
-});
-
-app.get('/test', (req, res) => {
-	async function envoyerEtAttendreReponse(ws) {
-		console.log('Demande envoyer !');
-		// Envoi du message "repond moi"
-		ws.send('repond moi');
-
-		// Mettre le programme en pause pendant l'attente de la réponse
-		await new Promise((resolve) => {
-			ws.once('message', (message) => {
-				// Renvoie la réponse du client
-				console.log('Reponse donné !');
-				resolve(message);
-			});
-		});
-	}
-
-	var test = envoyerEtAttendreReponse(PLAYERS[0].websocket);
-	console.log('test' + test);
-});
-app.get('/test2', (req, res) => {
-	const data = JSON.stringify({
-		type: 'test',
-		message: 'test',
+	// temp delete connexion
+	res.json({
+		connected: true,
+		username: 'Michel',
+		id: 1,
 	});
-	console.log(PLAYERS);
-	PLAYERS[0].websocket.send(data);
+	/*
+	if (session.connected) {
+		res.json({
+			connected: true,
+			username: session.username,
+			id: session.id,
+		});
+	} else {
+		res.json({
+			connected: false,
+		});
+	}
+	*/
 });
 
 // 404 page

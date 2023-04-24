@@ -1,4 +1,4 @@
-class proba {
+/*class proba {
     constructor() {
         
 		this.paire = 0;
@@ -21,3 +21,4 @@ function paire(probabilite, main, flop, turn, river, nb_cartes_talon) {
           
     }
 }
+*/

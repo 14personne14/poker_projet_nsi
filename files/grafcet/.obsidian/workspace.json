@@ -4,36 +4,36 @@
     "type": "split",
     "children": [
       {
-        "id": "74085aaec288add8",
+        "id": "de991eb91b391ad6",
         "type": "tabs",
-        "dimension": 77.12093862815884,
+        "dimension": 75.2132196162047,
         "children": [
           {
-            "id": "94b136b2f01c11c2",
-            "type": "leaf",
-            "state": {
-              "type": "canvas",
-              "state": {
-                "file": "grafcet/GLOBAL.canvas",
-                "viewState": {
-                  "x": 140,
-                  "y": 11,
-                  "zoom": 0
-                }
-              }
-            }
-          },
-          {
-            "id": "9078be01281dce36",
+            "id": "3b10bd524fb36be5",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
                 "file": "grafcet/MISE.canvas",
                 "viewState": {
-                  "x": 66,
-                  "y": 367,
-                  "zoom": 0
+                  "x": 47.54701020528401,
+                  "y": -115.87712597192146,
+                  "zoom": -0.03566371983970895
+                }
+              }
+            }
+          },
+          {
+            "id": "c1562624676fa56d",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "grafcet/GLOBAL.canvas",
+                "viewState": {
+                  "x": 197.2050372773682,
+                  "y": -361.78275048661516,
+                  "zoom": 0.3960289430922261
                 }
               }
             }
@@ -42,16 +42,17 @@
         "currentTab": 1
       },
       {
-        "id": "001276684638d205",
+        "id": "dde62a50808dfebc",
         "type": "split",
-        "dimension": 22.879061371841157,
+        "dimension": 24.78678038379531,
         "children": [
           {
-            "id": "de991eb91b391ad6",
+            "id": "5a315c905bcdf55c",
             "type": "tabs",
+            "dimension": 56.57142857142857,
             "children": [
               {
-                "id": "6897bcb2a47c19e3",
+                "id": "d5ddb0d8ea9de953",
                 "type": "leaf",
                 "state": {
                   "type": "markdown",
@@ -65,21 +66,19 @@
             ]
           },
           {
-            "id": "c209e960015f83fd",
+            "id": "68652b8f9e7ed2da",
             "type": "tabs",
+            "dimension": 43.42857142857143,
             "children": [
               {
-                "id": "ab4cfadff6c9b3b0",
+                "id": "88a857037da968a6",
                 "type": "leaf",
                 "state": {
-                  "type": "canvas",
+                  "type": "markdown",
                   "state": {
-                    "file": "GAME.canvas",
-                    "viewState": {
-                      "x": 40,
-                      "y": -150,
-                      "zoom": -1.8998544363360548
-                    }
+                    "file": "files/fonctions.md",
+                    "mode": "source",
+                    "source": false
                   }
                 }
               }
@@ -136,7 +135,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "cf6b768e6bf65aeb",
@@ -152,7 +152,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "grafcet/MISE.canvas",
+                "file": "info/Client.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -169,7 +169,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "grafcet/MISE.canvas",
+                "file": "info/Client.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -192,7 +192,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "grafcet/MISE.canvas"
+                "file": "info/Client.canvas"
               }
             }
           }
@@ -213,14 +213,94 @@
       "command-palette:Ouvrir la palette de commandes": false
     }
   },
-  "active": "9078be01281dce36",
+  "floating": {
+    "id": "d34588aca015aee9",
+    "type": "floating",
+    "children": [
+      {
+        "id": "bfdb621ec1847834",
+        "type": "window",
+        "children": [
+          {
+            "id": "1c98355e05410762",
+            "type": "tabs",
+            "children": [
+              {
+                "id": "2ff495212ae783bf",
+                "type": "leaf",
+                "state": {
+                  "type": "canvas",
+                  "state": {
+                    "file": "info/Serveur.canvas",
+                    "viewState": {
+                      "x": 25.5,
+                      "y": -260,
+                      "zoom": -0.6200650172257873
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "direction": "vertical",
+        "x": -1080,
+        "y": 122,
+        "width": 1080,
+        "height": 1588,
+        "maximize": false,
+        "zoom": 0
+      },
+      {
+        "id": "37903b48decb4c00",
+        "type": "window",
+        "children": [
+          {
+            "id": "fd2096c486646159",
+            "type": "tabs",
+            "children": [
+              {
+                "id": "6897bcb2a47c19e3",
+                "type": "leaf",
+                "state": {
+                  "type": "canvas",
+                  "state": {
+                    "file": "info/Client.canvas",
+                    "viewState": {
+                      "x": -39,
+                      "y": 300,
+                      "zoom": -0.24997825300834742
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "direction": "vertical",
+        "x": 757,
+        "y": 79,
+        "width": 1688,
+        "height": 1360,
+        "maximize": true,
+        "zoom": 0
+      }
+    ]
+  },
+  "active": "6897bcb2a47c19e3",
   "lastOpenFiles": [
+    "grafcet/GLOBAL.canvas",
     "files/variables.md",
     "grafcet/MISE.canvas",
-    "grafcet/GLOBAL.canvas",
-    "images/MISE.png",
-    "images",
+    "info/Client.canvas",
+    "info/Serveur.canvas",
+    "files/fonctions.md",
     "GAME.canvas",
+    "info/Client.md",
+    "info/Serveur.md",
+    "images/MISE.png",
+    "info",
+    "images",
     "files",
     "grafcet",
     "grafset/Sans titre.canvas"
