@@ -8,17 +8,25 @@
 		<link href="public/style/game.css" rel="stylesheet" />
 
 		<!-- JQuery -->
-		<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script> 
+		<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 
 		<title>Pok'help</title>
 	</head>
 	<body>
-		<h1>Page du jeu</h1>
 		<button onclick="button_start()">Start</button>
-		<h2>Joueur 1</h2>
-		<h2>Joueur 2</h2>
-		<h2>Joueur 3</h2>
-		<h2>Joueur 4</h2>
+
+		<div id="your_card">
+		</div>
+		
+		<div id="liste_players">
+			<% for (var i = 0; i < PLAYERS.length; i++) { %>
+			<div id="player-<%= PLAYERS[i].username %>" class="player_block">
+				<h2 style="margin: 0">Joueur :</h2>
+				<p id="player-username-<%= PLAYERS[i].username %>"><%= PLAYERS[i].username %></p>
+				<p id="player-argent_en_jeu-<%= PLAYERS[i].username %>"><%= PLAYERS[i].argent_en_jeu %></p>
+			</div>
+			<% } %>
+		</div>
 		<h1>Fin des joueurs</h1>
 		<a href="connexion"> <button>connexion</button> </a><br />
 		<a href="inscription"> <button>inscription</button> </a><br />

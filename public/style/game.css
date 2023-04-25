@@ -1,0 +1,20 @@
+.player_block {
+	border: #000000 solid 1px;
+	padding: 10px;
+}
+
+.player_block p {
+    margin: 0; 
+}
+
+.main_player {
+    background-color: #FF0000; 
+}
+
+.your_card {
+    padding: 10px;
+}
+
+.your_card img {
+    padding: 10px;
+}

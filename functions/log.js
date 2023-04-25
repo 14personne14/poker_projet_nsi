@@ -98,7 +98,8 @@ function log_discord(message, type = '') {
 	}
 	// Connexion
 	else if (type == 'connexion') {
-		data.message = `:white_medium_small_square: Connexion d\'un joueur: \`${message}\``;
+		data.username = 'Connexion';
+		data.message = `:flower_playing_cards: \`${message.replace(' | ', `\` \n:moneybag: \``)}\` `;
 		data.webhook_url =
 			'https://discord.com/api/webhooks/1089952792489246851/Jt2Krold4jCgvV4tE1IQa3ayF3w_VkgBOppttetyF41hEXlqIQzCwXfuqyaTgT_BH-Si';
 	}

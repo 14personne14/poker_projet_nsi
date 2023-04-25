@@ -6,7 +6,6 @@
       {
         "id": "de991eb91b391ad6",
         "type": "tabs",
-        "dimension": 75.2132196162047,
         "children": [
           {
             "id": "3b10bd524fb36be5",
@@ -16,9 +15,9 @@
               "state": {
                 "file": "grafcet/MISE.canvas",
                 "viewState": {
-                  "x": 47.54701020528401,
-                  "y": -115.87712597192146,
-                  "zoom": -0.03566371983970895
+                  "x": 130.0388359627385,
+                  "y": 170.63570560532494,
+                  "zoom": -0.25232696427731
                 }
               }
             }
@@ -31,61 +30,15 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": 197.2050372773682,
-                  "y": -361.78275048661516,
-                  "zoom": 0.3960289430922261
+                  "x": 324.1624612785494,
+                  "y": -561.772320538935,
+                  "zoom": 0.06269560975889277
                 }
               }
             }
           }
         ],
         "currentTab": 1
-      },
-      {
-        "id": "dde62a50808dfebc",
-        "type": "split",
-        "dimension": 24.78678038379531,
-        "children": [
-          {
-            "id": "5a315c905bcdf55c",
-            "type": "tabs",
-            "dimension": 56.57142857142857,
-            "children": [
-              {
-                "id": "d5ddb0d8ea9de953",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "files/variables.md",
-                    "mode": "source",
-                    "source": false
-                  }
-                }
-              }
-            ]
-          },
-          {
-            "id": "68652b8f9e7ed2da",
-            "type": "tabs",
-            "dimension": 43.42857142857143,
-            "children": [
-              {
-                "id": "88a857037da968a6",
-                "type": "leaf",
-                "state": {
-                  "type": "markdown",
-                  "state": {
-                    "file": "files/fonctions.md",
-                    "mode": "source",
-                    "source": false
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "direction": "horizontal"
       }
     ],
     "direction": "vertical"
@@ -152,7 +105,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "info/Client.canvas",
+                "file": "grafcet/GLOBAL.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -169,7 +122,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "info/Client.canvas",
+                "file": "grafcet/GLOBAL.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -192,7 +145,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "info/Client.canvas"
+                "file": "grafcet/GLOBAL.canvas"
               }
             }
           }
@@ -233,67 +186,49 @@
                   "state": {
                     "file": "info/Serveur.canvas",
                     "viewState": {
-                      "x": 25.5,
-                      "y": -260,
-                      "zoom": -0.6200650172257873
+                      "x": 408.15567310492844,
+                      "y": -339.05343877689774,
+                      "zoom": 0.3799349827742126
                     }
                   }
                 }
-              }
-            ]
-          }
-        ],
-        "direction": "vertical",
-        "x": -1080,
-        "y": 122,
-        "width": 1080,
-        "height": 1588,
-        "maximize": false,
-        "zoom": 0
-      },
-      {
-        "id": "37903b48decb4c00",
-        "type": "window",
-        "children": [
-          {
-            "id": "fd2096c486646159",
-            "type": "tabs",
-            "children": [
+              },
               {
-                "id": "6897bcb2a47c19e3",
+                "id": "72607651147c2cb9",
                 "type": "leaf",
                 "state": {
                   "type": "canvas",
                   "state": {
                     "file": "info/Client.canvas",
                     "viewState": {
-                      "x": -39,
-                      "y": 300,
-                      "zoom": -0.24997825300834742
+                      "x": 628.9100583865568,
+                      "y": 414.4875888394057,
+                      "zoom": 0.117538091330328
                     }
                   }
                 }
               }
-            ]
+            ],
+            "currentTab": 1
           }
         ],
         "direction": "vertical",
-        "x": 757,
-        "y": 79,
-        "width": 1688,
-        "height": 1360,
-        "maximize": true,
+        "x": -1080,
+        "y": 113,
+        "width": 1080,
+        "height": 973,
+        "maximize": false,
         "zoom": 0
       }
     ]
   },
-  "active": "6897bcb2a47c19e3",
+  "active": "c1562624676fa56d",
   "lastOpenFiles": [
-    "grafcet/GLOBAL.canvas",
-    "files/variables.md",
-    "grafcet/MISE.canvas",
     "info/Client.canvas",
     "info/Serveur.canvas",
+    "grafcet/GLOBAL.canvas",
+    "grafcet/MISE.canvas",
+    "files/variables.md",
     "files/fonctions.md",
     "GAME.canvas",
     "info/Client.md",
