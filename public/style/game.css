@@ -18,3 +18,7 @@
 .your_card img {
     padding: 10px;
 }
+
+#valeur_pot {
+    text-decoration: underline;
+}

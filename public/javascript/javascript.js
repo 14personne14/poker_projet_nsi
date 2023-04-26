@@ -6,9 +6,29 @@ if (window.location.host === 'azerty.tk') {
 	socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
 }
 
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 // Variable
 var local_user_info;
 var last_main_player;
+var mise_actuelle;
 
 // Fonctions
 function button_start() {
@@ -59,15 +79,17 @@ function update_main_player(username) {
 	 * [sortie] xxx
 	 */
 
-	if (last_main_player != undefined) {
-		var last_div = document.getElementById(`player-${last_main_player}`);
-		last_div.classList.remove('main_player');
+	if (last_main_player != username) {
+		if (last_main_player != undefined) {
+			var last_div = document.getElementById(`player-${last_main_player}`);
+			last_div.classList.remove('main_player');
+		}
+		
+		var div = document.getElementById(`player-${username}`);
+		div.classList.add('main_player');
+
+		last_main_player = username;
 	}
-
-	var div = document.getElementById(`player-${username}`);
-	div.classList.add('main_player');
-
-	last_main_player = username;
 }
 
 function update_argent_player(username, new_argent) {
@@ -100,14 +122,93 @@ function affiche_carte(cartes) {
 	}
 }
 
+function update_pot_mise(new_pot, new_mise) {
+	/**
+	 * Change le pot par le nouveau pot
+	 *
+	 * [entrée] new_pot: le nouveau pot (int)
+	 * [sortie] xxx
+	 */
+
+	mise_actuelle = new_mise;
+
+	var div = document.getElementById(`valeur_pot`);
+	div.innerHTML = `pot: ${new_pot} | mise: ${mise_actuelle}`;
+}
+
+function player_choose_action(action) {
+	/**
+	 * Gere quand un joueur choisi une action lors de son tour de jeu
+	 *
+	 * [entrée] action: l'action réaliser par le joueur
+	 * [sortie] xxx
+	 */
+
+	// Prepare les données
+	var data = {
+		action: action,
+	};
+	if (action == 'relance') {
+		data.value_relance = 100;
+	}
+
+	// Envoie en POST les données
+	$.post('/choice', data, function (data) {
+		// Affiche le resultat
+		if (data.valid == true) {
+			alert('TRUE');
+		} else {
+			alert(data.error);
+		}
+	});
+}
+
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 // Recupere les informations du joueur
-$.getJSON('/get_local_user_info', function (data) {
+$.getJSON('/get_user_info', function (data) {
 	if (data.connected == false) {
 		window.location.replace('/');
 	} else {
 		local_user_info = data;
 	}
 });
+
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
 
 // Ecouter les messages ws
 socket.addEventListener('message', (event) => {
@@ -127,10 +228,15 @@ socket.addEventListener('message', (event) => {
 	}
 	// Init game
 	else if (data.type == 'init_game') {
-		update_main_player(data.username_who_start);
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
+		update_main_player(data.who_playing);
+		update_pot_mise(data.pot, data.mise_actuelle);
 		affiche_carte(data.your_card);
+	}
+	// Nouveau main player
+	else if (data.type == 'next_player') {
+		update_main_player(data.next_player);
 	}
 	console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 5px;');
 	console.log(data);

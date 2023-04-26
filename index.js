@@ -48,6 +48,9 @@ var who_start; // Le joueur qui commence à jouer en premier (int)
 var who_playing; // Le joueur qui est en train de jouer (int)
 var try_start = false; // Si un joueur veut lancer le jeu (bool)
 var partie_en_cours = false; // Si une partie est cours (bool)
+var timer; // Un timer (object)
+var timer_choix_end = false; // Si le timer est terminé ou non (bool)
+var duree_timer = 60000; // Durée du timer en millisecondes (int)
 
 // Fonction local
 function wss_send_joueur(data) {
@@ -168,8 +171,7 @@ function get_indice_player_blind() {
 function action_global() {
 	// Etape 0
 	if (etape_global == 0) {
-		liste_joueur_playing = [];
-		console.log(nbr_joueur);
+		liste_joueur_playing = [null, null, null, null];
 	}
 	// Etape 1
 	else if (etape_global == 1) {
@@ -186,36 +188,43 @@ function action_global() {
 
 		// Genere l'indice du joueur qui commence :
 		who_start = get_random_number(0, nbr_joueur - 1);
-		who_playing = who_start - 1; // Décalage pour l'autoincrementation dans grafcet MISE
+		who_playing = who_start; // Décalage pour l'autoincrementation dans grafcet MISE
 
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
-		console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse);
+		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
-		liste_joueur_playing.push({
+		liste_joueur_playing[indice_blind.petite] = {
 			username: PLAYERS[indice_blind.petite].username,
 			last_action: 'blind',
 			argent_mise: valeur_blind.petite,
-		});
+			nbr_relance: 0,
+		};
 		// Grande blind :
 		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
-		liste_joueur_playing.push({
+		liste_joueur_playing[indice_blind.grosse] = {
 			username: PLAYERS[indice_blind.grosse].username,
 			last_action: 'blind',
 			argent_mise: valeur_blind.grosse,
-		});
-		// Ajoute les blind au pot
+			nbr_relance: 0,
+		};
+		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
+		mise_actuelle = valeur_blind.grosse;
 
-		console.log('who_start: ', who_start);
-		console.log('who_playing: ', who_playing);
+		// Debug
+		console.log('------------------');
+		console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
 		console.log('liste_joueur_playing:');
 		console.log(liste_joueur_playing);
 		console.log('pot: ', pot);
+		console.log('------------------');
 
+		// Envoie des données aux joueurs
 		for (var joueur of PLAYERS) {
 			if (joueur.ws != undefined) {
+				// Change type des cartes for send
 				var cartes_joueur = [];
 				for (var carte of joueur.cartes) {
 					cartes_joueur.push({
@@ -223,9 +232,11 @@ function action_global() {
 						numero: carte.numero,
 					});
 				}
+
+				// Envoie des données d'initialisation
 				var data = JSON.stringify({
 					type: 'init_game',
-					username_who_start: PLAYERS[who_start].username,
+					mise_actuelle: mise_actuelle,
 					petite_blind: {
 						username: PLAYERS[indice_blind.petite].username,
 						argent: PLAYERS[indice_blind.petite].argent_en_jeu,
@@ -236,13 +247,14 @@ function action_global() {
 					},
 					your_card: cartes_joueur,
 					pot: pot,
+					who_playing: PLAYERS[who_playing].username,
 				});
 				joueur.ws.send(data);
 			}
 		}
 
 		// Lance le grafcet MISE
-		GRAFCET_MISE == true;
+		GRAFCET_MISE = true;
 	}
 }
 
@@ -283,11 +295,101 @@ async function global() {
  */
 
 function action_mise() {
-	// Etape 0
+	// Etape 0 (do nothing)
+
+	// Etape 1
+	if (etape_mise == 1) {
+		console.log('etape 1 MISE');
+
+		// Send le nouveau joueur
+		wss_send_joueur({
+			type: 'next_player',
+			next_player: PLAYERS[who_playing].username,
+		});
+
+		// Démarre le timer
+		timer = setTimeout(() => {
+			timer_choix_end = true;
+		}, duree_timer);
+	}
+	// Etape 2
+	else if (etape_mise == 2) {
+		console.log('etape 2 MISE');
+	}
+	// Etape 3
+	else if (etape_mise == 3) {
+		console.log('etape 3 MISE');
+
+		// Reset timer
+		clearTimeout(timer);
+
+		// Joueur attend timer
+		if (timer_choix_end) {
+			// Fait abandonner le joueur
+			if (liste_joueur_playing[who_playing] == null) {
+				liste_joueur_playing[who_playing] = {
+					username: PLAYERS[who_playing].username,
+					last_action: 'abandon',
+					argent_mise: 0,
+					nbr_relance: 0,
+				};
+			} else {
+				liste_joueur_playing[who_playing].last_action = 'abandon';
+			}
+		}
+		// Joueur a fait un choix
+		else if (player_choice != undefined) {
+			// Change en fonction de l'action du joueur
+			if (player_choice.action == 'check') {
+				pot += mise_actuelle;
+
+				// Update liste
+				if (liste_joueur_playing[who_playing] == null) {
+					liste_joueur_playing[who_playing] = {
+						username: PLAYERS[who_playing].username,
+						last_action: player_choice.action,
+						argent_mise: mise_actuelle,
+						nbr_relance: 0,
+					};
+				} else {
+					liste_joueur_playing[who_playing].last_action = player_choice.action;
+					liste_joueur_playing[who_playing].argent_mise += mise_actuelle;
+				}
+			}
+
+			// met à jour le pot
+			pot += player_choice.argent_mise;
+		}
+
+		// Change le main joueur
+		who_playing += 1;
+		if (who_playing > 3) {
+			who_playing = 0;
+		}
+
+		console.log('-----------------');
+		console.log('liste_joueur_playing: ');
+		console.log(liste_joueur_playing);
+		console.log('-----------------');
+
+		// Reset timer 2
+		timer_choix_end = false;
+	}
 }
 
 function transition_mise() {
 	// Etape 0 -> Etape 1
+	if (etape_mise == 0 && GRAFCET_MISE == true) {
+		etape_mise = 1;
+	}
+	// Etape 1 -> Etape 2
+	else if (etape_mise == 1) {
+		etape_mise = 2;
+	}
+	// Etape 2 -> Etape 3
+	else if (etape_mise == 2 && (player_choice != undefined || timer_choix_end == true)) {
+		etape_mise = 3;
+	}
 	// Variable reset
 }
 
@@ -324,8 +426,7 @@ mise();
  */
 
 wss.on('connection', (ws, req) => {
-	log('WebSocket', 'Nouvel utilisateur connecté');
-
+	// Recupere session
 	sessionParser(req, {}, function () {
 		var argent = req.session.argent;
 		var username = req.session.username;
@@ -339,13 +440,15 @@ wss.on('connection', (ws, req) => {
 		}
 		// Joueur ok
 		else {
+			log('Game', `Nouveau joueur -> ${username}`);
+
 			nbr_joueur++;
 			PLAYERS.push({
-				numero: nbr_joueur,
 				username: username,
 				argent: argent,
 				argent_en_jeu: argent, // temp
 				ws: ws,
+				out: false,
 			});
 			// console.log(PLAYERS); // debug
 
@@ -373,21 +476,29 @@ wss.on('connection', (ws, req) => {
 		// Type start
 		if (message.type == 'start') {
 			try_start = true;
-			console.log(req.session);
 		}
 	});
 
 	// Quand le joueur quitte le jeu
 	ws.on('close', () => {
 		for (var i = 0; i < nbr_joueur; i++) {
+			// Si il est inscrit
 			if (PLAYERS[i].username == req.session.username) {
-				PLAYERS.splice(i, 1);
-				nbr_joueur--;
+				// Partie en cour ?
+				if (partie_en_cours == true) {
+					log('Game', `Delete joueur in-game -> ${req.session.username}`);
 
-				wss_send_joueur({
-					type: 'delete_player',
-					username: req.session.username,
-				});
+					PLAYERS[i].ws = undefined;
+					PLAYERS[i].out = true;
+				} else {
+					PLAYERS.splice(i, 1);
+					nbr_joueur--;
+
+					wss_send_joueur({
+						type: 'delete_player',
+						username: req.session.username,
+					});
+				}
 			}
 		}
 	});
@@ -411,6 +522,76 @@ wss.on('connection', (ws, req) => {
  *
  *
  */
+
+// Verifie le choix du joueur
+app.post('/choice', (req, res) => {
+	// Récupérer les données
+	const data = req.body;
+	var session = req.session;
+	var already_error = false;
+
+	// Verifie que le choix du joueur est possible
+	if (partie_en_cours) {
+		if (PLAYERS[who_playing].username == session.username) {
+			if (data.action == 'relance') {
+				if (liste_joueur_playing[who_playing] != null) {
+					if (liste_joueur_playing[who_playing].nbr_relance == 3) {
+						already_error = true;
+						res.json({
+							valid: false,
+							error: 'Tu ne peux pas faire plus de 3 relances !',
+						});
+					} else if (data.value_relance > liste_joueur_playing[who_playing].argent_mise) {
+						already_error = true;
+						res.json({
+							valid: false,
+							error: "Tu n'as pas assez d'argent pour la relance.",
+						});
+					}
+				} else {
+					if (data.value_relance > PLAYERS[who_playing].argent_en_jeu) {
+						already_error = true;
+						res.json({
+							valid: false,
+							error: "Tu n'as pas assez d'argent.",
+						});
+					}
+				}
+				if (already_error == false) {
+					if (data.value_relance < mise_actuelle) {
+						res.json({
+							valid: false,
+							error: "Tu doit miser plus d'argent pour continuer de jouer !",
+						});
+					} else {
+						// Valide le choix
+						res.json({
+							valid: true,
+						});
+						player_choice = data;
+					}
+				}
+			} else {
+				// Valide le choix
+				res.json({
+					valid: true,
+				});
+				player_choice = data;
+			}
+		} else {
+			res.json({
+				valid: false,
+				error: "Ce n'est pas à tou tour de jouer !",
+			});
+		}
+	} else {
+		res.json({
+			valid: false,
+			error: 'Pas de jeu en cour',
+		});
+	}
+	console.log(player_choice);
+});
 
 app.post('/connexion', (req, res) => {
 	// Récupérer les données
@@ -531,6 +712,25 @@ app.post('/inscription', (req, res) => {
 	}
 });
 
+/*
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
 // Quand le client demande '/'
 app.get('/', (req, res) => {
 	// Récupère les données de session
@@ -598,13 +798,26 @@ app.get('/game', (req, res) => {
 	var session = req.session;
 
 	// Le joueur est deja connecter ?
-	// temp delete connexion
-	alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-	session.connected = true; // temp
-	session.username = alphabet[ii].repeat(5); // temp
-	ii++; // temp
-	session.argent = 1000; // temp
-	res.render('game', { connected: true, alert: undefined, PLAYERS: PLAYERS }); //temp
+	if (partie_en_cours == false) {
+		// temp delete connexion
+		alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+		session.connected = true; // temp
+		session.username = alphabet[ii].repeat(5); // temp
+		ii++; // temp
+		session.argent = 1000; // temp
+		// console.log(session); // temp // debug
+		res.render('game', {
+			connected: true,
+			alert: undefined,
+			PLAYERS: PLAYERS,
+			username: session.username,
+		}); //temp --edittt--
+	} else {
+		res.render('index', {
+			connected: false,
+			alert: 'Des joueurs sont deja en train de jouer !',
+		});
+	}
 	/*
 	if (session.connected) {
 		res.render('game', {
@@ -648,7 +861,7 @@ app.get('/get_user_info', (req, res) => {
 	// temp delete connexion
 	res.json({
 		connected: true,
-		username: 'Michel',
+		username: session.username,
 		argent: session.argent,
 	});
 	/*

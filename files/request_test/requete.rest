@@ -1,0 +1,14 @@
+POST http://localhost:8101/choice
+content-type: application/json
+
+{
+    'action': 'check',
+}
+
+
+###
+GET http://127.0.0.1:8101/game
+
+
+###
+GET http://127.0.0.1:8101/get_user_info

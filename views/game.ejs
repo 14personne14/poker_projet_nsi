@@ -13,11 +13,14 @@
 		<title>Pok'help</title>
 	</head>
 	<body>
+		<p>Your are <%= username %></p>
+
 		<button onclick="button_start()">Start</button>
 
-		<div id="your_card">
-		</div>
-		
+		<p id="valeur_pot">pot: none | mise: none</p>
+
+		<div id="your_card"></div>
+
 		<div id="liste_players">
 			<% for (var i = 0; i < PLAYERS.length; i++) { %>
 			<div id="player-<%= PLAYERS[i].username %>" class="player_block">
@@ -27,7 +30,12 @@
 			</div>
 			<% } %>
 		</div>
-		<h1>Fin des joueurs</h1>
+		<button onclick="player_choose_action('suivre')">Suivre</button>
+		<button onclick="player_choose_action('abandon')">Abandonner</button>
+		<button onclick="player_choose_action('relance')">Relancer</button>
+		<button onclick="player_choose_action('all-in')">All-in</button>
+		<h1>---------------</h1>
+
 		<a href="connexion"> <button>connexion</button> </a><br />
 		<a href="inscription"> <button>inscription</button> </a><br />
 		<a href="deconnexion"> <button>deconnexion</button> </a><br />
