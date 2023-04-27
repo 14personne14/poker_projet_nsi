@@ -15,9 +15,9 @@
               "state": {
                 "file": "grafcet/MISE.canvas",
                 "viewState": {
-                  "x": -26.570188898635024,
-                  "y": 318.2750827500376,
-                  "zoom": -0.5856602976106433
+                  "x": -410,
+                  "y": 281.5,
+                  "zoom": -0.5862724539354489
                 }
               }
             }
@@ -30,10 +30,22 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": 159.477027609545,
-                  "y": -313.78669658386434,
-                  "zoom": 0.06269560975889277
+                  "x": -10.5,
+                  "y": 125,
+                  "zoom": -1.097641416584348
                 }
+              }
+            }
+          },
+          {
+            "id": "6a343fbc4cc6061f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "files/fonctions.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -222,12 +234,12 @@
   },
   "active": "3b10bd524fb36be5",
   "lastOpenFiles": [
+    "grafcet/GLOBAL.canvas",
+    "grafcet/MISE.canvas",
+    "files/fonctions.md",
     "info/Serveur.canvas",
     "info/Client.canvas",
-    "grafcet/MISE.canvas",
-    "grafcet/GLOBAL.canvas",
     "files/variables.md",
-    "files/fonctions.md",
     "GAME.canvas",
     "info/Client.md",
     "info/Serveur.md",

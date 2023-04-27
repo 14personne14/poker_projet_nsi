@@ -84,7 +84,7 @@ function update_main_player(username) {
 			var last_div = document.getElementById(`player-${last_main_player}`);
 			last_div.classList.remove('main_player');
 		}
-		
+
 		var div = document.getElementById(`player-${username}`);
 		div.classList.add('main_player');
 
@@ -149,16 +149,23 @@ function player_choose_action(action) {
 		action: action,
 	};
 	if (action == 'relance') {
-		data.value_relance = 100;
+		var value_relance = Number(document.getElementById('input_relance').value);
+		if (isNaN(value_relance) || value_relance == 0) {
+			// Mauvaise input du client
+			return;
+		} else {
+			data.value_relance = 100;
+			console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		}
+	} else {
+		console.log('%cChoice send' + `%c ${data.action}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 	}
 
 	// Envoie en POST les données
 	$.post('/choice', data, function (data) {
 		// Affiche le resultat
-		if (data.valid == true) {
-			alert('TRUE');
-		} else {
-			alert(data.error);
+		if (data.valid == false) {
+			console.log('%cChoice error' + `%c ${data.error}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
 		}
 	});
 }
@@ -187,6 +194,11 @@ $.getJSON('/get_user_info', function (data) {
 	if (data.connected == false) {
 		window.location.replace('/');
 	} else {
+		console.log(
+			'%cMy data' + `%c ${data.username} | ${data.argent} | connected: ${data.connected}`,
+			'background: #004CFF; color: #FFFFFF; padding: 0px 5px;',
+			''
+		);
 		local_user_info = data;
 	}
 });
@@ -216,28 +228,69 @@ socket.addEventListener('message', (event) => {
 
 	// Connection établie avec le serveur
 	if (data.type == 'connected') {
-		console.info(data.message);
+		console.log('%cBienvenue' + `%c ${data.message}`, 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;', '');
 	}
 	// Supression d'un joueur
 	else if (data.type == 'delete_player') {
+		console.log('%cDelete player' + `%c ${data.username}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
 		delete_player(data.username);
 	}
 	// Ajout d'un joueur
 	else if (data.type == 'new_player') {
+		console.log('%cNew player' + `%c ${data.username} | ${data.argent_en_jeu}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
 		add_player(data.username, data.argent_en_jeu);
 	}
 	// Init game
 	else if (data.type == 'init_game') {
+		console.log(
+			'%cInit Game' +
+				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
+			'background: #F9FF00; color: #000000; padding: 0px 5px;',
+			''
+		);
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
 		update_main_player(data.who_playing);
-		update_pot_mise(data.pot, data.mise_actuelle);
+		update_pot_mise(data.pot, data.mise_actuelle_requise);
 		affiche_carte(data.your_card);
 	}
 	// Nouveau main player
 	else if (data.type == 'next_player') {
+		console.log('%cUpdate main player' + `%c ${data.next_player}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 		update_main_player(data.next_player);
 	}
-	console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 5px;');
-	console.log(data);
+	// Nouveau choix d'un joueur
+	else if (data.type == 'player_choice') {
+		console.log(
+			'%cChoice player' + `%c ${data.username}` + `%c\n - action: ${data.action} \n - argent_mise: ${data.argent_mise}`,
+			'background: #00AB00; color: #000000; padding: 0px 5px;',
+			'',
+			''
+		);
+	}
+	// Autre cas
+	else {
+		console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;');
+		console.log(data);
+	}
 });
+
+socket.addEventListener('close', function (event) {
+	// Erreur deconnexion de la websocket.
+	$('body').hide();
+});
+
+// Debug info
+console.log(
+	'%cInfo color:' + '%c\n - ' + '%cServer info ' + '%c ' + '%c\n - ' + '%cBefore game ' + '%c ' + '%c\n - ' + '%cAfter game ' + '%c ',
+	'text-decoration: underline;',
+	'',
+	'color: #004CFF;',
+	'background: #004CFF; color: #FFFFFF; padding: 0px 5px;',
+	'',
+	'color: #F9FF00;',
+	'background: #F9FF00; color: #000000; padding: 0px 5px;',
+	'',
+	'color: #00AB00;',
+	'background: #00AB00; color: #000000; padding: 0px 5px;'
+);

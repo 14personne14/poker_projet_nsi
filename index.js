@@ -43,7 +43,7 @@ var nbr_joueur = 0; // Nombre de joueur (int)
 var liste_joueur_playing = []; // liste des joueurs qui ont commencés à miser (list)
 var player_choice = undefined; // Le choix du joueur (obj)
 var pot = 0; // Argent total mit en jeu par les joueurs (int)
-var mise_actuelle = 0; // Argent minimum à mettre en jeu pour continuer de jouer (int)
+var mise_actuelle_requise = 0; // Argent minimum à mettre en jeu pour continuer de jouer (int)
 var who_start; // Le joueur qui commence à jouer en premier (int)
 var who_playing; // Le joueur qui est en train de jouer (int)
 var try_start = false; // Si un joueur veut lancer le jeu (bool)
@@ -167,6 +167,34 @@ function get_indice_player_blind() {
 	return { petite: indice_petite, grosse: indice_grosse };
 }
 
+function is_end_of_mise() {
+	/**
+	 * Renvoie si la partie mise est terminée.
+	 * C'est à dire si tout les joueurs ont misés la bonne somme ou si ils ont abandonnés.
+	 *
+	 * [entrée] xxx
+	 * [sortie] Bool
+	 */
+
+	var end = true;
+	var nbr_joueur_playing_encore = 0;
+
+	for (var joueur of liste_joueur_playing) {
+		if (joueur.last_action == 'none' || joueur.last_action == 'blind') {
+			return false;
+		} else if ((joueur.last_action == 'suivre' || joueur.last_action == 'relance') && joueur.argent_mise < mise_actuelle_requise) {
+			end = false;
+			nbr_joueur_playing_encore += 1;
+		}
+	}
+
+	if (nbr_joueur_playing_encore <= 1) {
+		end = true;
+	}
+
+	return end;
+}
+
 // Function grafcet
 function action_global() {
 	// Etape 0
@@ -211,7 +239,19 @@ function action_global() {
 		};
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
-		mise_actuelle = valeur_blind.grosse;
+		mise_actuelle_requise = valeur_blind.grosse;
+
+		// Complete la liste liste_joueur_playing qui n'ont pas fait la blind
+		for (var i = 0; i < nbr_joueur; i++) {
+			if (liste_joueur_playing[i] == null) {
+				liste_joueur_playing[i] = {
+					username: PLAYERS[i].username,
+					last_action: 'none',
+					argent_mise: 0,
+					nbr_relance: 0,
+				};
+			}
+		}
 
 		// Debug
 		console.log('------------------');
@@ -219,6 +259,7 @@ function action_global() {
 		console.log('liste_joueur_playing:');
 		console.log(liste_joueur_playing);
 		console.log('pot: ', pot);
+		console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		console.log('------------------');
 
 		// Envoie des données aux joueurs
@@ -236,7 +277,7 @@ function action_global() {
 				// Envoie des données d'initialisation
 				var data = JSON.stringify({
 					type: 'init_game',
-					mise_actuelle: mise_actuelle,
+					mise_actuelle_requise: mise_actuelle_requise,
 					petite_blind: {
 						username: PLAYERS[indice_blind.petite].username,
 						argent: PLAYERS[indice_blind.petite].argent_en_jeu,
@@ -255,6 +296,11 @@ function action_global() {
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
+	}
+	// Etape 2
+	// Etape 3
+	else if (etape_global == 3) {
+		console.log('ETAPE 3333 GRAPHE FINIIIII');
 	}
 }
 
@@ -324,56 +370,90 @@ function action_mise() {
 		clearTimeout(timer);
 
 		// Joueur attend timer
-		if (timer_choix_end) {
+		if (timer_choix_end == true) {
 			// Fait abandonner le joueur
-			if (liste_joueur_playing[who_playing] == null) {
-				liste_joueur_playing[who_playing] = {
-					username: PLAYERS[who_playing].username,
-					last_action: 'abandon',
-					argent_mise: 0,
-					nbr_relance: 0,
-				};
-			} else {
-				liste_joueur_playing[who_playing].last_action = 'abandon';
-			}
+			liste_joueur_playing[who_playing].last_action = 'abandon';
 		}
 		// Joueur a fait un choix
 		else if (player_choice != undefined) {
 			// Change en fonction de l'action du joueur
-			if (player_choice.action == 'check') {
-				pot += mise_actuelle;
-
+			//
+			// Suivre
+			if (player_choice.action == 'suivre') {
+				// Calcule valeur à payer par le joueur
+				var value_to_pay = mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise;
 				// Update liste
-				if (liste_joueur_playing[who_playing] == null) {
-					liste_joueur_playing[who_playing] = {
-						username: PLAYERS[who_playing].username,
-						last_action: player_choice.action,
-						argent_mise: mise_actuelle,
-						nbr_relance: 0,
-					};
-				} else {
-					liste_joueur_playing[who_playing].last_action = player_choice.action;
-					liste_joueur_playing[who_playing].argent_mise += mise_actuelle;
+				liste_joueur_playing[who_playing].last_action = 'suivre';
+				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
+				// Update pot & joueur.argent_en_jeu
+				PLAYERS[who_playing].argent_en_jeu -= value_to_pay;
+				pot += value_to_pay;
+			}
+			// Relance
+			else if (player_choice.action == 'relance') {
+				// Calcule valeur à payer par le joueur
+				var value_to_pay = player_choice.value_relance + (mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise);
+				// Update liste
+				liste_joueur_playing[who_playing].last_action = 'relance';
+				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
+				// Update pot & joueur.argent_en_jeu
+				PLAYERS[who_playing].argent_en_jeu -= value_to_pay;
+				pot += value_to_pay;
+				// Update mise_actuelle_requise
+				mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
+			}
+			// All-in
+			else if (player_choice.action == 'all-in') {
+				// Calcule valeur à payer par le joueur
+				var value_to_pay = PLAYERS[who_playing].argent_mise;
+				// Update liste
+				liste_joueur_playing[who_playing].last_action = 'all-in';
+				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
+				// Update pot & joueur.argent_en_jeu
+				PLAYERS[who_playing].argent_en_jeu = 0;
+				pot += value_to_pay;
+				// Update mise_actuelle_requise
+				if (liste_joueur_playing[who_playing].argent_mise > mise_actuelle_requise) {
+					mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
 				}
 			}
-
-			// met à jour le pot
-			pot += player_choice.argent_mise;
+			// Abandon
+			else if (player_choice.action == 'abandon') {
+				// Update liste
+				liste_joueur_playing[who_playing].last_action = player_choice.action;
+			}
 		}
 
-		// Change le main joueur
+		// Envoie des données aux joueurs
+		wss_send_joueur({
+			type: 'player_choice',
+			username: PLAYERS[who_playing].username,
+			action: liste_joueur_playing[who_playing].last_action,
+			argent_mise: liste_joueur_playing[who_playing].argent_mise,
+		});
+
+		// Change le main joueur (after send)
 		who_playing += 1;
 		if (who_playing > 3) {
 			who_playing = 0;
 		}
 
-		console.log('-----------------');
-		console.log('liste_joueur_playing: ');
+		// Debug
+		console.log('------------------');
+		console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
+		console.log('liste_joueur_playing:');
 		console.log(liste_joueur_playing);
-		console.log('-----------------');
+		console.log('pot: ', pot);
+		console.log('mise_actuelle_requise: ', mise_actuelle_requise);
+		console.log('------------------');
 
-		// Reset timer 2
+		// Reset timer 2 & player_choice
 		timer_choix_end = false;
+		player_choice = undefined;
+	}
+	// Etape 4
+	else if (etape_mise == 4) {
+		GRAFCET_MISE = false;
 	}
 }
 
@@ -390,7 +470,14 @@ function transition_mise() {
 	else if (etape_mise == 2 && (player_choice != undefined || timer_choix_end == true)) {
 		etape_mise = 3;
 	}
-	// Variable reset
+	// Etape 3 -> Etape 4
+	else if (etape_mise == 3 && is_end_of_mise() == true) {
+		etape_mise = 4;
+	}
+	// Etape 3 -> Etape 1 (boucle)
+	else if (etape_mise == 3 && is_end_of_mise() == false) {
+		etape_mise = 1;
+	}
 }
 
 async function mise() {
@@ -558,10 +645,10 @@ app.post('/choice', (req, res) => {
 					}
 				}
 				if (already_error == false) {
-					if (data.value_relance < mise_actuelle) {
+					if (data.value_relance <= 0) {
 						res.json({
 							valid: false,
-							error: "Tu doit miser plus d'argent pour continuer de jouer !",
+							error: 'Tu doit relancer avec un nombre positif',
 						});
 					} else {
 						// Valide le choix
@@ -590,7 +677,6 @@ app.post('/choice', (req, res) => {
 			error: 'Pas de jeu en cour',
 		});
 	}
-	console.log(player_choice);
 });
 
 app.post('/connexion', (req, res) => {
