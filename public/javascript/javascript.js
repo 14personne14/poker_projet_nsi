@@ -66,6 +66,7 @@ function add_player(username, argent_en_jeu) {
 				<h2 style="margin: 0">Joueur :</h2>
 				<p id="player-username-${username}">${username}</p>
 				<p id="player-argent_en_jeu-${username}">${argent_en_jeu}</p>
+				<p id="player-last_action-${username}">aucune</p>
     `;
 
 	document.getElementById('liste_players').appendChild(new_div);
@@ -103,6 +104,24 @@ function update_argent_player(username, new_argent) {
 
 	var div = document.getElementById(`player-argent_en_jeu-${username}`);
 	div.innerHTML = new_argent;
+}
+
+function update_action_player(username, new_action) {
+	/**
+	 * Change la derniere action du joueur concerné
+	 *
+	 * [entree] username:    l'username du joueur à qui l'action change (string)
+	 * 			new_agrgent: le nouvel argent à afficher (int)
+	 * [sortie] xxx
+	 */
+
+	var div = document.getElementById(`player-last_action-${username}`);
+	div.innerHTML = new_action;
+
+	if (new_action == 'abandon') {
+		var div_player = document.getElementById(`player-${username}`);
+		div_player.classList.add('abandon');
+	}
 }
 
 function affiche_carte(cartes) {
@@ -154,7 +173,7 @@ function player_choose_action(action) {
 			// Mauvaise input du client
 			return;
 		} else {
-			data.value_relance = 100;
+			data.value_relance = value_relance;
 			console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 		}
 	} else {
@@ -249,7 +268,9 @@ socket.addEventListener('message', (event) => {
 			''
 		);
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
+		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
+		update_action_player(data.grosse_blind.username, 'grosse blind');
 		update_main_player(data.who_playing);
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
 		affiche_carte(data.your_card);
@@ -262,11 +283,14 @@ socket.addEventListener('message', (event) => {
 	// Nouveau choix d'un joueur
 	else if (data.type == 'player_choice') {
 		console.log(
-			'%cChoice player' + `%c ${data.username}` + `%c\n - action: ${data.action} \n - argent_mise: ${data.argent_mise}`,
+			'%cChoice player' + `%c ${data.username}` + `%c\n - action: ${data.action} \n - argent_left: ${data.argent_left}`,
 			'background: #00AB00; color: #000000; padding: 0px 5px;',
 			'',
 			''
 		);
+		update_argent_player(data.username, data.argent_left);
+		update_action_player(data.username, data.action);
+		update_pot_mise(data.pot, data.mise);
 	}
 	// Autre cas
 	else {

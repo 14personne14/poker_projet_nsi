@@ -15,9 +15,9 @@
               "state": {
                 "file": "grafcet/MISE.canvas",
                 "viewState": {
-                  "x": -410,
-                  "y": 281.5,
-                  "zoom": -0.5862724539354489
+                  "x": 18.562665854668353,
+                  "y": 950.1279809705661,
+                  "zoom": 0.08039421273121772
                 }
               }
             }
@@ -30,9 +30,9 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": -10.5,
-                  "y": 125,
-                  "zoom": -1.097641416584348
+                  "x": 203.29604970652238,
+                  "y": 945.6697384241024,
+                  "zoom": -0.3333333333333332
                 }
               }
             }
@@ -49,7 +49,8 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -116,7 +117,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "grafcet/MISE.canvas",
+                "file": "grafcet/GLOBAL.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -133,7 +134,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "grafcet/MISE.canvas",
+                "file": "grafcet/GLOBAL.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -156,7 +157,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "grafcet/MISE.canvas"
+                "file": "grafcet/GLOBAL.canvas"
               }
             }
           }
@@ -177,65 +178,10 @@
       "command-palette:Ouvrir la palette de commandes": false
     }
   },
-  "floating": {
-    "id": "d34588aca015aee9",
-    "type": "floating",
-    "children": [
-      {
-        "id": "bfdb621ec1847834",
-        "type": "window",
-        "children": [
-          {
-            "id": "1c98355e05410762",
-            "type": "tabs",
-            "children": [
-              {
-                "id": "2ff495212ae783bf",
-                "type": "leaf",
-                "state": {
-                  "type": "canvas",
-                  "state": {
-                    "file": "info/Serveur.canvas",
-                    "viewState": {
-                      "x": -356.47418800618277,
-                      "y": -232.55986941016835,
-                      "zoom": 0.3799349827742126
-                    }
-                  }
-                }
-              },
-              {
-                "id": "72607651147c2cb9",
-                "type": "leaf",
-                "state": {
-                  "type": "canvas",
-                  "state": {
-                    "file": "info/Client.canvas",
-                    "viewState": {
-                      "x": -597.0297564282582,
-                      "y": 153.62971846903525,
-                      "zoom": 0.117538091330328
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        ],
-        "direction": "vertical",
-        "x": -1080,
-        "y": 113,
-        "width": 1080,
-        "height": 973,
-        "maximize": false,
-        "zoom": 0
-      }
-    ]
-  },
-  "active": "3b10bd524fb36be5",
+  "active": "c1562624676fa56d",
   "lastOpenFiles": [
-    "grafcet/GLOBAL.canvas",
     "grafcet/MISE.canvas",
+    "grafcet/GLOBAL.canvas",
     "files/fonctions.md",
     "info/Serveur.canvas",
     "info/Client.canvas",

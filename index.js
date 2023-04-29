@@ -167,32 +167,41 @@ function get_indice_player_blind() {
 	return { petite: indice_petite, grosse: indice_grosse };
 }
 
-function is_end_of_mise() {
+function calc_nbr_end_player() {
 	/**
-	 * Renvoie si la partie mise est terminée.
+	 * Renvoie le nombre de joueur qui ont terminé de jouer.
 	 * C'est à dire si tout les joueurs ont misés la bonne somme ou si ils ont abandonnés.
 	 *
 	 * [entrée] xxx
 	 * [sortie] Bool
 	 */
 
-	var end = true;
-	var nbr_joueur_playing_encore = 0;
+	var nbr_end_player = 0;
 
 	for (var joueur of liste_joueur_playing) {
-		if (joueur.last_action == 'none' || joueur.last_action == 'blind') {
-			return false;
-		} else if ((joueur.last_action == 'suivre' || joueur.last_action == 'relance') && joueur.argent_mise < mise_actuelle_requise) {
-			end = false;
-			nbr_joueur_playing_encore += 1;
+		// Suivre ou relance terminée
+		if ((joueur.last_action == 'suivre' || joueur.last_action == 'relance') && joueur.argent_mise == mise_actuelle_requise) {
+			nbr_end_player += 1;
+		}
+		// All-in ou abandon
+		else if (joueur.last_action == 'all-in' || joueur.last_action == 'abandon') {
+			nbr_end_player += 1;
 		}
 	}
 
-	if (nbr_joueur_playing_encore <= 1) {
-		end = true;
-	}
+	return nbr_end_player;
+}
 
-	return end;
+function end_of_tour() {
+	/**
+	 * Renvoie si il y a un winner determiné à ce moment.
+	 * C'est à dire si il reste plus que un seul joueur dans le jeu (avec peux etre des all-in).
+	 *
+	 * [entrée] xxx
+	 * [sortie] Bool
+	 */
+
+	return false;
 }
 
 // Function grafcet
@@ -300,7 +309,17 @@ function action_global() {
 	// Etape 2
 	// Etape 3
 	else if (etape_global == 3) {
-		console.log('ETAPE 3333 GRAPHE FINIIIII');
+		console.log('ETAPE 3333 GRAPHE MISE FINIIIII');
+	}
+	// Etape 4
+	else if (etape_global == 4) {
+		console.log('ETAPE 4 GLOBAL');
+		var cartes_flop = jeu_cartes.pioche(3);
+		for (var carte of cartes_flop) {
+			cartes_communes.push(carte);
+		}
+
+		console.log(cartes_communes);
 	}
 }
 
@@ -317,6 +336,18 @@ function transition_global() {
 	// Etape 2 -> Etape 3
 	else if (etape_global == 2 && GRAFCET_MISE == false) {
 		etape_global = 3;
+	}
+	// Etape 3 -> Etape 4
+	else if (etape_global == 3 && end_of_tour() == false) {
+		etape_global = 4;
+	}
+	// Etape 3 -> Etape [end] ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	else if (etape_global == 3 && end_of_tour() == true) {
+		etape_global = 'end'; ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
+	// Etape 4 -> Etape 5
+	else if (etape_global == 4) {
+		etape_global = 5;
 	}
 
 	// Variable reset
@@ -425,12 +456,25 @@ function action_mise() {
 		}
 
 		// Envoie des données aux joueurs
-		wss_send_joueur({
-			type: 'player_choice',
-			username: PLAYERS[who_playing].username,
-			action: liste_joueur_playing[who_playing].last_action,
-			argent_mise: liste_joueur_playing[who_playing].argent_mise,
-		});
+		if (liste_joueur_playing[who_playing].last_action == 'relance') {
+			wss_send_joueur({
+				type: 'player_choice',
+				username: PLAYERS[who_playing].username,
+				action: `relance ${player_choice.value_relance}`,
+				argent_left: PLAYERS[who_playing].argent_en_jeu,
+				pot: pot,
+				mise: mise_actuelle_requise,
+			});
+		} else {
+			wss_send_joueur({
+				type: 'player_choice',
+				username: PLAYERS[who_playing].username,
+				action: liste_joueur_playing[who_playing].last_action,
+				argent_left: PLAYERS[who_playing].argent_en_jeu,
+				pot: pot,
+				mise: mise_actuelle_requise,
+			});
+		}
 
 		// Change le main joueur (after send)
 		who_playing += 1;
@@ -471,12 +515,16 @@ function transition_mise() {
 		etape_mise = 3;
 	}
 	// Etape 3 -> Etape 4
-	else if (etape_mise == 3 && is_end_of_mise() == true) {
+	else if (etape_mise == 3 && calc_nbr_end_player() == 4) {
 		etape_mise = 4;
 	}
 	// Etape 3 -> Etape 1 (boucle)
-	else if (etape_mise == 3 && is_end_of_mise() == false) {
+	else if (etape_mise == 3 && calc_nbr_end_player() < 4) {
 		etape_mise = 1;
+	}
+	// Etape 4 -> Etape 0
+	else if (etape_mise == 4) {
+		etape_mise = 0;
 	}
 }
 
@@ -615,48 +663,35 @@ app.post('/choice', (req, res) => {
 	// Récupérer les données
 	const data = req.body;
 	var session = req.session;
-	var already_error = false;
 
 	// Verifie que le choix du joueur est possible
 	if (partie_en_cours) {
 		if (PLAYERS[who_playing].username == session.username) {
 			if (data.action == 'relance') {
-				if (liste_joueur_playing[who_playing] != null) {
-					if (liste_joueur_playing[who_playing].nbr_relance == 3) {
-						already_error = true;
-						res.json({
-							valid: false,
-							error: 'Tu ne peux pas faire plus de 3 relances !',
-						});
-					} else if (data.value_relance > liste_joueur_playing[who_playing].argent_mise) {
-						already_error = true;
-						res.json({
-							valid: false,
-							error: "Tu n'as pas assez d'argent pour la relance.",
-						});
-					}
+				// Transforme en nombre
+				data.value_relance = Number(data.value_relance);
+
+				if (liste_joueur_playing[who_playing].nbr_relance == 3) {
+					res.json({
+						valid: false,
+						error: 'Tu ne peux pas faire plus de 3 relances !',
+					});
+				} else if (data.value_relance > PLAYERS[who_playing].argent_en_jeu) {
+					res.json({
+						valid: false,
+						error: "Tu n'as pas assez d'argent.",
+					});
+				} else if (data.value_relance <= 0) {
+					res.json({
+						valid: false,
+						error: 'Tu doit relancer avec un nombre positif',
+					});
 				} else {
-					if (data.value_relance > PLAYERS[who_playing].argent_en_jeu) {
-						already_error = true;
-						res.json({
-							valid: false,
-							error: "Tu n'as pas assez d'argent.",
-						});
-					}
-				}
-				if (already_error == false) {
-					if (data.value_relance <= 0) {
-						res.json({
-							valid: false,
-							error: 'Tu doit relancer avec un nombre positif',
-						});
-					} else {
-						// Valide le choix
-						res.json({
-							valid: true,
-						});
-						player_choice = data;
-					}
+					// Valide le choix
+					res.json({
+						valid: true,
+					});
+					player_choice = data;
 				}
 			} else {
 				// Valide le choix
