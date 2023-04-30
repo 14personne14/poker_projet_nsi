@@ -1,1 +1,2 @@
-Finir recupération de l'event 'Init game' par le client (javascript). 
+25/04/2023 - Finir recupération de l'event 'Init game' par le client (javascript). 
+30/04/2023 - Finir partie flop du jeu !

@@ -27,7 +27,6 @@ if (window.location.host === 'azerty.tk') {
 
 // Variable
 var local_user_info;
-var last_main_player;
 var mise_actuelle;
 
 // Fonctions
@@ -72,7 +71,7 @@ function add_player(username, argent_en_jeu) {
 	document.getElementById('liste_players').appendChild(new_div);
 }
 
-function update_main_player(username) {
+function update_main_player(username, status) {
 	/**
 	 * Change le joueur principal en lui ajoutant la classe 'main_player'
 	 *
@@ -80,16 +79,12 @@ function update_main_player(username) {
 	 * [sortie] xxx
 	 */
 
-	if (last_main_player != username) {
-		if (last_main_player != undefined) {
-			var last_div = document.getElementById(`player-${last_main_player}`);
-			last_div.classList.remove('main_player');
-		}
-
+	if (status == 'off') {
+		var last_div = document.getElementById(`player-${username}`);
+		last_div.classList.remove('main_player');
+	} else if (status == 'on') {
 		var div = document.getElementById(`player-${username}`);
 		div.classList.add('main_player');
-
-		last_main_player = username;
 	}
 }
 
@@ -271,23 +266,26 @@ socket.addEventListener('message', (event) => {
 		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
 		update_action_player(data.grosse_blind.username, 'grosse blind');
-		update_main_player(data.who_playing);
+		update_main_player(data.who_playing, 'on');
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
 		affiche_carte(data.your_card);
 	}
 	// Nouveau main player
 	else if (data.type == 'next_player') {
 		console.log('%cUpdate main player' + `%c ${data.next_player}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
-		update_main_player(data.next_player);
+		update_main_player(data.next_player, 'on');
 	}
 	// Nouveau choix d'un joueur
 	else if (data.type == 'player_choice') {
 		console.log(
-			'%cChoice player' + `%c ${data.username}` + `%c\n - action: ${data.action} \n - argent_left: ${data.argent_left}`,
+			'%cChoice player' +
+				`%c ${data.username}` +
+				`%c\n - action: ${data.action} \n - argent_left: ${data.argent_left} \n - pot: ${data.pot} \n - mise: ${data.mise}`,
 			'background: #00AB00; color: #000000; padding: 0px 5px;',
 			'',
 			''
 		);
+		update_main_player(data.username, 'off');
 		update_argent_player(data.username, data.argent_left);
 		update_action_player(data.username, data.action);
 		update_pot_mise(data.pot, data.mise);

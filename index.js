@@ -33,7 +33,10 @@ var etape_mise = 0; // Le numéro de l'étape en grafcet MISE (int)
 // Constante (for game)
 const argent_min_require = 1000; // Argent minimal requit pour jouer une partie (int)
 const valeur_blind = { petite: 100, grosse: 200 }; // Valeurs de la petite et la grosse blind (object)
-const sleep_time = 1000; // La fluidité et rapidité du jeu (int)
+const sleep_time = 100; // La fluidité et rapidité du jeu (int)
+const duree_timer = 60000; // Durée du timer en millisecondes (int)
+const nbr_joueur_min_require = 2; // Nombre minimum de joueur (int)
+const nbr_joueur_max_require = 8; // Nombre maximum de joueur (int)
 
 // Variables (for game)
 var PLAYERS = []; // Liste des joueurs avec leurs ws associé (list)
@@ -50,7 +53,6 @@ var try_start = false; // Si un joueur veut lancer le jeu (bool)
 var partie_en_cours = false; // Si une partie est cours (bool)
 var timer; // Un timer (object)
 var timer_choix_end = false; // Si le timer est terminé ou non (bool)
-var duree_timer = 60000; // Durée du timer en millisecondes (int)
 
 // Fonction local
 function wss_send_joueur(data) {
@@ -158,18 +160,18 @@ app.set('view engine', 'ejs');
 function get_indice_player_blind() {
 	var indice_grosse = who_start - 1;
 	if (indice_grosse < 0) {
-		indice_grosse = 3;
+		indice_grosse = nbr_joueur - 1;
 	}
 	var indice_petite = indice_grosse - 1;
 	if (indice_petite < 0) {
-		indice_petite = 3;
+		indice_petite = nbr_joueur - 1;
 	}
 	return { petite: indice_petite, grosse: indice_grosse };
 }
 
 function calc_nbr_end_player() {
 	/**
-	 * Renvoie le nombre de joueur qui ont terminé de jouer.
+	 * Renvoie le nombre de joueur qui ont terminé de jouer et le nombre d'abandon.
 	 * C'est à dire si tout les joueurs ont misés la bonne somme ou si ils ont abandonnés.
 	 *
 	 * [entrée] xxx
@@ -177,19 +179,40 @@ function calc_nbr_end_player() {
 	 */
 
 	var nbr_end_player = 0;
+	var nbr_abandon = 0;
 
 	for (var joueur of liste_joueur_playing) {
-		// Suivre ou relance terminée
-		if ((joueur.last_action == 'suivre' || joueur.last_action == 'relance') && joueur.argent_mise == mise_actuelle_requise) {
-			nbr_end_player += 1;
+		// Suivre ou relance terminée ou all-in
+		if (
+			((joueur.last_action == 'suivre' || joueur.last_action == 'relance') && joueur.argent_mise == mise_actuelle_requise) ||
+			joueur.last_action == 'all-in'
+		) {
+			nbr_end_player++;
 		}
-		// All-in ou abandon
-		else if (joueur.last_action == 'all-in' || joueur.last_action == 'abandon') {
-			nbr_end_player += 1;
+		// Abandon
+		else if (joueur.last_action == 'abandon') {
+			nbr_end_player++;
+			nbr_abandon++;
 		}
 	}
 
-	return nbr_end_player;
+	return { nbr_end_player: nbr_end_player, nbr_abandon: nbr_abandon };
+}
+
+function end_of_mise() {
+	/**
+	 * Renvoie si l'étape mise est terminée ou non.
+	 *
+	 * [entrée] xxx
+	 * [sortie] Bool
+	 */
+
+	var result = calc_nbr_end_player();
+	if (result.nbr_end_player == nbr_joueur || result.nbr_abandon == nbr_joueur - 1) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function end_of_tour() {
@@ -208,7 +231,8 @@ function end_of_tour() {
 function action_global() {
 	// Etape 0
 	if (etape_global == 0) {
-		liste_joueur_playing = [null, null, null, null];
+		liste_joueur_playing = Array(nbr_joueur).fill(null);
+		// console.log(liste_joueur_playing); // Debug
 	}
 	// Etape 1
 	else if (etape_global == 1) {
@@ -227,40 +251,32 @@ function action_global() {
 		who_start = get_random_number(0, nbr_joueur - 1);
 		who_playing = who_start; // Décalage pour l'autoincrementation dans grafcet MISE
 
-		// Prépare les blindes des joueurs
-		var indice_blind = get_indice_player_blind();
-		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
-		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
-		liste_joueur_playing[indice_blind.petite] = {
-			username: PLAYERS[indice_blind.petite].username,
-			last_action: 'blind',
-			argent_mise: valeur_blind.petite,
-			nbr_relance: 0,
-		};
-		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
-		liste_joueur_playing[indice_blind.grosse] = {
-			username: PLAYERS[indice_blind.grosse].username,
-			last_action: 'blind',
-			argent_mise: valeur_blind.grosse,
-			nbr_relance: 0,
-		};
-		// Ajoute les blind au pot et le minimum requit
-		pot += valeur_blind.petite + valeur_blind.grosse;
-		mise_actuelle_requise = valeur_blind.grosse;
-
-		// Complete la liste liste_joueur_playing qui n'ont pas fait la blind
+		// Complete la liste liste_joueur_playing
 		for (var i = 0; i < nbr_joueur; i++) {
 			if (liste_joueur_playing[i] == null) {
 				liste_joueur_playing[i] = {
 					username: PLAYERS[i].username,
-					last_action: 'none',
+					last_action: 'aucune',
 					argent_mise: 0,
 					nbr_relance: 0,
 				};
 			}
 		}
+
+		// Prépare les blindes des joueurs
+		var indice_blind = get_indice_player_blind();
+		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
+		// Grosse blind :
+		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
+		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		// Grande blind :
+		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
+		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		// Ajoute les blind au pot et le minimum requit
+		pot += valeur_blind.petite + valeur_blind.grosse;
+		mise_actuelle_requise = valeur_blind.grosse;
 
 		// Debug
 		console.log('------------------');
@@ -314,18 +330,57 @@ function action_global() {
 	// Etape 4
 	else if (etape_global == 4) {
 		console.log('ETAPE 4 GLOBAL');
+
+		// Carte du flop
 		var cartes_flop = jeu_cartes.pioche(3);
 		for (var carte of cartes_flop) {
 			cartes_communes.push(carte);
 		}
 
+		// Reste liste_joueur_playing
+		for (var i = 0; i <= nbr_joueur; i++) {
+			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
+				liste_joueur_playing[i].last_action = 'aucune';
+				liste_joueur_playing[i].argent_mise = 0;
+				liste_joueur_playing[i].nbr_relance = 0;
+			}
+		}
+
+		// Prépare les blindes des joueurs
+		var indice_blind = get_indice_player_blind();
+		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
+		// Grosse blind :
+		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
+		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		// Grande blind :
+		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
+		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		// Ajoute les blind au pot et le minimum requit
+		pot += valeur_blind.petite + valeur_blind.grosse;
+		mise_actuelle_requise = valeur_blind.grosse; // Reset
+
+		// Debug
+		console.log('------------------');
+		console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
+		console.log('cartes_communes:');
 		console.log(cartes_communes);
+		console.log('liste_joueur_playing:');
+		console.log(liste_joueur_playing);
+		console.log('pot: ', pot);
+		console.log('mise_actuelle_requise: ', mise_actuelle_requise);
+		console.log('------------------');
+	}
+	// Etape 'end' // temp
+	else if (etape_global == 'end') {
+		console.log('END GAME (GLABAL)');
 	}
 }
 
 function transition_global() {
 	// Etape 0 -> Etape 1
-	if (etape_global == 0 && try_start == true && nbr_joueur == 4) {
+	if (etape_global == 0 && try_start == true && nbr_joueur >= nbr_joueur_min_require && nbr_joueur <= nbr_joueur_max_require) {
 		etape_global = 1;
 		partie_en_cours = true;
 	}
@@ -432,11 +487,13 @@ function action_mise() {
 				pot += value_to_pay;
 				// Update mise_actuelle_requise
 				mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
+				// Update nbr relance of player
+				liste_joueur_playing[who_playing].nbr_relance++;
 			}
 			// All-in
 			else if (player_choice.action == 'all-in') {
 				// Calcule valeur à payer par le joueur
-				var value_to_pay = PLAYERS[who_playing].argent_mise;
+				var value_to_pay = PLAYERS[who_playing].argent_en_jeu;
 				// Update liste
 				liste_joueur_playing[who_playing].last_action = 'all-in';
 				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
@@ -477,9 +534,26 @@ function action_mise() {
 		}
 
 		// Change le main joueur (after send)
-		who_playing += 1;
-		if (who_playing > 3) {
-			who_playing = 0;
+		if (end_of_mise() == false) {
+			var good_next_player = false;
+			while (good_next_player == false) {
+				// Change player
+				who_playing += 1;
+				if (who_playing > nbr_joueur - 1) {
+					who_playing = 0;
+				}
+				// Verifie si player ok
+				if (
+					!(
+						((liste_joueur_playing[who_playing].last_action == 'suivre' || liste_joueur_playing[who_playing].last_action == 'relance') &&
+							liste_joueur_playing[who_playing].argent_mise == mise_actuelle_requise) ||
+						liste_joueur_playing[who_playing].last_action == 'all-in' ||
+						liste_joueur_playing[who_playing].last_action == 'abandon'
+					)
+				) {
+					good_next_player = true;
+				}
+			}
 		}
 
 		// Debug
@@ -515,11 +589,11 @@ function transition_mise() {
 		etape_mise = 3;
 	}
 	// Etape 3 -> Etape 4
-	else if (etape_mise == 3 && calc_nbr_end_player() == 4) {
+	else if (etape_mise == 3 && end_of_mise() == true) {
 		etape_mise = 4;
 	}
 	// Etape 3 -> Etape 1 (boucle)
-	else if (etape_mise == 3 && calc_nbr_end_player() < 4) {
+	else if (etape_mise == 3 && end_of_mise() == false) {
 		etape_mise = 1;
 	}
 	// Etape 4 -> Etape 0
@@ -670,13 +744,14 @@ app.post('/choice', (req, res) => {
 			if (data.action == 'relance') {
 				// Transforme en nombre
 				data.value_relance = Number(data.value_relance);
+				var value_to_pay = data.value_relance + (mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise);
 
 				if (liste_joueur_playing[who_playing].nbr_relance == 3) {
 					res.json({
 						valid: false,
 						error: 'Tu ne peux pas faire plus de 3 relances !',
 					});
-				} else if (data.value_relance > PLAYERS[who_playing].argent_en_jeu) {
+				} else if (value_to_pay > PLAYERS[who_playing].argent_en_jeu) {
 					res.json({
 						valid: false,
 						error: "Tu n'as pas assez d'argent.",
