@@ -338,7 +338,7 @@ function action_global() {
 		}
 
 		// Reste liste_joueur_playing
-		for (var i = 0; i <= nbr_joueur; i++) {
+		for (var i = 0; i < nbr_joueur; i++) {
 			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
 				liste_joueur_playing[i].last_action = 'aucune';
 				liste_joueur_playing[i].argent_mise = 0;
