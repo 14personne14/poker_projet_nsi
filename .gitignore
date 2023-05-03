@@ -124,5 +124,5 @@ dist
 test/
 zip/
 .ipynb_checkpoints/
-.vscode/
+# .vscode/
 desktop.ini

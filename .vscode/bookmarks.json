@@ -1,0 +1,44 @@
+{
+	"files": [
+		{
+			"path": "index.js",
+			"bookmarks": [
+				{
+					"line": 27,
+					"column": 33,
+					"label": "var                                               "
+				},
+				{
+					"line": 116,
+					"column": 35,
+					"label": "websocket                                        "
+				},
+				{
+					"line": 276,
+					"column": 32,
+					"label": "/game                                            "
+				},
+				{
+					"line": 317,
+					"column": 41,
+					"label": "/get_user_info                              "
+				},
+				{
+					"line": 344,
+					"column": 0,
+					"label": "                                                 "
+				}
+			]
+		},
+		{
+			"path": "public/javascript/javascript.js",
+			"bookmarks": [
+				{
+					"line": 10,
+					"column": 47,
+					"label": "websocket                                  "
+				}
+			]
+		}
+	]
+}
