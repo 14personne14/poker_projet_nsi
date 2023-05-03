@@ -1,0 +1,199 @@
+{
+  "main": {
+    "id": "c030b1758b238982",
+    "type": "split",
+    "children": [
+      {
+        "id": "de991eb91b391ad6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3b10bd524fb36be5",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "grafcet/MISE.canvas",
+                "viewState": {
+                  "x": 18.562665854668353,
+                  "y": 950.1279809705661,
+                  "zoom": 0.08039421273121772
+                }
+              }
+            }
+          },
+          {
+            "id": "c1562624676fa56d",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "grafcet/GLOBAL.canvas",
+                "viewState": {
+                  "x": -56.77326696088184,
+                  "y": -645.2933330123908,
+                  "zoom": -0.3333333333333332
+                }
+              }
+            }
+          },
+          {
+            "id": "6a343fbc4cc6061f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "files/fonctions.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "97307cfc57a75f3a",
+    "type": "split",
+    "children": [
+      {
+        "id": "493965c0328dfbf9",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "59e84535166fae5f",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "d726aaf911c8015b",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "fb4be510d2bc8ac8",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "right": {
+    "id": "cf6b768e6bf65aeb",
+    "type": "split",
+    "children": [
+      {
+        "id": "94a446784481fc4e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bc78312e32407a02",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "grafcet/GLOBAL.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "4f4717364d1798ef",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "grafcet/GLOBAL.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "6890b71ac827b71f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "e88377e1d9a5b135",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "grafcet/GLOBAL.canvas"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Ouvrir le sélecteur rapide": false,
+      "graph:Ouvrir la vue graphique": false,
+      "canvas:Créer une nouvelle toile": false,
+      "daily-notes:Ouvrir la note quotidienne": false,
+      "templates:Insérer le modèle": false,
+      "command-palette:Ouvrir la palette de commandes": false
+    }
+  },
+  "active": "c1562624676fa56d",
+  "lastOpenFiles": [
+    "grafcet/MISE.canvas",
+    "grafcet/GLOBAL.canvas",
+    "files/fonctions.md",
+    "info/Serveur.canvas",
+    "info/Client.canvas",
+    "files/variables.md",
+    "GAME.canvas",
+    "info/Client.md",
+    "info/Serveur.md",
+    "images/MISE.png",
+    "info",
+    "images",
+    "files",
+    "grafcet",
+    "grafset/Sans titre.canvas"
+  ]
+}

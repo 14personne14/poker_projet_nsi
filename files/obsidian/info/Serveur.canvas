@@ -1,0 +1,18 @@
+{
+	"nodes":[
+		{"type":"text","text":"NODE.JS","id":"9cb476614e1cdd3c","x":-449,"y":-600,"width":119,"height":50,"color":"6"},
+		{"type":"text","text":"WEBSOCKET","id":"d30d410791ecb1fb","x":376,"y":-600,"width":149,"height":50,"color":"4"},
+		{"type":"text","text":"Coder la fonction qui tourne en continue *(toutes les 0.1 millisecondes)* \n-> voir [[GLOBAL.canvas]] et [[MISE.canvas]] pour plus d'info...","id":"d9560e58ae592284","x":-668,"y":-80,"width":559,"height":80,"color":"#ffffff"},
+		{"type":"text","text":"Nouvelle `ws` : do nothing","id":"a709c1eaf72c17e0","x":248,"y":-160,"width":405,"height":60,"color":"#ffffff"},
+		{"type":"text","text":"event `start` : \n- Variable `start = true`","id":"7fe864ad5482187c","x":310,"y":-20,"width":280,"height":100,"color":"#ffffff"},
+		{"type":"text","text":"App on request on `/choice` : \nVerification des données : *`mise_actuelle` < argent misé < argent max et max 3 relance*\n- Données correct : \n\t- Send `ok` to client\n\t- Mettre variable `player_choice` avec les bonnes valeurs\n- Données incorrect :\n\t- Send `non` to client et pourquoi `non`","id":"1fc9045c1b62e5cb","x":-729,"y":-460,"width":681,"height":260,"color":"#ffffff"},
+		{"type":"text","text":"event `add_player` : \n- Si argent mit en jeu < `argent_min_require` :\n\t- Detruire la ws \n- Sinon : \n\t- Ajouter le client dans `players` avec sa websocket (`ws`) et son argent mit en jeu (`argent`)\n\t- Envoyer à tous les joueur qu'un nouveau joueur à rejoint le jeu ","id":"9a605d09f72b85b0","x":120,"y":-480,"width":660,"height":240,"color":"#ffffff"}
+	],
+	"edges":[
+		{"id":"aca860f09725e264","fromNode":"9cb476614e1cdd3c","fromSide":"bottom","toNode":"1fc9045c1b62e5cb","toSide":"top","toEnd":"none","color":"6"},
+		{"id":"185972a699231187","fromNode":"d30d410791ecb1fb","fromSide":"bottom","toNode":"9a605d09f72b85b0","toSide":"top","toEnd":"none","color":"4"},
+		{"id":"5b0129d22e2d7df7","fromNode":"1fc9045c1b62e5cb","fromSide":"bottom","toNode":"d9560e58ae592284","toSide":"top","toEnd":"none","color":"6"},
+		{"id":"761b21fac1118ff8","fromNode":"9a605d09f72b85b0","fromSide":"bottom","toNode":"a709c1eaf72c17e0","toSide":"top","toEnd":"none","color":"4"},
+		{"id":"e9616e4c0a6c2213","fromNode":"a709c1eaf72c17e0","fromSide":"bottom","toNode":"7fe864ad5482187c","toSide":"top","toEnd":"none","color":"4"}
+	]
+}

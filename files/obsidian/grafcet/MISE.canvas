@@ -1,0 +1,39 @@
+{
+	"nodes":[
+		{"type":"text","text":"4","id":"00631340cb828355","x":-130,"y":1125,"width":60,"height":50,"color":"3"},
+		{"type":"text","text":"3","id":"55ee364a65a9345a","x":-130,"y":725,"width":60,"height":50,"color":"3"},
+		{"type":"text","text":"- Mettre la variable `GRAFCET_MISE` à `false`","id":"11cb4f0610042bd5","x":0,"y":1118,"width":460,"height":65,"color":"3"},
+		{"type":"text","text":"*`mise_fini(liste_joueur_playing, mise_actuelle) == true`*","id":"bddd9877410c3775","x":-337,"y":940,"width":475,"height":60},
+		{"type":"text","text":"0","id":"2fff2357109e57fb","x":-130,"y":-620,"width":60,"height":50,"color":"4"},
+		{"type":"text","text":"Do nothing... ","id":"3fd004d276ec714e","x":0,"y":-620,"width":460,"height":50,"color":"4"},
+		{"type":"text","text":"*`GRAFCET_MISE == true`*","id":"1feea844b8ea3be6","x":-218,"y":-460,"width":237,"height":50},
+		{"type":"text","text":"1","id":"7b49064cd30a05e3","x":-129,"y":-259,"width":60,"height":50,"color":"3"},
+		{"type":"text","text":"*`true`*","id":"28baa9a00d50c651","x":-148,"y":-80,"width":98,"height":60},
+		{"type":"text","text":"*`mise_fini(liste_joueur_playing, mise_actuelle) == false`*","id":"3e0d413f054cd99c","x":-960,"y":207,"width":500,"height":50},
+		{"type":"text","text":"`1=1`","id":"54e79412a2279976","x":-1420,"y":207,"width":100,"height":50},
+		{"type":"text","text":"2","id":"b5d5e0b5827a14f8","x":-131,"y":182,"width":60,"height":50,"color":"3"},
+		{"type":"text","text":"Do nothing...","id":"3917d7bef3164608","x":0,"y":182,"width":200,"height":50,"color":"3"},
+		{"type":"text","text":"*`player_choice != undefined` OR `timer_choix >= 60 sec`*","id":"3268ffe7fa24d228","x":-331,"y":420,"width":460,"height":50},
+		{"type":"text","text":"- Envoyer event `next_player` avec valeur `i` à tous les joueurs\n- Démarrer `timer_choix`","id":"17209b5fab591ec1","x":0,"y":-289,"width":500,"height":111,"color":"3"},
+		{"type":"text","text":"- Mettre à jour `liste_joueur_playing` : \n\t- Si `player_choice != undefined` : ajouter les données de `player_choice` et supprime l'argent du joueur dans `players`\n\t- Si `timer_choix >= 60` : faire abandonner le joueur\n- Mettre à jour `pot` et `mise_actuelle`\n- send event `player`\n- Faire avancer la variable `i` pour passer au joueur suivant (qui n'a pas déja ABANDONNER ou qui n'a pas PERDU)","id":"6a5fe04579a00a58","x":0,"y":625,"width":600,"height":251,"color":"3"}
+	],
+	"edges":[
+		{"id":"3d31174875a2fae7","fromNode":"b5d5e0b5827a14f8","fromSide":"right","toNode":"3917d7bef3164608","toSide":"left","toEnd":"none","color":"3"},
+		{"id":"f9ee6c4da2f15279","fromNode":"2fff2357109e57fb","fromSide":"bottom","toNode":"1feea844b8ea3be6","toSide":"top","toEnd":"none"},
+		{"id":"7fcfe90d838959cc","fromNode":"2fff2357109e57fb","fromSide":"right","toNode":"3fd004d276ec714e","toSide":"left","toEnd":"none","color":"4"},
+		{"id":"ec2da7c881542522","fromNode":"55ee364a65a9345a","fromSide":"right","toNode":"6a5fe04579a00a58","toSide":"left","toEnd":"none","color":"3"},
+		{"id":"6eb0a26b647e1202","fromNode":"b5d5e0b5827a14f8","fromSide":"bottom","toNode":"3268ffe7fa24d228","toSide":"top","toEnd":"none"},
+		{"id":"5ab53ed4d7dd0810","fromNode":"00631340cb828355","fromSide":"right","toNode":"11cb4f0610042bd5","toSide":"left","toEnd":"none","color":"3"},
+		{"id":"54875c6684fcd18f","fromNode":"55ee364a65a9345a","fromSide":"bottom","toNode":"bddd9877410c3775","toSide":"top","toEnd":"none"},
+		{"id":"62a3c33586710c9a","fromNode":"55ee364a65a9345a","fromSide":"left","toNode":"3e0d413f054cd99c","toSide":"bottom","toEnd":"none"},
+		{"id":"bcb063462cfeea2c","fromNode":"3e0d413f054cd99c","fromSide":"top","toNode":"7b49064cd30a05e3","toSide":"left"},
+		{"id":"63f18320ce14dbdd","fromNode":"1feea844b8ea3be6","fromSide":"bottom","toNode":"7b49064cd30a05e3","toSide":"top"},
+		{"id":"b654758d0713caaa","fromNode":"3268ffe7fa24d228","fromSide":"bottom","toNode":"55ee364a65a9345a","toSide":"top"},
+		{"id":"3cb85f6e7cd6bf6a","fromNode":"bddd9877410c3775","fromSide":"bottom","toNode":"00631340cb828355","toSide":"top"},
+		{"id":"5b08ab8e5f53e718","fromNode":"00631340cb828355","fromSide":"left","toNode":"54e79412a2279976","toSide":"bottom"},
+		{"id":"1e087a6d439c4c4e","fromNode":"54e79412a2279976","fromSide":"top","toNode":"2fff2357109e57fb","toSide":"left"},
+		{"id":"c0557c5acf709ce8","fromNode":"7b49064cd30a05e3","fromSide":"right","toNode":"17209b5fab591ec1","toSide":"left","toEnd":"none","color":"3"},
+		{"id":"a7d1532f38e97d53","fromNode":"7b49064cd30a05e3","fromSide":"bottom","toNode":"28baa9a00d50c651","toSide":"top","toEnd":"none"},
+		{"id":"c60222417d230d0e","fromNode":"28baa9a00d50c651","fromSide":"bottom","toNode":"b5d5e0b5827a14f8","toSide":"top"}
+	]
+}
