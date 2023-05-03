@@ -1,6 +1,6 @@
 // Websocket
 var socket;
-if (window.location.host === 'azerty.tk') {
+if (window.location.host === 'azerty.tk') { // azerty.tk
 	socket = new WebSocket(`wss://azerty.tk/`); // wss://azerty.tk/
 } else {
 	socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
