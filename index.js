@@ -19,7 +19,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({
 	server: server,
 });
-const port = 8101; // default: [8101]
+const port = 8103; // default: [8103]
 
 // Variables constantes
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
@@ -360,6 +360,30 @@ function action_global() {
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse; // Reset
+        
+        // 
+        var cartes_flop_to_send = [];
+        for (var carte of cartes_flop) {
+            cartes_flop_to_send.push({
+                symbole: carte.symbole,
+                numero: carte.numero,
+            });
+        }
+        wss_send_joueur({
+            type: 'next_game',
+            mise_actuelle_requise: mise_actuelle_requise,
+            petite_blind: {
+                username: PLAYERS[indice_blind.petite].username,
+                argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+            },
+            grosse_blind: {
+                username: PLAYERS[indice_blind.grosse].username,
+                argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+            },
+            cartes_flop: cartes_flop_to_send,
+            pot: pot,
+            who_playing: PLAYERS[who_playing].username,
+        });
 
 		// Debug
 		console.log('------------------');
@@ -404,6 +428,7 @@ function transition_global() {
 	else if (etape_global == 4) {
 		etape_global = 5;
 	}
+    // 
 
 	// Variable reset
 	try_start = false;

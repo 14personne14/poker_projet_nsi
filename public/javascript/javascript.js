@@ -1,7 +1,7 @@
 // Websocket
 var socket;
-if (window.location.host === 'azerty.tk') { // azerty.tk
-	socket = new WebSocket(`wss://azerty.tk/`); // wss://azerty.tk/
+if (window.location.host === 'poker.azerty.tk') { // azerty.tk
+	socket = new WebSocket(`wss://poker.azerty.tk/`); // wss://poker.azerty.tk/
 } else {
 	socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
 }
@@ -184,6 +184,23 @@ function player_choose_action(action) {
 	});
 }
 
+function affiche_carte_flop(cartes) {
+	/**
+	 * Affiche les cartes du flop
+	 *
+	 * [entree] cartes: les cartes du flop (list)
+	 * [sortie] xxx
+	 */
+
+	for (var carte of cartes) {
+		var new_img = document.createElement('img');
+		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
+		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
+
+		document.getElementById('card_flop').appendChild(new_img);
+	}
+}
+
 /*
  *
  *
@@ -290,6 +307,21 @@ socket.addEventListener('message', (event) => {
 		update_action_player(data.username, data.action);
 		update_pot_mise(data.pot, data.mise);
 	}
+    else if (data.type == 'next_game') {
+		console.log(
+			'%cNext Game' +
+				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.cartes_flop[0].numero} ${data.cartes_flop[0].symbole} \n       card 2: ${data.cartes_flop[1].numero} ${data.cartes_flop[1].symbole} \n       card 3: ${data.cartes_flop[2].numero} ${data.cartes_flop[2].symbole}`,
+			'background: #F9FF00; color: #000000; padding: 0px 5px;',
+			''
+		);
+        update_argent_player(data.petite_blind.username, data.petite_blind.argent);
+		update_action_player(data.petite_blind.username, 'petite blind');
+		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
+		update_action_player(data.grosse_blind.username, 'grosse blind');
+		update_main_player(data.who_playing, 'on');
+		update_pot_mise(data.pot, data.mise_actuelle_requise);
+		affiche_carte_flop(data.cartes_flop);
+    }
 	// Autre cas
 	else {
 		console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;');
