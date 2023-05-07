@@ -11,13 +11,16 @@
 		<!-- Style -->
 		<link href="public/style/style.css" rel="stylesheet" />
 
+		<!-- Font Awesome -->
+		<script src="https://kit.fontawesome.com/ec062b5335.js" crossorigin="anonymous"></script>
+
 		<!-- Police google font -->
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet"> 
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet" />
 
 		<title>Accueil pok'help</title>
 	</head>
@@ -30,11 +33,14 @@
 			</div>
 
 			<!-- ALERT -->
-			<div class="texte_defilant">
+			<div class="alerts">
 				<% if (alert) { %>
-				<p class="alert"><%= alert.message %></p>
-				<% } else { %>
-				<p class="alert">pas d'alerte en cours !</p>
+				<div class="d-flex justify-content-center">
+					<div class="alert animation--shake">
+						<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+						<p><%= alert.message %></p>
+					</div>
+				</div>
 				<% } %>
 			</div>
 

@@ -15,43 +15,56 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet"> 
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet" />
 
 		<title>Connexion</title>
 	</head>
 	<body>
-        <div class="container">
+		<div class="container">
 			<!-- TITRE -->
 			<div class="d-flex justify-content-center">
 				<h1>connexion</h1>
 			</div>
-		<form method="post" action="connexion">
-			<label for="username">Nom d'utilisateur:</label>
-			<input type="text" id="username" name="username" required />
-			<br />
-			<label for="password">Mot de passe:</label>
-			<input type="password" id="password" name="password" required />
-			<br />
-			<input type="submit" value="Se connecter" />
-		</form>
-		<br /><br />
-		<a href="inscription"> <button>inscription</button> </a><br />
-		<a href=""> <button>acceuil</button> </a><br />
-		<a href="deconnexion"> <button>deconnexion</button> </a><br />
-		<a href="game">
-			<button>game</button>
-		</a>
 
-		<!-- ALERT BLOCK -->
-		<% if (alert) { %>
-		<p class="alert"><%= alert.message %></p>
-		<% } else { %>
-		<p>pas d'alert en cour !</p>
-		<% } %>
-            
-            			<!-- FOOTER -->
+			<!-- ALERT -->
+			<div class="alerts">
+				<% if (alert) { %>
+				<div class="d-flex justify-content-center">
+					<div class="alert animation--shake">
+						<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+						<p><%= alert.message %></p>
+					</div>
+				</div>
+				<% } %>
+			</div>
+
+			<form method="post" action="connexion">
+				<label for="username">Nom d'utilisateur:</label>
+				<input type="text" id="username" name="username" required />
+				<br />
+				<label for="password">Mot de passe:</label>
+				<input type="password" id="password" name="password" required />
+				<br />
+				<input type="submit" value="Se connecter" />
+			</form>
+			<br /><br />
+			<a href="inscription"> <button>inscription</button> </a><br />
+			<a href="/"> <button>acceuil</button> </a><br />
+			<a href="deconnexion"> <button>deconnexion</button> </a><br />
+			<a href="game">
+				<button>game</button>
+			</a>
+
+			<!-- ALERT BLOCK -->
+			<% if (alert) { %>
+			<p class="alert"><%= alert.message %></p>
+			<% } else { %>
+			<p>pas d'alert en cour !</p>
+			<% } %>
+
+			<!-- FOOTER -->
 			<footer>
 				<div class="d-flex justify-content-center">
 					<div class="line_separation"></div>
@@ -77,6 +90,6 @@
 					</div>
 				</div>
 			</footer>
-        </div>
+		</div>
 	</body>
 </html>

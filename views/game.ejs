@@ -10,50 +10,50 @@
 		<!-- JQuery -->
 		<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 
-		<title>Pok'help</title>
+		<title>Pok'help - Game</title>
 	</head>
 	<body>
-		<p>Your are <%= username %></p>
-
-		<button onclick="button_start()">Start</button>
-
-		<p id="valeur_pot">pot: none | mise: none</p>
-
-		<div id="your_card"></div>
-        
-        <div id="card_flop"></div>
-
-		<div id="liste_players">
-			<% for (var i = 0; i < PLAYERS.length; i++) { %>
-			<div id="player-<%= PLAYERS[i].username %>" class="player_block">
-				<h2 style="margin: 0">Joueur :</h2>
-				<p id="player-username-<%= PLAYERS[i].username %>"><%= PLAYERS[i].username %></p>
-				<p id="player-argent_en_jeu-<%= PLAYERS[i].username %>"><%= PLAYERS[i].argent_en_jeu %></p>
-				<p id="player-last_action-<%= PLAYERS[i].username %>">aucune</p>
+		<div class="container">
+			<!-- ALERT -->
+			<div class="alerts">
+				<% if (alert) { %>
+				<div class="d-flex justify-content-center">
+					<div class="alert animation--shake">
+						<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+						<p><%= alert.message %></p>
+					</div>
+				</div>
+				<% } %>
 			</div>
-			<% } %>
+
+			<!-- Username -->
+			<p>Your are <%= username %></p>
+
+			<!-- Button start -->
+			<button onclick="button_start()">Start</button>
+
+			<!-- Pot & Mise actuelle -->
+			<p id="valeur_pot">pot: none | mise: none</p>
+
+			<!-- Card of player -->
+			<div id="your_card"></div>
+
+			<!-- Card communes -->
+			<div id="cartes_communes"></div>
+
+			<!-- Liste Joueurs -->
+			<div id="liste_players">
+			</div>
+
+			<!-- Choix possible -->
+			<button onclick="player_choose_action('suivre')">Suivre</button>
+			<button onclick="player_choose_action('abandon')">Abandonner</button>
+			<button onclick="player_choose_action('relance')">Relancer</button
+			><input type="text" value="100" min="0" max="" placeholder="valeur relance" id="input_relance" />
+			<button onclick="player_choose_action('all-in')">All-in</button>
+
+			<!-- Javascript -->
+			<script src="public/javascript/javascript.js"></script>
 		</div>
-		<button onclick="player_choose_action('suivre')">Suivre</button>
-		<button onclick="player_choose_action('abandon')">Abandonner</button>
-		<button onclick="player_choose_action('relance')">Relancer</button><input type="text" value="100" min="0" max="" placeholder="valeur relance" id="input_relance">
-		<button onclick="player_choose_action('all-in')">All-in</button>
-		<h1>---------------</h1>
-
-		<a href="connexion"> <button>connexion</button> </a><br />
-		<a href="inscription"> <button>inscription</button> </a><br />
-		<a href="deconnexion"> <button>deconnexion</button> </a><br />
-		<a href="">
-			<button>Accueil</button>
-		</a>
-
-		<!-- ALERT BLOCK -->
-		<% if (alert) { %>
-		<p class="alert"><%= alert.message %></p>
-		<% } else { %>
-		<p>pas d'alert en cour !</p>
-		<% } %>
-
-		<!-- Javascript -->
-		<script src="public/javascript/javascript.js"></script>
 	</body>
 </html>

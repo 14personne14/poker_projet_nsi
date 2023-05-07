@@ -1,31 +1,42 @@
+/* --- FOND --- */
+body {
+	background: #2b2f77;
+	background: -webkit-linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
+	background: linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
+	background-attachment: scroll;
+	color: #ffffff; 
+}
+
 .player_block {
 	border: #000000 solid 1px;
+	background-color: #ffffff;
+	color: #000000; 
 	padding: 10px;
 }
 
 .player_block p {
-    margin: 0; 
+	margin: 0;
 }
 
 .main_player {
-    background-color: #FF0000; 
+	background-color: #ff0000;
 }
 
 .your_card {
-    padding: 10px;
+	padding: 10px;
 }
 
 .your_card img {
-    padding: 10px;
+	padding: 10px;
 }
 
 #valeur_pot {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 .abandon {
-    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='black' stroke-width='1'/><path d='M0 0 L100 100 ' stroke='black' stroke-width='1'/></svg>");
-    background-repeat:no-repeat;
-    background-position:center center;
-    background-size: 100% 100%, auto;
+	background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='black' stroke-width='1'/><path d='M0 0 L100 100 ' stroke='black' stroke-width='1'/></svg>");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% 100%, auto;
 }

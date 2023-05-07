@@ -271,6 +271,14 @@ socket.addEventListener('message', (event) => {
 		console.log('%cNew player' + `%c ${data.username} | ${data.argent_en_jeu}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
 		add_player(data.username, data.argent_en_jeu);
 	}
+	// Init liste players
+	else if (data.type == 'liste_player') {
+		console.log('%cListe player', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
+		console.log(data.liste);
+		for (var joueur of data.liste) {
+			add_player(joueur.username, joueur.argent_en_jeu);
+		}
+	}
 	// Init game
 	else if (data.type == 'init_game') {
 		console.log(
@@ -306,22 +314,21 @@ socket.addEventListener('message', (event) => {
 		update_argent_player(data.username, data.argent_left);
 		update_action_player(data.username, data.action);
 		update_pot_mise(data.pot, data.mise);
-	}
-    else if (data.type == 'next_game') {
+	} else if (data.type == 'next_game') {
 		console.log(
 			'%cNext Game' +
 				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.cartes_flop[0].numero} ${data.cartes_flop[0].symbole} \n       card 2: ${data.cartes_flop[1].numero} ${data.cartes_flop[1].symbole} \n       card 3: ${data.cartes_flop[2].numero} ${data.cartes_flop[2].symbole}`,
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
-        update_argent_player(data.petite_blind.username, data.petite_blind.argent);
+		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
 		update_action_player(data.grosse_blind.username, 'grosse blind');
 		update_main_player(data.who_playing, 'on');
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
 		affiche_carte_flop(data.cartes_flop);
-    }
+	}
 	// Autre cas
 	else {
 		console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;');
@@ -331,7 +338,7 @@ socket.addEventListener('message', (event) => {
 
 socket.addEventListener('close', function (event) {
 	// Erreur deconnexion de la websocket.
-	$('body').hide();
+	$('.container').hide();
 });
 
 // Debug info

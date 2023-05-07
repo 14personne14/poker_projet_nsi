@@ -2,5 +2,5 @@
 CREATE TABLE players (
     username TEXT PRIMARY KEY,
     password TEXT NOT NULL, 
-    argent INTERGET DEFAULT 0 
+    argent INTERGET DEFAULT 0
 );

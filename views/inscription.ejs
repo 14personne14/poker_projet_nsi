@@ -15,76 +15,85 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet"> 
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet" />
 
 		<title>Inscription</title>
-
 	</head>
 	<body>
-        <div class="container">
-					<!-- TITRE -->
+		<div class="container">
+			<!-- TITRE -->
 			<div class="d-flex justify-content-center">
 				<h1>inscription</h1>
 			</div>
-        <p>Le nom d'utilisateur ne peux contenir que des lettres ou des chiffres ou un tiret du bas.</p>
-        <p>Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial. Il doit aussi être entre 8 et 16 caractères.</p>
-		<form method="post" action="inscription">
-			<label for="username">Nom d'utilisateur:</label>
-			<input type="text" id="username" name="username" required>
-			<br>
-			<label for="password">Mot de passe:</label>
-			<input type="password" id="password" name="password" required>
-			<br>
-			<input type="submit" value="S'inscrire">
-		</form><br><br>
-		<a href="connexion">  
-			<button>connexion</button>  
-		</a><br>
-		<a href="">  
-			<button>acceuil</button>  
-		</a><br>
-		<a href="deconnexion">  
-			<button>deconnexion</button>  
-		</a><br>
-		<a href="game">  
-			<button>game</button> 
-		</a>
 
-		<!-- ALERT BLOCK -->
-		<% if (alert) { %> 
-		<p class="alert"><%= alert.message %></p>
-		<% } else { %> 
-		<p>pas d'alert en cour !</p>
-		<% } %>
-        </div>
-        
-        			<!-- FOOTER -->
-			<footer>
+			<!-- ALERT -->
+			<div class="alerts">
+				<% if (alert) { %>
 				<div class="d-flex justify-content-center">
-					<div class="line_separation"></div>
-				</div>
-
-				<div class="d-flex justify-content-center">
-					<div class="grid text-center">
-						<div class="g-col-12 g-col-lg-4">
-							<a href="proba">
-								<button class="secondary_button">calcul des probabilités</button>
-							</a>
-						</div>
-						<div class="g-col-12 g-col-lg-4">
-							<a href="crédits">
-								<button class="secondary_button">crédits</button>
-							</a>
-						</div>
-						<div class="g-col-12 g-col-lg-4">
-							<a href="règles du jeu">
-								<button class="secondary_button space">règles du jeu</button>
-							</a>
-						</div>
+					<div class="alert animation--shake">
+						<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+						<p><%= alert.message %></p>
 					</div>
 				</div>
-			</footer>
+				<% } %>
+			</div>
+
+			<p>Le nom d'utilisateur ne peux contenir que des lettres ou des chiffres ou un tiret du bas.</p>
+			<p>
+				Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial. Il doit aussi
+				être entre 8 et 16 caractères.
+			</p>
+			<form method="post" action="inscription">
+				<label for="username">Nom d'utilisateur:</label>
+				<input type="text" id="username" name="username" required />
+				<br />
+				<label for="password">Mot de passe:</label>
+				<input type="password" id="password" name="password" required />
+				<br />
+				<input type="submit" value="S'inscrire" />
+			</form>
+			<br /><br />
+			<a href="connexion">
+				<button>connexion</button> </a
+			><br />
+			<a href="/">
+				<button>acceuil</button> </a
+			><br />
+			<a href="deconnexion">
+				<button>deconnexion</button> </a
+			><br />
+			<a href="game">
+				<button>game</button>
+			</a>
+		</div>
+
+		<!-- FOOTER -->
+		<footer>
+			<div class="d-flex justify-content-center">
+				<div class="line_separation"></div>
+			</div>
+
+			<div class="d-flex justify-content-center">
+				<div class="grid text-center">
+					<div class="g-col-12 g-col-lg-4">
+						<a href="proba">
+							<button class="secondary_button">calcul des probabilités</button>
+						</a>
+					</div>
+					<div class="g-col-12 g-col-lg-4">
+						<a href="crédits">
+							<button class="secondary_button">crédits</button>
+						</a>
+					</div>
+					<div class="g-col-12 g-col-lg-4">
+						<a href="règles du jeu">
+							<button class="secondary_button space">règles du jeu</button>
+						</a>
+					</div>
+				</div>
+			</div>
+		</footer>
 	</body>
 </html>

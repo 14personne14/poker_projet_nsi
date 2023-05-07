@@ -55,17 +55,18 @@ var timer; // Un timer (object)
 var timer_choix_end = false; // Si le timer est terminé ou non (bool)
 
 // Fonction local
-function wss_send_joueur(data) {
+function wss_send_joueur(data, except = []) {
 	/**
-	 * Envoie un message à tous les joueurs de la liste PLAYERS en websocket.
+	 * Envoie un message à tous les joueurs de la liste PLAYERS sauf ceux de la liste except en websocket.
 	 *
-	 * [entrée] data: Les données à envoyer (object)
+	 * [entrée] data: 	Les données à envoyer (object)
+	 * 			except: Liste des joueurs à ne pas envoyer (liste)
 	 * [sortie] xxx
 	 */
 
 	const wss_data = JSON.stringify(data);
 	for (var joueur of PLAYERS) {
-		if (joueur.ws != undefined) {
+		if (joueur.ws != undefined && !except.includes(joueur.username)) {
 			joueur.ws.send(wss_data);
 		}
 	}
@@ -360,30 +361,30 @@ function action_global() {
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse; // Reset
-        
-        // 
-        var cartes_flop_to_send = [];
-        for (var carte of cartes_flop) {
-            cartes_flop_to_send.push({
-                symbole: carte.symbole,
-                numero: carte.numero,
-            });
-        }
-        wss_send_joueur({
-            type: 'next_game',
-            mise_actuelle_requise: mise_actuelle_requise,
-            petite_blind: {
-                username: PLAYERS[indice_blind.petite].username,
-                argent: PLAYERS[indice_blind.petite].argent_en_jeu,
-            },
-            grosse_blind: {
-                username: PLAYERS[indice_blind.grosse].username,
-                argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
-            },
-            cartes_flop: cartes_flop_to_send,
-            pot: pot,
-            who_playing: PLAYERS[who_playing].username,
-        });
+
+		// Prepare send carte flop
+		var cartes_flop_to_send = [];
+		for (var carte of cartes_flop) {
+			cartes_flop_to_send.push({
+				symbole: carte.symbole,
+				numero: carte.numero,
+			});
+		}
+		wss_send_joueur({
+			type: 'next_game',
+			mise_actuelle_requise: mise_actuelle_requise,
+			petite_blind: {
+				username: PLAYERS[indice_blind.petite].username,
+				argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+			},
+			grosse_blind: {
+				username: PLAYERS[indice_blind.grosse].username,
+				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+			},
+			cartes_flop: cartes_flop_to_send,
+			pot: pot,
+			who_playing: PLAYERS[who_playing].username,
+		});
 
 		// Debug
 		console.log('------------------');
@@ -395,6 +396,14 @@ function action_global() {
 		console.log('pot: ', pot);
 		console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		console.log('------------------');
+
+		// Lance le grafcet MISE
+		GRAFCET_MISE = true;
+	}
+	// Etape 5
+	// Etape 6
+	else if (etape_global == 6) {
+		console.log('ETAPE 6666 GRAPHE MISE FINIIIII');
 	}
 	// Etape 'end' // temp
 	else if (etape_global == 'end') {
@@ -428,7 +437,10 @@ function transition_global() {
 	else if (etape_global == 4) {
 		etape_global = 5;
 	}
-    // 
+	// Etape 5 -> Etape 6
+	else if (etape_global == 5 && GRAFCET_MISE == false) {
+		etape_global = 6;
+	}
 
 	// Variable reset
 	try_start = false;
@@ -452,8 +464,7 @@ async function global() {
  */
 
 function action_mise() {
-	// Etape 0 (do nothing)
-
+	// Etape 0
 	// Etape 1
 	if (etape_mise == 1) {
 		console.log('etape 1 MISE');
@@ -686,11 +697,28 @@ wss.on('connection', (ws, req) => {
 			});
 			// console.log(PLAYERS); // debug
 
-			wss_send_joueur({
-				type: 'new_player',
-				username: username,
-				argent_en_jeu: argent, // temp -fake-
-			});
+			// Prepare init list of players
+			var data = {
+				type: 'liste_player',
+				liste: [],
+			};
+			for (var joueur of PLAYERS) {
+				data.liste.push({
+					username: joueur.username,
+					argent_en_jeu: joueur.argent_en_jeu,
+				});
+			}
+			ws.send(JSON.stringify(data));
+
+			// Send new player
+			wss_send_joueur(
+				{
+					type: 'new_player',
+					username: username,
+					argent_en_jeu: argent, // temp -fake-
+				},
+				[username]
+			);
 		}
 	});
 
@@ -1036,7 +1064,9 @@ app.get('/game', (req, res) => {
 	} else {
 		res.render('index', {
 			connected: false,
-			alert: 'Des joueurs sont deja en train de jouer !',
+			alert: {
+				message: 'Des joueurs sont deja en train de jouer !',
+			},
 		});
 	}
 	/*
