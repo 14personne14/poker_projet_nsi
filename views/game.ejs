@@ -14,17 +14,7 @@
 	</head>
 	<body>
 		<div class="container">
-			<!-- ALERT -->
-			<div class="alerts">
-				<% if (alert) { %>
-				<div class="d-flex justify-content-center">
-					<div class="alert animation--shake">
-						<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-						<p><%= alert.message %></p>
-					</div>
-				</div>
-				<% } %>
-			</div>
+			<%- include('includes/alert'); %>
 
 			<!-- Username -->
 			<p>Your are <%= username %></p>

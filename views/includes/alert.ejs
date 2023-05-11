@@ -1,0 +1,11 @@
+<!-- ALERT -->
+<div class="alerts">
+    <% if (alert) { %>
+    <div class="d-flex justify-content-center">
+        <div class="alert animation--shake">
+            <div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <p><%= alert.message %></p>
+        </div>
+    </div>
+    <% } %>
+</div>

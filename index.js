@@ -996,7 +996,9 @@ app.get('/', (req, res) => {
 	} else {
 		res.render('index', {
 			connected: false,
-			alert: undefined,
+            alert: {
+				message: `Ceci est une alert pour test !`,
+			},
 		});
 	}
 });
@@ -1039,6 +1041,21 @@ app.get('/inscription', (req, res) => {
 			alert: undefined,
 		});
 	}
+});
+
+// Quand le client demande '/credits'
+app.get('/credits', (req, res) => {
+    res.render('credits');
+});
+
+// Quand le client demande '/regles_du_jeu'
+app.get('/regles_du_jeu', (req, res) => {
+    res.render('regles_du_jeu');
+});
+
+// Quand le client demande '/calcul_proba'
+app.get('/calcul_proba', (req, res) => {
+    res.render('calcul_proba');
 });
 
 // Quand le client demande '/game'

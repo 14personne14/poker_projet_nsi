@@ -113,6 +113,24 @@ h1 {
 	margin-bottom: 10px;
 }
 
+/* --- FORM --- */
+
+.form-label{
+    font-family: 'Comfortaa', cursive;
+}
+
+.form-check{
+    padding-left: 0;
+}
+
+.btn-primary{
+    background-color: #00ed04;
+    border: None;
+}
+
+.form-control{
+    font-size: 15px;
+}
 /* --- ALERT --- */
 /*.texte_defilant {
 	display: block;
@@ -152,8 +170,6 @@ h1 {
 }*/
 
 /* Alert */
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500&display=swap');
-
 .alert {
 	font-family: 'Baloo 2', cursive;
 
