@@ -55,6 +55,10 @@ function log(titre, message = '', type = '') {
 	else if (type == 'info') {
 		console.log('\n' + `${titre}:`.bgWhite.black + ` ${message} `.white);
 	}
+	// Game
+	else if (type == 'game') {
+		console.log('\n' + `${titre}:`.bgBlue.white + ` ${message} `.white);
+	}
 	// Cas de base
 	else {
 		console.log('\n' + `${titre}`.bgWhite + `   ${message} `.white);

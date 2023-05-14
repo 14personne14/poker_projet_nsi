@@ -11,7 +11,6 @@ const colors = require('colors'); // For color console
 const { verif_regex, encode_sha256, sleep, get_random_number } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
 const JeuCartes = require('./functions/card');
-const { Console } = require('console');
 
 // Variables for server
 const app = express();
@@ -125,7 +124,7 @@ app.use(
 
 // Pour les sessions des utilisateurs
 var sessionParser = sessions({
-	secret: 'ce-texte-doit-rester-secret',
+	secret: 'ce-texte-doit-rester-un-secret',
 	resave: true,
 	saveUninitialized: true,
 	cookie: {
@@ -405,9 +404,9 @@ function action_global() {
 	else if (etape_global == 6) {
 		console.log('ETAPE 6666 GRAPHE MISE FINIIIII');
 	}
-	// Etape 'end' // temp
-	else if (etape_global == 'end') {
-		console.log('END GAME (GLABAL)');
+	// Etape 13 (end)
+	else if (etape_global == 13) {
+		console.log('END GAME (GLOBAL)');
 	}
 }
 
@@ -416,6 +415,7 @@ function transition_global() {
 	if (etape_global == 0 && try_start == true && nbr_joueur >= nbr_joueur_min_require && nbr_joueur <= nbr_joueur_max_require) {
 		etape_global = 1;
 		partie_en_cours = true;
+		log('Game', 'Start Etape 1', 'game');
 	}
 	// Etape 1 -> Etape 2
 	else if (etape_global == 1) {
@@ -429,9 +429,9 @@ function transition_global() {
 	else if (etape_global == 3 && end_of_tour() == false) {
 		etape_global = 4;
 	}
-	// Etape 3 -> Etape [end] ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Etape 3 -> Etape 13
 	else if (etape_global == 3 && end_of_tour() == true) {
-		etape_global = 'end'; ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		etape_global = 13;
 	}
 	// Etape 4 -> Etape 5
 	else if (etape_global == 4) {
