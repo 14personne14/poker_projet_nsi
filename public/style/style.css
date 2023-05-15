@@ -115,21 +115,46 @@ h1 {
 
 /* --- FORM --- */
 
+.espace {
+	margin-bottom: 50px;
+}
 .cadre{
-    background-color :#0101DF;
+	background: linear-gradient(0deg, #58ACFA 0%, #BDBDBD 100%);
+		padding: 30px;
+		border-radius: 10px;
+		box-shadow: 0px 0px 15px black;
 }
 
 .form-label{
     font-family: 'Comfortaa', cursive;
+	width: 550px;
 }
 
 .form-check{
     padding-left: 0;
 }
 
+.form-text {
+	color: #ffffff;
+}
+
+.icon-link {
+	color: #ffffff;
+}
+
+.icon-link:hover {
+	color: #D8D8D8;
+}
 .btn-primary{
-    background-color: #00ed04;
+	background-color: #CEF6EC;
     border: None;
+	color: #424242;
+	}
+	
+	.btn-primary:hover {
+		background-color: #A9F5E1;
+		border: None;
+		color: #424242;
 }
 
 .form-control{

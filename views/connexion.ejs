@@ -14,22 +14,28 @@
 
 			<%- include('includes/alert'); %>
 
-			<form method="post" action="connexion">
-				<label for="username">Nom d'utilisateur:</label>
-				<input type="text" id="username" name="username" required />
-				<br />
-				<label for="password">Mot de passe:</label>
-				<input type="password" id="password" name="password" required />
-				<br />
-				<input type="submit" value="Se connecter" />
-			</form>
-			<br /><br />
-			<a href="inscription"> <button>inscription</button> </a><br />
-			<a href="/"> <button>acceuil</button> </a><br />
-			<a href="deconnexion"> <button>deconnexion</button> </a><br />
-			<a href="game">
-				<button>game</button>
-			</a>
+			<div class="d-flex justify-content-center espace">
+                <form method="post" action="connexion" class="cadre">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username :</label>
+                        <input type="text" class= "form-control" id="username" name="username" placeholder="ex : davidou_38" aria-describedby="username" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password :</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="ex : Mathis1+beau" aria-describedby="password" required />
+                    </div>
+                    <br>
+                    <div class="mb-3 form-check">
+                        <button type="submit" value= "Se connecter" class="btn btn-primary">Submit</button>
+                    </div>
+                        <a class="icon-link" href="/inscription">
+                        Pas encore inscris? inscrivez vous ici
+                        <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
+                    </a>
+                    <br>
+                    
+                </form>
+            </div>
 
 			<%- include('includes/footer'); %>
 		</div>
