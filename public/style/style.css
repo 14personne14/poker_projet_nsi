@@ -115,6 +115,10 @@ h1 {
 
 /* --- FORM --- */
 
+.cadre{
+    background-color :#0101DF;
+}
+
 .form-label{
     font-family: 'Comfortaa', cursive;
 }
