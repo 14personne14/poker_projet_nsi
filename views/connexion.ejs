@@ -6,6 +6,8 @@
 		<title>Pok'help | Connexion</title>
 	</head>
 	<body>
+        <%- include('includes/home_icon'); %>
+
 		<div class="container">
 			<!-- TITRE -->
 			<div class="d-flex justify-content-center">
@@ -14,28 +16,40 @@
 
 			<%- include('includes/alert'); %>
 
-			<div class="d-flex justify-content-center espace">
-                <form method="post" action="connexion" class="cadre">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username :</label>
-                        <input type="text" class= "form-control" id="username" name="username" placeholder="ex : davidou_38" aria-describedby="username" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password :</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="ex : Mathis1+beau" aria-describedby="password" required />
-                    </div>
-                    <br>
-                    <div class="mb-3 form-check">
-                        <button type="submit" value= "Se connecter" class="btn btn-primary">Submit</button>
-                    </div>
-                        <a class="icon-link" href="/inscription">
-                        Pas encore inscris? inscrivez vous ici
-                        <svg class="bi" aria-hidden="true"><use xlink:href="#arrow-right"></use></svg>
-                    </a>
-                    <br>
-                    
-                </form>
-            </div>
+			<div class="d-flex justify-content-center text-center espace">
+				<form method="post" action="connexion" class="cadre">
+					<div class="mb-3">
+						<label for="username" class="form-label">Username :</label>
+						<input
+							type="text"
+							class="form-control"
+							id="username"
+							name="username"
+							placeholder="davidou_38"
+							aria-describedby="username"
+							required
+						/>
+					</div>
+					<div class="mb-3">
+						<label for="password" class="form-label">Password :</label>
+						<input
+							type="password"
+							class="form-control"
+							id="password"
+							name="password"
+							placeholder="Mathis1+beau"
+							aria-describedby="password"
+							required
+						/>
+					</div>
+
+					<div class="mb-3 form-check">
+						<button type="submit" value="Se connecter" class="btn btn-success">Se connecter <i class="fa-solid fa-right-to-bracket"></i></button>
+						<br />
+						<a class="icon-link" href="/inscription"> Pas encore inscrit? </a>
+					</div>
+				</form>
+			</div>
 
 			<%- include('includes/footer'); %>
 		</div>
