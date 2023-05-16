@@ -57,7 +57,7 @@ function log(titre, message = '', type = '') {
 	}
 	// Game
 	else if (type == 'game') {
-		console.log('\n' + `${titre}:`.bgBlue.white + ` ${message} `.white);
+		console.log('\n' + `${titre}`.bgBlue.white + ` ${message} `.white);
 	}
 	// Cas de base
 	else {

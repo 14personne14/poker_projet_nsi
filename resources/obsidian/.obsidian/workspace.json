@@ -30,9 +30,9 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": -18.35142253032714,
-                  "y": -40.82818698884239,
-                  "zoom": -0.14220462009014534
+                  "x": -785,
+                  "y": 1303,
+                  "zoom": -2.4755379534234785
                 }
               }
             }
@@ -49,8 +49,7 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -124,7 +123,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "grafcet/GLOBAL.canvas",
+                "file": "grafcet/MISE.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -141,7 +140,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "grafcet/GLOBAL.canvas",
+                "file": "grafcet/MISE.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -164,7 +163,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "grafcet/GLOBAL.canvas"
+                "file": "grafcet/MISE.canvas"
               }
             }
           }
@@ -185,11 +184,12 @@
       "command-palette:Ouvrir la palette de commandes": false
     }
   },
-  "active": "c1562624676fa56d",
+  "active": "3b10bd524fb36be5",
   "lastOpenFiles": [
-    "grafcet/MISE.canvas",
     "grafcet/GLOBAL.canvas",
     "Statistiques.md",
+    "grafcet/MISE.canvas",
+    "images/GLOBAL.png",
     "images/stat1.png",
     "images/stats2.png",
     "files/fonctions.md",

@@ -2,8 +2,7 @@
 	"nodes":[
 		{"type":"text","text":"0","id":"3d5b00b50d3b19ca","x":-140,"y":-1125,"width":60,"height":50,"color":"4"},
 		{"type":"text","text":"*`try_start = true` AND `nbr_players >= nbr_joueur_min_require` AND `nbr_players <= nbr_joueur_max_require`*","id":"8bc8b839a4407ba0","x":-539,"y":-1000,"width":858,"height":60},
-		{"type":"text","text":"- Init variable : `liste_joueur_playing` avec `null` pour chaque joueur","id":"0e1926810d3389d0","x":1,"y":-1129,"width":579,"height":58,"color":"4"},
-		{"type":"text","text":"- Créer et mélanger `jeu_cartes`\n- Distribuer 2 cartes à chaque joueurs dans `players`\n- Choisir le joueur qui commence la partie aléatoirement `who_start` puis en déduire `who_playing` avec un décalage de 1\n- Ajouter tous les joueurs dans `liste_joueur_playing` en indiquant qu'il n'ont pas encore jouer \n- Modifier `liste_joueur_playing` en ajoutant les blinds des 2 joueurs avant `who_start` \n- Actualiser `pot` et `mise_actuelle_requise` en fonction des blinds\n- Envoyer event `init_game` à tous les joueurs avec les informations : \n\t- `mise_actuelle_requise`\n\t- le joueur de la petite blind \n\t- le joueur de la grosse blind\n\t- les cartes du joueur\n\t- `pot`\n\t- `who_playing`\n- Démarrer la phase de mise (`GRAFCET_MISE = true`)","id":"fca20c427d814511","x":1,"y":-880,"width":579,"height":492,"color":"3"},
+		{"type":"text","text":"","id":"0e1926810d3389d0","x":1,"y":-1129,"width":579,"height":58,"color":"4"},
 		{"type":"text","text":"1","id":"777b67e1f714110a","x":-140,"y":-659,"width":60,"height":50,"color":"3"},
 		{"type":"text","text":"*`always`*","id":"6754dc8c27f4a436","x":-165,"y":-340,"width":110,"height":60},
 		{"type":"text","text":"2","id":"bd2d7b74d15423ea","x":-140,"y":-200,"width":60,"height":50,"color":"3"},
@@ -47,7 +46,8 @@
 		{"type":"text","text":"- Afficher les cartes qui n'ont pas encore été devoiler sauf dans le cas où il reste seulement 1 joueur","id":"9bb45568b0964290","x":-960,"y":3205,"width":479,"height":80,"color":"3"},
 		{"type":"text","text":"","id":"b1244b5598c57514","x":-2120,"y":3640,"width":50,"height":50},
 		{"type":"text","text":"*`always`*","id":"01818d7eb160defa","x":-2150,"y":1020,"width":110,"height":60},
-		{"type":"text","text":"","id":"e1664136fbf119c8","x":-2120,"y":-1129,"width":50,"height":50}
+		{"type":"text","text":"","id":"e1664136fbf119c8","x":-2120,"y":-1129,"width":50,"height":50},
+		{"type":"text","text":"- Créer et mélanger `jeu_cartes`\n- Distribuer 2 cartes à chaque joueurs dans `players`\n- Choisir le joueur qui commence la partie aléatoirement `who_start` puis en déduire `who_playing` avec un décalage de 1\n- Ajouter tous les joueurs dans `liste_joueur_playing` en indiquant qu'il n'ont pas encore jouer \n- Modifier `liste_joueur_playing` en ajoutant les blinds des 2 joueurs avant `who_start` \n- Actualiser `pot` et `mise_actuelle_requise` en fonction des blinds\n- Envoyer event `init_game` à tous les joueurs avec les informations : \n\t- `mise_actuelle_requise`\n\t- le joueur de la petite blind \n\t- le joueur de la grosse blind\n\t- les cartes du joueur\n\t- `pot`\n\t- `who_playing`\n- Démarrer la phase de mise (`GRAFCET_MISE = true`)","id":"fca20c427d814511","x":1,"y":-877,"width":579,"height":486,"color":"3"}
 	],
 	"edges":[
 		{"id":"fdb4bfe39dfece52","fromNode":"3d5b00b50d3b19ca","fromSide":"bottom","toNode":"8bc8b839a4407ba0","toSide":"top","toEnd":"none"},
