@@ -184,11 +184,11 @@ function player_choose_action(action) {
 	});
 }
 
-function affiche_carte_flop(cartes) {
+function affiche_carte(cartes) {
 	/**
-	 * Affiche les cartes du flop
+	 * Affiche des cartes
 	 *
-	 * [entree] cartes: les cartes du flop (list)
+	 * [entree] cartes: liste de cartes (list)
 	 * [sortie] xxx
 	 */
 
@@ -197,7 +197,7 @@ function affiche_carte_flop(cartes) {
 		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
 		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
 
-		document.getElementById('card_flop').appendChild(new_img);
+		document.getElementById('cartes_communes').appendChild(new_img);
 	}
 }
 
@@ -317,7 +317,7 @@ socket.addEventListener('message', (event) => {
 	} else if (data.type == 'next_game') {
 		console.log(
 			'%cNext Game' +
-				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.cartes_flop[0].numero} ${data.cartes_flop[0].symbole} \n       card 2: ${data.cartes_flop[1].numero} ${data.cartes_flop[1].symbole} \n       card 3: ${data.cartes_flop[2].numero} ${data.cartes_flop[2].symbole}`,
+				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.cartes_new[0].numero} ${data.cartes_new[0].symbole} \n       card 2: ${data.cartes_new[1].numero} ${data.cartes_new[1].symbole} \n       card 3: ${data.cartes_new[2].numero} ${data.cartes_new[2].symbole}`,
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
@@ -327,7 +327,7 @@ socket.addEventListener('message', (event) => {
 		update_action_player(data.grosse_blind.username, 'grosse blind');
 		update_main_player(data.who_playing, 'on');
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
-		affiche_carte_flop(data.cartes_flop);
+		affiche_carte(data.cartes_new);
 	}
 	// Autre cas
 	else {

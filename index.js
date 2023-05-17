@@ -1,4 +1,3 @@
-// Require
 const express = require('express');
 const sessions = require('express-session');
 const http = require('http');
@@ -325,13 +324,8 @@ function action_global() {
 	}
 	// Etape 2
 	// Etape 3
-	else if (etape_global == 3) {
-		console.log('ETAPE 3333 GRAPHE MISE FINIIIII');
-	}
 	// Etape 4
 	else if (etape_global == 4) {
-		console.log('ETAPE 4 GLOBAL');
-
 		// Carte du flop
 		var cartes_flop = jeu_cartes.pioche(3);
 		for (var carte of cartes_flop) {
@@ -381,7 +375,7 @@ function action_global() {
 				username: PLAYERS[indice_blind.grosse].username,
 				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
 			},
-			cartes_flop: cartes_flop_to_send,
+			cartes_new: cartes_flop_to_send,
 			pot: pot,
 			who_playing: PLAYERS[who_playing].username,
 		});
@@ -402,12 +396,70 @@ function action_global() {
 	}
 	// Etape 5
 	// Etape 6
-	else if (etape_global == 6) {
-		console.log('ETAPE 6666 GRAPHE MISE FINIIIII');
-	}
-	// Etape 13 (end)
-	else if (etape_global == 13) {
-		console.log('END GAME (GLOBAL)');
+    // Etape 7
+	else if (etape_global == 7) {
+		// Carte turn
+		var carte_turn = jeu_cartes.pioche(1);
+		cartes_communes.push(carte_turn);
+
+		// Reste liste_joueur_playing
+		for (var i = 0; i < nbr_joueur; i++) {
+			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
+				liste_joueur_playing[i].last_action = 'aucune';
+				liste_joueur_playing[i].argent_mise = 0;
+				liste_joueur_playing[i].nbr_relance = 0;
+			}
+		}
+
+		// Prépare les blindes des joueurs
+		var indice_blind = get_indice_player_blind();
+		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
+		// Grosse blind :
+		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
+		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		// Grande blind :
+		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
+		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		// Ajoute les blind au pot et le minimum requit
+		pot += valeur_blind.petite + valeur_blind.grosse;
+		mise_actuelle_requise = valeur_blind.grosse; // Reset
+
+		// Prepare send carte flop
+		var cartes_turn_to_send = [{
+            symbole: carte_turn.symbole,
+            numero: carte_turn.numero,
+        }];
+		wss_send_joueur({
+			type: 'next_game',
+			mise_actuelle_requise: mise_actuelle_requise,
+			petite_blind: {
+				username: PLAYERS[indice_blind.petite].username,
+				argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+			},
+			grosse_blind: {
+				username: PLAYERS[indice_blind.grosse].username,
+				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+			},
+			cartes_new: cartes_flop_to_send,
+			pot: pot,
+			who_playing: PLAYERS[who_playing].username,
+		});
+
+		// Debug
+		// console.log('------------------');
+		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
+		// console.log('cartes_communes:');
+		// console.log(cartes_communes);
+		// console.log('liste_joueur_playing:');
+		// console.log(liste_joueur_playing);
+		// console.log('pot: ', pot);
+		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
+		// console.log('------------------');
+
+		// Lance le grafcet MISE
+		GRAFCET_MISE = true;
 	}
 }
 
@@ -429,11 +481,12 @@ function transition_global() {
 	// Etape 3 -> Etape 4
 	else if (etape_global == 3 && end_of_global() == false) {
 		etape_global = 4;
+        log('Game', 'Continue', 'game');
 	}
-	// Etape 3 -> Etape 13
+	// Etape 3 -> Etape 12
 	else if (etape_global == 3 && end_of_global() == true) {
-		etape_global = 13;
-		log('Game', 'Skip game', 'game'); // #whereiam
+		etape_global = 12;
+		log('Game', 'Skip to end', 'game'); 
 	}
 	// Etape 4 -> Etape 5
 	else if (etape_global == 4) {
@@ -443,7 +496,16 @@ function transition_global() {
 	else if (etape_global == 5 && GRAFCET_MISE == false) {
 		etape_global = 6;
 	}
-
+    // Etape 6 -> Etape 7
+	else if (etape_global == 6 && end_of_global() == false) {
+		etape_global = 7;
+        log('Game', 'Continue', 'game');
+	}
+    // Etape 6 -> Etape 12
+    else if (etape_global == 6 && end_of_global() == true) {
+		etape_global = 12;
+		log('Game', 'Skip to end', 'game'); 
+	}
 	// Variable reset
 	try_start = false;
 }

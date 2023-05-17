@@ -1,8 +1,9 @@
 class Card {
-	constructor(symbole, numero, valeur) {
+	constructor(symbole, numero, valeur, num2) {
 		this.symbole = symbole;
 		this.numero = numero;
         this.valeur = valeur;
+        this.num2 = num2;
 	}
 
 	get_url(graphic = 'classic') {
@@ -14,12 +15,12 @@ class Card {
 class JeuCartes {
 	constructor() {
 		this.cartes = [];
-		this.symboles = ['carreau', 'pique', 'trefle', 'coeur'];
-		this.numeros = [['A', 13], ['2', 1], ['3', 2], ['4', 3], ['5', 4], ['6', 5], ['7', 6], ['8', 7], ['9', 8], ['10', 9] , ['V', 10], ['D', 11], ['R', 12]];
+		this.symboles = [['carreau','d'], ['pique', 's'], ['trefle', 'c'], ['coeur', 'h']];               
+		this.numeros = [['A', 'A'], ['2', '2'], ['3', '3'], ['4', '4'], ['5', '5'], ['6', '6'], ['7', '7'], ['8', '8'], ['9', '9'], ['10', 'T'] , ['V', 'J'], ['D', 'Q'], ['R', 'K']];
 		this.nombre_cartes = 0;
 		for (var symbole of this.symboles) {
 			for (var numero of this.numeros) {
-				this.cartes.push(new Card(symbole, numero[0], numero[1]));
+				this.cartes.push(new Card(symbole[0], numero[0], symbole[1], numero[1]));
 				this.nombre_cartes++;
 			}
 		}
