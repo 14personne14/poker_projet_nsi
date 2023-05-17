@@ -1,6 +1,7 @@
 // Websocket
 var socket;
-if (window.location.host === 'poker.azerty.tk') { // azerty.tk
+if (window.location.host === 'poker.azerty.tk') {
+	// azerty.tk
 	socket = new WebSocket(`wss://poker.azerty.tk/`); // wss://poker.azerty.tk/
 } else {
 	socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
@@ -314,10 +315,16 @@ socket.addEventListener('message', (event) => {
 		update_argent_player(data.username, data.argent_left);
 		update_action_player(data.username, data.action);
 		update_pot_mise(data.pot, data.mise);
-	} else if (data.type == 'next_game') {
+	}
+	// Next game
+	else if (data.type == 'next_game') {
+		var text_log_cartes = '';
+		for (var carte of data.cartes_new) {
+			text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
+		}
 		console.log(
 			'%cNext Game' +
-				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.cartes_new[0].numero} ${data.cartes_new[0].symbole} \n       card 2: ${data.cartes_new[1].numero} ${data.cartes_new[1].symbole} \n       card 3: ${data.cartes_new[2].numero} ${data.cartes_new[2].symbole}`,
+				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
@@ -327,6 +334,15 @@ socket.addEventListener('message', (event) => {
 		update_action_player(data.grosse_blind.username, 'grosse blind');
 		update_main_player(data.who_playing, 'on');
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
+		affiche_carte(data.cartes_new);
+	}
+	// Affiche cartes
+	else if (data.type == 'new_cartes') {
+		var text_log_cartes = '';
+		for (var carte of data.cartes_new) {
+			text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
+		}
+		console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
 		affiche_carte(data.cartes_new);
 	}
 	// Autre cas
