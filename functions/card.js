@@ -1,6 +1,13 @@
 const proba = require('./proba/src/index.js');
 
 class Card {
+	/**
+	 * Créer une carte
+	 * @param {String} symbole Le symbole de la carte en toutes lettres et en français
+	 * @param {String} numero Le numero de la carte ou sa valeur en français
+	 * @param {String} valeur La lettre de la carte en anglais
+	 * @param {String} numero2 Le numero de la carte ou sa valeur en anglais
+	 */
 	constructor(symbole, numero, valeur, numero2) {
 		this.symbole = symbole;
 		this.numero = numero;
@@ -10,12 +17,20 @@ class Card {
 		this.parsed = proba.parse(numero2 + valeur);
 	}
 
+	/**
+	 * Obtenir l'url de la carte
+	 * @param {String} graphic Le type de carte à afficher ['classic', 'original']
+	 * @returns {String} L'url de la carte
+	 */
 	get_url(graphic = 'classic') {
 		return `public/images/cards/${graphic}/${this.numero}_${this.symbole}.svg`;
 	}
 }
 
 class JeuCartes {
+	/**
+	 * Créé un jeu de carte
+	 */
 	constructor() {
 		this.cartes = [];
 		this.symboles = [
@@ -48,6 +63,9 @@ class JeuCartes {
 		}
 	}
 
+	/**
+	 * Melanger le jeu de carte
+	 */
 	melanger() {
 		/**
 		 * Mélange le jeu de carte
@@ -63,13 +81,12 @@ class JeuCartes {
 		}
 	}
 
+	/**
+	 * Supprime et renvoie un certain nombre de carte dans le jeu de cartes
+	 * @param {Number} nbr_cartes Le nombre de cartes à piocher
+	 * @returns {Array} La liste des cartes piochés
+	 */
 	pioche(nbr_cartes) {
-		/**
-		 * Supprime et renvoie un nombre de carte dans le jeu de cartes.
-		 *
-		 * [entree] nbr_cartes: le nombre de cartes à piocher (int)
-		 * [sortie] List
-		 */
 		var cartes = [];
 		for (var i = 0; i < nbr_cartes; i++) {
 			cartes.push(this.cartes.shift());

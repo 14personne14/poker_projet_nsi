@@ -55,16 +55,16 @@ var timer_choix_end = false; // Si le timer est terminé ou non (bool)
 var timer_reset; // Un timer pour le reset du jeu à la fin (object)
 var timer_reset_end = false; // Si le timer est terminé ou non (bool)
 
-// Fonction local
-function wss_send_joueur(data, except = []) {
-	/**
-	 * Envoie un message à tous les joueurs de la liste PLAYERS sauf ceux de la liste except en websocket.
-	 *
-	 * [entrée] data: 	Les données à envoyer (object)
-	 * 			except: Liste des joueurs à ne pas envoyer (liste)
-	 * [sortie] xxx
-	 */
+// Variable temp
+var ii = 0;
 
+// --- Fonction local ---
+/**
+ * Envoie un message à tous les joueurs de la liste PLAYERS sauf ceux de la liste except en websocket
+ * @param {Object} data Les données à envoyer
+ * @param {Array} except La liste des joueurs à ne pas envoyer
+ */
+function wss_send_joueur(data, except = []) {
 	const wss_data = JSON.stringify(data);
 	for (var joueur of PLAYERS) {
 		if (joueur.ws != undefined && !except.includes(joueur.username)) {
@@ -73,14 +73,11 @@ function wss_send_joueur(data, except = []) {
 	}
 }
 
+/**
+ * Envoie un message à tous les clients connectés en websocket avec le serveur
+ * @param {Object} data Les données à envoyer
+ */
 function wss_send(data) {
-	/**
-	 * Envoie un message à tous les clients connectés en websocket avec le serveur.
-	 *
-	 * [entrée] data: Les données à envoyer (object)
-	 * [sortie] xxx
-	 */
-
 	const wss_data = JSON.stringify(data);
 	wss.clients.forEach(function each(client) {
 		if (client.readyState === WebSocket.OPEN) {
@@ -88,9 +85,6 @@ function wss_send(data) {
 		}
 	});
 }
-
-// Variable temp
-var ii = 0;
 
 // Connexion à la base de données
 const database = new sqlite3.Database('./database/database.db');
@@ -158,7 +152,11 @@ app.set('view engine', 'ejs');
  *
  */
 
-// Function for game
+// --- Function for game ---
+/**
+ * Obtenir l'indice des deux joueurs pour la grosse blind et la petite blind
+ * @returns {Object}
+ */
 function get_indice_player_blind() {
 	var indice_grosse = who_start - 1;
 	if (indice_grosse < 0) {
@@ -171,14 +169,11 @@ function get_indice_player_blind() {
 	return { petite: indice_petite, grosse: indice_grosse };
 }
 
+/**
+ * Renvoie le nombre de joueur qui ont terminé de jouer, le nombre d'abandon et le nombre de joueur qui n'ont pas besoin de continuer de choisir pour jouer.
+ * @returns {Object}
+ */
 function calc_status_player() {
-	/**
-	 * Renvoie le nombre de joueur qui ont terminé de jouer et le nombre d'abandon.
-	 *
-	 * [entrée] xxx
-	 * [sortie] Bool
-	 */
-
 	var nbr_end_player = 0;
 	var nbr_abandon = 0;
 	var nbr_no_re_choice = 0;
@@ -208,30 +203,25 @@ function calc_status_player() {
 	return { nbr_end_player: nbr_end_player, nbr_abandon: nbr_abandon, nbr_no_re_choice: nbr_no_re_choice };
 }
 
+/**
+ * Renvoie si l'étape mise doit continuer ou non.
+ * @returns {Boolean}
+ */
 function end_of_mise() {
-	/**
-	 * Renvoie si l'étape mise est terminée ou non.
-	 *
-	 * [entrée] xxx
-	 * [sortie] Bool
-	 */
-
 	var result = calc_status_player();
 	if (result.nbr_end_player == nbr_joueur || result.nbr_abandon == nbr_joueur - 1) {
 		return true;
-	} else {
+	}
+	else {
 		return false;
 	}
 }
 
+/**
+ * Renvoie si il y a un winner determiné à ce moment. C'est à dire si ont peux skip une partie du jeu
+ * @returns {Boolean}
+ */
 function end_of_global() {
-	/**
-	 * Renvoie si il y a un winner determiné à ce moment.
-	 *
-	 * [entrée] xxx
-	 * [sortie] Bool
-	 */
-
 	var result = calc_status_player();
 	if (result.nbr_no_re_choice >= nbr_joueur - 1) {
 		return true;
@@ -239,7 +229,9 @@ function end_of_global() {
 	return false;
 }
 
-// Function grafcet
+/**
+ * Fonction principale du jeu (grafcet GLOBAL)
+ */
 function action_global() {
 	// Etape 0
 	// Etape 1
@@ -614,6 +606,9 @@ function action_global() {
 	}
 }
 
+/**
+ * Fonction des transition de la fonction action_global() (grafcet GLOBAL)
+ */
 function transition_global() {
 	// Etape 0 -> Etape 1
 	if (etape_global == 0 && try_start == true && nbr_joueur >= nbr_joueur_min_require && nbr_joueur <= nbr_joueur_max_require) {
@@ -707,6 +702,9 @@ function transition_global() {
 	try_start = false;
 }
 
+/**
+ * Fonction infini du jeu (grafcet GLOBAL)
+ */
 async function global() {
 	while (true) {
 		await action_global();
@@ -715,15 +713,9 @@ async function global() {
 	}
 }
 
-/*
- *
- *
- *
- *
- *
- *
+/**
+ * Fonction principale de la partie mise du jeu (grafcet MISE)
  */
-
 function action_mise() {
 	// Etape 0
 	// Etape 1
@@ -864,6 +856,9 @@ function action_mise() {
 	}
 }
 
+/**
+ * Fonction des transition de la fonction action_mise() (grafcet MISE)
+ */
 function transition_mise() {
 	// Etape 0 -> Etape 1
 	if (etape_mise == 0 && GRAFCET_MISE == true) {
@@ -896,6 +891,9 @@ function transition_mise() {
 	}
 }
 
+/**
+ * Fonction infini du jeu des mise (grafcet MISE)
+ */
 async function mise() {
 	while (true) {
 		await action_mise();

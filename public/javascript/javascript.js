@@ -26,11 +26,15 @@ if (window.location.host === 'poker.azerty.tk') {
  *
  */
 
-// Variable
+// --- Variable ---
 var local_user_info;
 var mise_actuelle;
 
-// Fonctions
+// --- Fonctions ---
+
+/**
+ * Envoie une demande pour démarrer le jeu au serveur
+ */
 function button_start() {
 	const data = JSON.stringify({
 		type: 'start',
@@ -38,26 +42,20 @@ function button_start() {
 	socket.send(data);
 }
 
+/**
+ * Supprime un joueur de la liste des joueurs 
+ * @param {String} username L'username du joueur à supprimer
+ */
 function delete_player(username) {
-	/**
-	 * Supprime un joueur de la liste.
-	 *
-	 * [entrée] username: l'username du joueur à supprimer (string)
-	 * [sortie] xxx
-	 */
-
 	document.getElementById(`player-${username}`).remove();
 }
 
+/**
+ * Ajoute un joueur de la liste
+ * @param {String} username L'username du joueur à ajouter
+ * @param {Number} argent_en_jeu L'argent mit en jeu par le joueur
+ */
 function add_player(username, argent_en_jeu) {
-	/**
-	 * Ajoute un joueur de la liste.
-	 *
-	 * [entrée] username: 	   l'username du joueur à supprimer (string)
-	 * 			argent_en_jeu: l'argent mit en jeu par le joueur (int)
-	 * [sortie] xxx
-	 */
-
 	var new_div = document.createElement('div');
 	new_div.classList.add('player_block');
 	new_div.setAttribute('id', `player-${username}`);
@@ -72,14 +70,12 @@ function add_player(username, argent_en_jeu) {
 	document.getElementById('liste_players').appendChild(new_div);
 }
 
+/**
+ * Change le joueur principal en lui ajoutant ou supprimant la classe 'main_player'
+ * @param {String} username L'username du nouveau joueur principal
+ * @param {*} status Le status, c'est à dire si on doit ajouter ou suppimer le main player au joueur ['on', 'off']
+ */
 function update_main_player(username, status) {
-	/**
-	 * Change le joueur principal en lui ajoutant la classe 'main_player'
-	 *
-	 * [entree] username: l'username du nouveau joueur principal (string)
-	 * [sortie] xxx
-	 */
-
 	if (status == 'off') {
 		var last_div = document.getElementById(`player-${username}`);
 		last_div.classList.remove('main_player');
@@ -89,28 +85,22 @@ function update_main_player(username, status) {
 	}
 }
 
+/**
+ * Change l'argent du joueur 
+ * @param {String} username L'username du joueur à qui l'argent change
+ * @param {Number} new_argent Le nouvel argent à afficher
+ */
 function update_argent_player(username, new_argent) {
-	/**
-	 * Change l'argent du joueur concerné
-	 *
-	 * [entree] username:    l'username du joueur à qui l'argent change (string)
-	 * 			new_agrgent: le nouvel argent à afficher (int)
-	 * [sortie] xxx
-	 */
-
 	var div = document.getElementById(`player-argent_en_jeu-${username}`);
 	div.innerHTML = new_argent;
 }
 
+/**
+ * Change la derniere action du joueur 
+ * @param {String} username L'username du joueur à qui l'action change
+ * @param {Number} new_action Le nouvel argent à afficher
+ */
 function update_action_player(username, new_action) {
-	/**
-	 * Change la derniere action du joueur concerné
-	 *
-	 * [entree] username:    l'username du joueur à qui l'action change (string)
-	 * 			new_agrgent: le nouvel argent à afficher (int)
-	 * [sortie] xxx
-	 */
-
 	var div = document.getElementById(`player-last_action-${username}`);
 	div.innerHTML = new_action;
 
@@ -120,14 +110,11 @@ function update_action_player(username, new_action) {
 	}
 }
 
+/**
+ * Affiche les cartes du joueur
+ * @param {Array} cartes Les cartes du joueur
+ */
 function affiche_carte(cartes) {
-	/**
-	 * Affiche les cartes du joueur
-	 *
-	 * [entree] cartes: les cartes du joueur (list)
-	 * [sortie] xxx
-	 */
-
 	for (var carte of cartes) {
 		var new_img = document.createElement('img');
 		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
@@ -137,28 +124,23 @@ function affiche_carte(cartes) {
 	}
 }
 
+/**
+ * Change le pot par le nouveau pot et la mise par la nouvelle mise 
+ * @param {Number} new_pot Le nouveau pot
+ * @param {Number} new_mise La nouvelle mise 
+ */
 function update_pot_mise(new_pot, new_mise) {
-	/**
-	 * Change le pot par le nouveau pot
-	 *
-	 * [entrée] new_pot: le nouveau pot (int)
-	 * [sortie] xxx
-	 */
-
 	mise_actuelle = new_mise;
 
 	var div = document.getElementById(`valeur_pot`);
 	div.innerHTML = `pot: ${new_pot} | mise: ${mise_actuelle}`;
 }
 
+/**
+ * Gere quand un joueur choisi une action lors de son tour de jeu
+ * @param {String} action L'action réaliser par le joueur
+ */
 function player_choose_action(action) {
-	/**
-	 * Gere quand un joueur choisi une action lors de son tour de jeu
-	 *
-	 * [entrée] action: l'action réaliser par le joueur
-	 * [sortie] xxx
-	 */
-
 	// Prepare les données
 	var data = {
 		action: action,
@@ -185,14 +167,11 @@ function player_choose_action(action) {
 	});
 }
 
+/**
+ * Affiche des cartes
+ * @param {Array} cartes La liste de cartes
+ */
 function affiche_carte(cartes) {
-	/**
-	 * Affiche des cartes
-	 *
-	 * [entree] cartes: liste de cartes (list)
-	 * [sortie] xxx
-	 */
-
 	for (var carte of cartes) {
 		var new_img = document.createElement('img');
 		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);

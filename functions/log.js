@@ -8,7 +8,7 @@ const util = require('util');
 var log_file = fs.createWriteStream('./logs/console.log', { flags: 'a' });
 var log_stdout = process.stdout;
 
-// Change la fonction console.log pour enregistré chaque log.
+// Change la fonction console.log pour enregistré chaque log. // Debug
 /*console.log = function (d) {
 	// Date
 	var date_object = new Date();
@@ -36,17 +36,13 @@ var log_stdout = process.stdout;
 	log_stdout.write(util.format(d) + '\n');
 };*/
 
+/**
+ * Affiche des log dans la console avec les données spécifier
+ * @param {String} titre Le titre du message
+ * @param {String} message Le message à afficher
+ * @param {String} type Le type du message pour préciser sa couleur dans la console ['', 'erreur', 'info', 'game']
+ */
 function log(titre, message = '', type = '') {
-	/**
-	 * Affiche des log dans la console avec les données spécifier.
-	 *
-	 * [entrée] titre: 	 Le titre du message (string)
-	 * 			message: Le message à afficher (string)
-	 * 			^type: 	 Le type du message pour préciser sa couleur dans la console.
-	 * 					 ∈ {'', 'erreur'}
-	 * [sortie] xxx
-	 */
-
 	// Erreur
 	if (type == 'erreur' || type == 'error') {
 		console.log('\n' + `Error`.bgRed.black + ` ${titre}:`.red + ` ${message} `.white);
@@ -65,19 +61,12 @@ function log(titre, message = '', type = '') {
 	}
 }
 
+/**
+ * Envoie un webhook sur le serveur discord des log de @personne14 avec un embed en fonction du type et du message.
+ * @param {*} message Le message à envoyer
+ * @param {*} type Le type du message pour préciser son affichage ['', 'error', 'erreur', 'connexion', 'incription']
+ */
 function log_discord(message, type = '') {
-	/**
-	 * Envoie un webhook sur le serveur discord des log de @personne14 avec un embed en fonction du type et du message.
-	 *
-	 * [entrée] message: le message à envoyer (string)
-	 * 					 	- [type = 'error' -> l'erreur à envoyer]
-	 * 					 	- [type = 'connexion' -> username du joueur]
-	 * 					 	- [type = 'incription' -> username du joueur]
-	 * 			^type:   Le type du message pour préciser son affichage à envoyer (string)
-	 * 					 ∈ {'', 'erreur', 'connexion', 'incription'}
-	 * [sortie] xxx
-	 */
-
 	// Valeur par default
 	var data = {
 		message: message,

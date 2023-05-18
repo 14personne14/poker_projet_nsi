@@ -1,14 +1,11 @@
 const proba = require('./proba/src/index.js');
-const JeuCartes = require('./card');
 
+/**
+ * Renvoie la valeur d'une liste de carte et pourquoi c'est cette valeur.
+ * @param {Array} cartes La liste des cartes
+ * @returns {Object}
+ */
 function get_valeurs_cartes(cartes) {
-	/**
-	 * Renvoie la valeur d'une liste de carte et pourquoi c'est cette valeur.
-	 *
-	 * [entrée] cartes: La liste des cartes (list)
-	 * [sortie] Object
-	 */
-
 	var cartes_parsed = [];
 	for (var carte of cartes) {
 		cartes_parsed.push(carte.parsed);
@@ -19,15 +16,13 @@ function get_valeurs_cartes(cartes) {
 	return { valeur: valeur, nom: nom_main };
 }
 
+/**
+ * Calcule la probabilité du joueur de gagner avec les cartes et le nombre de joueur.
+ * @param {Array} cartes Liste des cartes du joueur
+ * @param {Number} nb_joueurs Le nombre de joueur
+ * @returns {Number}
+ */
 function get_proba(cartes, nb_joueurs) {
-	/**
-	 * Renvoie la probabilité du joueur de gagner avec les cartes et le nombre de joueur.
-	 *
-	 * [entrée]    cartes: Liste des cartes du joueur (list)
-	 * 			nb_joueur: Le nombre de joueur (number)
-	 * [sortie] Number
-	 */
-
 	var cartes_parsed = [];
 	for (var carte of cartes) {
 		cartes_parsed.push(carte.parsed);
@@ -36,15 +31,13 @@ function get_proba(cartes, nb_joueurs) {
 	return proba.hs(cartes_parsed, nb_joueurs);
 }
 
+/**
+ * Renvoie le winner du en fonction de la liste des joueurs et leurs cartes et les cartes communes.
+ * @param {Array} liste_joueurs La liste des joueurs avec leur username et leurs cartes
+ * @param {Array} cartes_communes Les cartes communes aux joueurs
+ * @returns {Object} l'username du winner et comment il gagne
+ */
 function who_is_winner(liste_joueurs, cartes_communes) {
-	/**
-	 * Renvoie le winner du en fonction de la liste des joueurs et leurs cartes et les cartes communes.
-	 *
-	 * [entrée]   liste_joueurs: La liste des joueurs avec leur username et leurs cartes (list)
-	 * 			cartes_communes: Les cartes communes aux joueurs (list)
-	 * [sortie] Object (l'username du winner et comment il gagne)
-	 */
-
 	// Genere liste avec valeurs
 	var liste_valeur_joueurs = [];
 	for (var joueur of liste_joueurs) {
@@ -94,28 +87,6 @@ function who_is_winner(liste_joueurs, cartes_communes) {
 		};
 	}
 }
-
-var j = new JeuCartes();
-j.melanger();
-// console.log(get_valeurs_cartes(j.pioche(7)));
-// console.log(get_proba(j.pioche(2), 2));
-var joueur = [
-	{ username: 'aaaaa', cartes: j.pioche(2) },
-	{ username: 'bbbbb', cartes: j.pioche(2) },
-];
-var cartes_communes = j.pioche(5);
-for (var p of joueur) {
-	console.log('\n' + p.username);
-	for (var c of p.cartes) {
-		console.log(c.text);
-	}
-}
-console.log('\ncartes comm');
-for (var c of cartes_communes) {
-	console.log(c.text);
-}
-console.log();
-console.log(who_is_winner(joueur, cartes_communes));
 
 module.exports = {
 	who_is_winner: who_is_winner,
