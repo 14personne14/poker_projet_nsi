@@ -64,7 +64,7 @@ function log(titre, message = '', type = '') {
 /**
  * Envoie un webhook sur le serveur discord des log de @personne14 avec un embed en fonction du type et du message.
  * @param {*} message Le message à envoyer
- * @param {*} type Le type du message pour préciser son affichage ['', 'error', 'erreur', 'connexion', 'incription']
+ * @param {*} type Le type du message pour préciser son affichage ['', 'error', 'erreur', 'connexion', 'incription', 'game']
  */
 function log_discord(message, type = '') {
 	// Valeur par default
@@ -101,6 +101,12 @@ function log_discord(message, type = '') {
 		data.message = `:white_medium_small_square: Nouveau joueur: \`${message}\``;
 		data.webhook_url =
 			'https://discord.com/api/webhooks/1089945104409690172/jo0OVgmwrrSV02DFbxkSrpE1TSJekFxN7yHVHiVSByR3wMhY7XzvWoJxsqIbLeh-RXw-';
+	}
+	// Game
+	else if (type == 'game') {
+		data.message = `${message}`;
+		data.webhook_url =
+			'https://discord.com/api/webhooks/1108822157238206494/KJaMqY38nbEbhlDH2hqsdy7xezeP0-Xw7W6fc6061kEXID6u5T9Kr8qpGidbwMdg5_hf';
 	}
 
 	// Webhook

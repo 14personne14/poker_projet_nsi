@@ -12,14 +12,18 @@ body {
 	background-color: #ffffff;
 	color: #000000; 
 	padding: 10px;
+	margin: 0;
 }
 
 .player_block p {
 	margin: 0;
 }
 
+.player_block h2 {
+	margin: 0;
+}
 .main_player {
-	background-color: #ff0000;
+	background-color: #008fa8;
 }
 
 .your_card {
@@ -39,4 +43,8 @@ body {
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: 100% 100%, auto;
+}
+
+.winner {
+	background-color: #00ff00;
 }

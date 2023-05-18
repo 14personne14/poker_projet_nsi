@@ -1,64 +1,236 @@
+// ---------------------------- Modules ./node_modules ----------------------------
+
 const express = require('express');
 const sessions = require('express-session');
 const http = require('http');
 const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const WebSocket = require('ws');
-const colors = require('colors'); // For color console
+const colors = require('colors'); // (for color console)
 
-// My modules (functions)
+// ---------------------------- My modules (functions) ----------------------------
+
 const { verif_regex, encode_sha256, sleep, get_random_number } = require('./functions/functions');
 const { log, log_discord } = require('./functions/log');
 const JeuCartes = require('./functions/card');
 const { who_is_winner, get_proba } = require('./functions/proba');
+const { Database } = require('sqlite3');
 
-// Variables for server
+// ---------------------------- Variables for server ----------------------------
+
 const app = express();
 const server = http.createServer(app);
+/**
+ * Le websocket du serveur
+ * @type {WebSocket}
+ */
 const wss = new WebSocket.Server({
 	server: server,
 });
-const port = 8103; // default: [8103]
+/**
+ * La base de données
+ * @type {Database}
+ */
+const database = new sqlite3.Database('./database/database.db'); // Connexion à la base de données
 
-// Variables constantes
+/**
+ * Le port où démarre le serveur [default: 8103]
+ * @type {Number}
+ */
+const port = 8103;
+
+// ---------------------------- Variables temporaire ----------------------------
+
+var ii = 0; // temp
+
+// ---------------------------- Variables constantes ----------------------------
+
+/**
+ * La regex qui vérifie l'username des joueurs (le nom d'utilisateur ne peux contenir que des lettres, des chiffres ou un tiret du bas)
+ * @type {RegExp}
+ */
 const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
+/**
+ * La regex qui vérifie le mot de passe des joueurs (le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial. Il doit aussi être entre 8 et 16 caractères)
+ * @type {RegExp}
+ */
 const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
-// Variable true/false (for game)
-var GRAFCET_MISE = false; // Si le Graph MISE doit être executé (bool)
-var etape_global = 0; // Le numéro de l'étape en grafcet GLOBAL (int)
-var etape_mise = 0; // Le numéro de l'étape en grafcet MISE (int)
+// ---------------------------- Variable true/false (for game) ----------------------------
 
-// Constante (for game)
-const argent_min_require = 1000; // Argent minimal requit pour jouer une partie (int)
-const valeur_blind = { petite: 100, grosse: 200 }; // Valeurs de la petite et la grosse blind (object)
-const sleep_time = 100; // La fluidité et rapidité du jeu (int)
-const duree_timer = 60000; // Durée du timer en millisecondes (int)
-const nbr_joueur_min_require = 2; // Nombre minimum de joueur (int)
-const nbr_joueur_max_require = 8; // Nombre maximum de joueur (int)
+/**
+ * Si le Graph MISE doit être executé
+ * @type {Boolean}
+ */
+var GRAFCET_MISE = false;
 
-// Variables (for game)
-var PLAYERS = []; // Liste des joueurs avec leurs ws associé (list)
-var jeu_cartes; // Jeu de cartes (object)
-var cartes_communes = []; // Les cartes du centre de la table (list)
-var nbr_joueur = 0; // Nombre de joueur (int)
-var liste_joueur_playing = []; // liste des joueurs qui ont commencés à miser (list)
-var player_choice = undefined; // Le choix du joueur (obj)
-var pot = 0; // Argent total mit en jeu par les joueurs (int)
-var mise_actuelle_requise = 0; // Argent minimum à mettre en jeu pour continuer de jouer (int)
-var who_start; // Le joueur qui commence à jouer en premier (int)
-var who_playing; // Le joueur qui est en train de jouer (int)
-var try_start = false; // Si un joueur veut lancer le jeu (bool)
-var partie_en_cours = false; // Si une partie est cours (bool)
-var timer; // Un timer (object)
-var timer_choix_end = false; // Si le timer est terminé ou non (bool)
-var timer_reset; // Un timer pour le reset du jeu à la fin (object)
-var timer_reset_end = false; // Si le timer est terminé ou non (bool)
+/**
+ * Le numéro de l'étape en grafcet GLOBAL
+ * @type {Number}
+ */
+var etape_global = 0;
 
-// Variable temp
-var ii = 0;
+/**
+ * Le numéro de l'étape en grafcet MISE
+ * @type {Number}
+ */
+var etape_mise = 0;
 
-// --- Fonction local ---
+// ---------------------------- Constante (for game) ----------------------------
+
+/**
+ * Argent donner au joueur lorsqu'il s'inscrit
+ */
+const argent_inscription = 10000;
+
+/**
+ * Argent minimal requit pour jouer une partie
+ * @type {Number}
+ */
+const argent_min_require = 1000;
+
+/**
+ * Valeurs de la petite et la grosse blind
+ * @type {Object}
+ */
+const valeur_blind = { petite: 100, grosse: 200 };
+
+/**
+ * Temps d'attente entre chaque topu de boucle pour la fluidité et rapidité du jeu
+ * @type {Number}
+ */
+const sleep_time = 100;
+
+/**
+ * Temps d'attente quand on skip des tour de mise
+ * @type {Number}
+ */
+const sleep_time_skip = 2000;
+
+/**
+ * Durée du timer en millisecondes
+ * @type {Number}
+ */
+const duree_timer = 60000;
+
+/**
+ * Durée de timer_reset en millisecondes
+ * @type {Number}
+ */
+const duree_timer_reset = 5000;
+
+/**
+ * Nombre minimum de joueur
+ * @type {Number}
+ */
+const nbr_joueur_min_require = 2;
+
+/**
+ * Nombre maximum de joueur
+ * @type {Number}
+ */
+const nbr_joueur_max_require = 8;
+
+// ---------------------------- Variable (for game) ----------------------------
+
+/**
+ * Liste des joueurs avec leurs informations associées
+ * @type {Array}
+ */
+var PLAYERS = [];
+
+/**
+ * Le jeu de cartes
+ * @type {JeuCartes}
+ */
+var jeu_cartes;
+
+/**
+ * Les cartes du centre de la table du jeu
+ * @type {Array}
+ */
+var cartes_communes = [];
+
+/**
+ * Le nombre de joueur
+ * @type {Number}
+ */
+var nbr_joueur = 0;
+
+/**
+ * Liste des joueurs qui ont commencés à miser (liste temporaire du jeu en cour)
+ * @type {Array}
+ */
+var liste_joueur_playing = [];
+
+/**
+ * Le choix du joueur
+ * @type {Object}
+ */
+var player_choice = undefined;
+
+/**
+ * Argent total mit en jeu par les joueurs
+ * @type {Number}
+ */
+var pot = 0;
+
+/**
+ * Argent minimum à mettre en jeu pour continuer de jouer
+ * @type {Number}
+ */
+var mise_actuelle_requise = 0;
+
+/**
+ * L'indice du joueur qui commence à jouer en premier
+ * @type {Number}
+ */
+var who_start;
+
+/**
+ * L'indice du joueur qui est en train de jouer
+ * @type {Number}
+ */
+var who_playing;
+
+/**
+ * Si un joueur veut lancer le jeu
+ * @type {Boolean}
+ */
+var try_start = false;
+
+/**
+ * Si une partie est cours
+ * @type {Boolean}
+ */
+var partie_en_cours = false;
+
+/**
+ * Un timer
+ * @type {Timer}
+ */
+var timer;
+
+/**
+ * Si le timer est terminé ou non
+ * @type {Boolean}
+ */
+var timer_choix_end = false;
+
+/**
+ * Un timer pour le reset du jeu à la fin
+ * @type {Timer}
+ */
+var timer_reset;
+
+/**
+ * Si le timer_reset est terminé ou non
+ * @type {Boolean}
+ */
+var timer_reset_end = false;
+
+// ---------------------------- Fonction websocket ----------------------------
+
 /**
  * Envoie un message à tous les joueurs de la liste PLAYERS sauf ceux de la liste except en websocket
  * @param {Object} data Les données à envoyer
@@ -86,27 +258,7 @@ function wss_send(data) {
 	});
 }
 
-// Connexion à la base de données
-const database = new sqlite3.Database('./database/database.db');
-
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
+// ---------------------------- Preparation ----------------------------
 
 // Gère les fichiers du dossier "/public"
 app.use(express.static(__dirname));
@@ -152,7 +304,8 @@ app.set('view engine', 'ejs');
  *
  */
 
-// --- Function for game ---
+// ---------------------------- Function for Game ----------------------------
+
 /**
  * Obtenir l'indice des deux joueurs pour la grosse blind et la petite blind
  * @returns {Object}
@@ -212,9 +365,7 @@ function end_of_mise() {
 	if (result.nbr_end_player == nbr_joueur || result.nbr_abandon == nbr_joueur - 1) {
 		return true;
 	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 /**
@@ -230,15 +381,38 @@ function end_of_global() {
 }
 
 /**
+ * Renvoie si le jeu est terminé. C'est à dire si il ne reste plus que un seul joueur encore en 'vie'
+ */
+function end_of_game() {
+	var counter_out = 0;
+	for (var joueur of PLAYERS) {
+		if (joueur.out == true) {
+			counter_out++;
+		}
+	}
+
+	return nbr_joueur + 1 == counter_out;
+}
+
+// ---------------------------- ACTION GLOBAL ----------------------------
+
+/**
  * Fonction principale du jeu (grafcet GLOBAL)
  */
-function action_global() {
+async function action_global() {
 	// Etape 0
+	if (etape_global == 0) {
+		nbr_joueur = PLAYERS.length;
+	}
 	// Etape 1
 	if (etape_global == 1) {
 		// Créé et melange jeu de cartes
 		jeu_cartes = new JeuCartes();
 		jeu_cartes.melanger();
+
+		// Reset carte_communes
+		cartes_communes = [];
+		pot = 0;
 
 		// Distribution des cartes
 		for (var i = 0; i < nbr_joueur; i++) {
@@ -548,6 +722,7 @@ function action_global() {
 			type: 'new_cartes',
 			cartes_new: cartes_flop_to_send,
 		});
+		await sleep(sleep_time_skip);
 	}
 	// Etape 122 (skip turn)
 	else if (etape_global == 122) {
@@ -566,6 +741,7 @@ function action_global() {
 			type: 'new_cartes',
 			cartes_new: cartes_turn_to_send,
 		});
+		await sleep(sleep_time_skip);
 	}
 	// Etape 123 (skip river)
 	else if (etape_global == 123) {
@@ -584,32 +760,97 @@ function action_global() {
 			type: 'new_cartes',
 			cartes_new: cartes_river_to_send,
 		});
+		await sleep(sleep_time_skip);
 	}
 	// Etape 13 (end)
 	else if (etape_global == 13) {
 		// Prepare liste for function winner
 		var liste_joueur_cartes = [];
+		for (var i = 0; i < nbr_joueur; i++) {
+			if (!(liste_joueur_playing[i].last_action == 'abandon')) {
+				liste_joueur_cartes.push({
+					username: PLAYERS[i].username,
+					cartes: PLAYERS[i].cartes,
+				});
+			}
+		}
+
+		var winner_infos = who_is_winner(liste_joueur_cartes, cartes_communes);
+
+		// Ajoute pot aux winners
+		var nbr_winner = winner_infos.liste_indices.length;
+		for (var indice of winner_infos.liste_indices) {
+			PLAYERS[indice].argent_en_jeu += pot / nbr_winner;
+		}
+
+		// Send winner
+		wss_send_joueur({
+			type: 'winner',
+			liste_usernames: winner_infos.liste_usernames,
+			how_win: winner_infos.how_win,
+		});
+
+		// Send updated argent_en_jeu
+		data = {
+			type: 'update_argent_en_jeu',
+			liste_joueurs: [],
+		};
 		for (var joueur of PLAYERS) {
-			liste_joueur_cartes.push({
+			data.liste_joueurs.push({
 				username: joueur.username,
-				cartes: joueur.cartes,
+				argent_en_jeu: joueur.argent_en_jeu,
 			});
 		}
-		console.log(liste_joueur_cartes);
-		console.log(cartes_communes);
-		console.log(who_is_winner(liste_joueur_cartes, cartes_communes));
+		wss_send_joueur(data);
+
+		// Démarre timer_reset
+		timer_reset = setTimeout(() => {
+			timer_reset_end = true;
+		}, duree_timer_reset);
 	}
 	// Etape 14
-	// Etape 15 (reset)
+	// Etape 15
 	else if (etape_global == 15) {
-		// TODO : ...
+		// Reset timer
+		clearTimeout(timer_reset);
+		timer_reset_end = false;
+
+		// Send winner
+		wss_send_joueur({
+			type: 'restart_global',
+		});
+	}
+	// Etape 16 (END & reset)
+	else if (etape_global == 16) {
+		// Log
+		var text_discord_log = '**New game finished**';
+		for (var joueur of PLAYERS) {
+			text_discord_log += `\n:white_medium_small_square: \`${joueur.username}:\` ${joueur.argent_en_jeu}`;
+		}
+		log_discord(`${text_discord_log}`, 'game');
+
+		// Requete database pour chaque joueur
+		for (var joueur of PLAYERS) {
+			database.all(
+				`UPDATE argent FROM players VALUES ${joueur.argent + joueur.argent_en_jeu} WHERE username = '${joueur.username}'; `,
+				(err, rows) => {
+					// Erreur
+					if (err) {
+						log('database', err, 'erreur');
+						log_discord(err, 'erreur');
+					}
+				}
+			);
+		}
 	}
 }
+
+// ---------------------------- TRANSITION GLOBAL ----------------------------
 
 /**
  * Fonction des transition de la fonction action_global() (grafcet GLOBAL)
  */
-function transition_global() {
+async function transition_global() {
 	// Etape 0 -> Etape 1
 	if (etape_global == 0 && try_start == true && nbr_joueur >= nbr_joueur_min_require && nbr_joueur <= nbr_joueur_max_require) {
 		etape_global = 1;
@@ -698,25 +939,29 @@ function transition_global() {
 	else if (etape_global == 14 && timer_reset_end == true) {
 		etape_global = 15;
 	}
+	// Etape 15 -> Etape 16
+	else if (etape_global == 15 && end_of_game() == true) {
+		etape_global = 16;
+		log('Game', 'GAME END | Do request database', 'game');
+	}
+	// Etape 15 -> Etape 1
+	else if (etape_global == 15 && end_of_game() == false) {
+		etape_global = 1;
+	}
+	// Etape 16 -> Etape 0
+	else if (etape_global == 16) {
+		etape_global = 0;
+	}
 	// Variable reset
 	try_start = false;
 }
 
-/**
- * Fonction infini du jeu (grafcet GLOBAL)
- */
-async function global() {
-	while (true) {
-		await action_global();
-		await transition_global();
-		await sleep(sleep_time);
-	}
-}
+// ---------------------------- ACTION MISE ----------------------------
 
 /**
  * Fonction principale de la partie mise du jeu (grafcet MISE)
  */
-function action_mise() {
+async function action_mise() {
 	// Etape 0
 	// Etape 1
 	if (etape_mise == 1) {
@@ -856,10 +1101,12 @@ function action_mise() {
 	}
 }
 
+// ---------------------------- TRANSITION MISE ----------------------------
+
 /**
  * Fonction des transition de la fonction action_mise() (grafcet MISE)
  */
-function transition_mise() {
+async function transition_mise() {
 	// Etape 0 -> Etape 1
 	if (etape_mise == 0 && GRAFCET_MISE == true) {
 		console.log(` ___________________ \n|                   |\n|--- Start MISE  ---|\n| \n| Joueur ${PLAYERS[who_playing].username}`);
@@ -891,6 +1138,8 @@ function transition_mise() {
 	}
 }
 
+// ---------------------------- Function infini ----------------------------
+
 /**
  * Fonction infini du jeu des mise (grafcet MISE)
  */
@@ -898,6 +1147,16 @@ async function mise() {
 	while (true) {
 		await action_mise();
 		await transition_mise();
+		await sleep(sleep_time);
+	}
+}
+/**
+ * Fonction infini du jeu (grafcet GLOBAL)
+ */
+async function global() {
+	while (true) {
+		await action_global();
+		await transition_global();
 		await sleep(sleep_time);
 	}
 }
@@ -925,6 +1184,8 @@ mise();
  *
  *
  */
+
+// ---------------------------- Websocket ----------------------------
 
 wss.on('connection', (ws, req) => {
 	// Recupere session
@@ -1040,6 +1301,8 @@ wss.on('connection', (ws, req) => {
  *
  *
  */
+
+// ---------------------------- Serveur POST data ----------------------------
 
 // Verifie le choix du joueur
 app.post('/choice', (req, res) => {
@@ -1185,27 +1448,30 @@ app.post('/inscription', (req, res) => {
 				});
 			} else {
 				// Insertion dans la base de donnée
-				database.all(`INSERT INTO players (username, password) VALUES ('${data.username}', '${password_sha256}'); `, (err, rows) => {
-					if (err) {
-						log('database', err, 'erreur');
-						log_discord(err, 'erreur');
+				database.all(
+					`INSERT INTO players (username, password, argent) VALUES ('${data.username}', '${password_sha256}', ${argent_inscription}); `,
+					(err, rows) => {
+						if (err) {
+							log('database', err, 'erreur');
+							log_discord(err, 'erreur');
 
-						res.render('inscription', {
-							alert: {
-								message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
-							},
-						});
-					} else {
-						log('Inscription', `${data.username} | ${password_sha256}`, 'info');
-						log_discord(data.username, 'incription');
+							res.render('inscription', {
+								alert: {
+									message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+								},
+							});
+						} else {
+							log('Inscription', `${data.username} | ${password_sha256}`, 'info');
+							log_discord(data.username, 'incription');
 
-						res.render('connexion', {
-							alert: {
-								message: `Vous avez bien été inscrit avec l'username : '${data.username}'.`,
-							},
-						});
+							res.render('connexion', {
+								alert: {
+									message: `Vous avez bien été inscrit avec l'username : '${data.username}'.`,
+								},
+							});
+						}
 					}
-				});
+				);
 			}
 		});
 	} else {
@@ -1235,6 +1501,8 @@ app.post('/inscription', (req, res) => {
  *
  *
  */
+
+// ---------------------------- Serveur GET data ----------------------------
 
 // Quand le client demande '/'
 app.get('/', (req, res) => {
@@ -1408,26 +1676,8 @@ app.get('*', (req, res) => {
 	res.render('404');
 });
 
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
+// ---------------------------- Demarrer serveur ----------------------------
 
-// Démarre le serveur (ecoute)
 server.listen(port, () => {
 	console.log('\n' + `L'application a démarré au port :`.blue + ' ' + `${port}`.bgWhite.black);
 });

@@ -52,9 +52,7 @@ function who_is_winner(liste_joueurs, cartes_communes) {
 	// Trouve le ou les meilleurs joueurs
 	var valeur_max = liste_valeur_joueurs[0].valeur;
 	var indice = [0];
-	console.log('init max:', valeur_max);
 	for (var i = 1; i < liste_valeur_joueurs.length; i++) {
-		console.log('val j:', liste_valeur_joueurs[i].valeur);
 		// Egalité parfaite
 		if (liste_valeur_joueurs[i].valeur == valeur_max) {
 			console.log('egality');
@@ -70,20 +68,22 @@ function who_is_winner(liste_joueurs, cartes_communes) {
 
 	// Affiche le resultat
 	if (indice.length > 1) {
-		var joueurs_egaux = [];
+		var username_joueurs_egaux = [];
 		for (var i of indice) {
-			joueurs_egaux.push(liste_valeur_joueurs[i].username);
+			username_joueurs_egaux.push(liste_valeur_joueurs[i].username);
 		}
 		return {
 			type: 'egalite',
-			joueurs_usernames: joueurs_egaux,
-			why_victoire: liste_valeur_joueurs[indice[0]].nom,
+			liste_usernames: username_joueurs_egaux,
+			liste_indices: indice,
+			how_win: liste_valeur_joueurs[indice[0]].nom,
 		};
 	} else {
 		return {
 			type: 'normal',
-			joueur_username: liste_valeur_joueurs[indice[0]].username,
-			why_victoire: liste_valeur_joueurs[indice[0]].nom,
+			liste_usernames: [liste_valeur_joueurs[indice[0]].username],
+			liste_indices: indice,
+			how_win: liste_valeur_joueurs[indice[0]].nom,
 		};
 	}
 }

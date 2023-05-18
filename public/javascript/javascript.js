@@ -29,6 +29,8 @@ if (window.location.host === 'poker.azerty.tk') {
 // --- Variable ---
 var local_user_info;
 var mise_actuelle;
+var last_winner;
+var last_abandon = [];
 
 // --- Fonctions ---
 
@@ -43,7 +45,7 @@ function button_start() {
 }
 
 /**
- * Supprime un joueur de la liste des joueurs 
+ * Supprime un joueur de la liste des joueurs
  * @param {String} username L'username du joueur à supprimer
  */
 function delete_player(username) {
@@ -61,7 +63,7 @@ function add_player(username, argent_en_jeu) {
 	new_div.setAttribute('id', `player-${username}`);
 
 	new_div.innerHTML = `
-				<h2 style="margin: 0">Joueur :</h2>
+				<h2>Joueur: <span id="player-is_winner-${username}"></span></h2>
 				<p id="player-username-${username}">${username}</p>
 				<p id="player-argent_en_jeu-${username}">${argent_en_jeu}</p>
 				<p id="player-last_action-${username}">aucune</p>
@@ -86,7 +88,7 @@ function update_main_player(username, status) {
 }
 
 /**
- * Change l'argent du joueur 
+ * Change l'argent du joueur
  * @param {String} username L'username du joueur à qui l'argent change
  * @param {Number} new_argent Le nouvel argent à afficher
  */
@@ -96,7 +98,7 @@ function update_argent_player(username, new_argent) {
 }
 
 /**
- * Change la derniere action du joueur 
+ * Change la derniere action du joueur
  * @param {String} username L'username du joueur à qui l'action change
  * @param {Number} new_action Le nouvel argent à afficher
  */
@@ -105,6 +107,7 @@ function update_action_player(username, new_action) {
 	div.innerHTML = new_action;
 
 	if (new_action == 'abandon') {
+		last_abandon.push(username);
 		var div_player = document.getElementById(`player-${username}`);
 		div_player.classList.add('abandon');
 	}
@@ -114,7 +117,7 @@ function update_action_player(username, new_action) {
  * Affiche les cartes du joueur
  * @param {Array} cartes Les cartes du joueur
  */
-function affiche_carte(cartes) {
+function affiche_your_carte(cartes) {
 	for (var carte of cartes) {
 		var new_img = document.createElement('img');
 		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
@@ -125,9 +128,9 @@ function affiche_carte(cartes) {
 }
 
 /**
- * Change le pot par le nouveau pot et la mise par la nouvelle mise 
+ * Change le pot par le nouveau pot et la mise par la nouvelle mise
  * @param {Number} new_pot Le nouveau pot
- * @param {Number} new_mise La nouvelle mise 
+ * @param {Number} new_mise La nouvelle mise
  */
 function update_pot_mise(new_pot, new_mise) {
 	mise_actuelle = new_mise;
@@ -152,17 +155,17 @@ function player_choose_action(action) {
 			return;
 		} else {
 			data.value_relance = value_relance;
-			console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+			console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
 		}
 	} else {
-		console.log('%cChoice send' + `%c ${data.action}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		console.log('%cChoice send' + `%c ${data.action}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
 	}
 
 	// Envoie en POST les données
 	$.post('/choice', data, function (data) {
 		// Affiche le resultat
 		if (data.valid == false) {
-			console.log('%cChoice error' + `%c ${data.error}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
+			console.log('%cChoice response error' + `%c ${data.error}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
 		}
 	});
 }
@@ -178,6 +181,41 @@ function affiche_carte(cartes) {
 		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
 
 		document.getElementById('cartes_communes').appendChild(new_img);
+	}
+}
+
+/**
+ * Affiche le ou les winners et comment ils ont gagnés
+ * @param {Array} liste_usernames La liste des noms du ou des gagnants
+ * @param {String} how_win Comment le ou les gagnants ont gagnés
+ */
+function set_winner(liste_usernames, how_win) {
+	last_winner = liste_usernames;
+	for (var username of liste_usernames) {
+		var div_player = document.getElementById(`player-${username}`);
+		div_player.classList.add('winner');
+
+		var div = document.getElementById(`player-is_winner-${username}`);
+		div.innerHTML = how_win;
+	}
+}
+
+function restart_global() {
+	// Delete your_card
+	document.getElementById('your_card').innerHTML = '';
+
+	// Delete carte communes
+	document.getElementById('cartes_communes').innerHTML = '';
+
+	// Delete winner
+	for (var winner of last_winner) {
+		document.getElementById(`player-${winner}`).classList.remove('winner');
+		document.getElementById(`player-is_winner-${winner}`).innerHTML = '';
+	}
+
+	// Delete abandon
+	for (var joueur of last_abandon) {
+		document.getElementById(`player-${joueur}`).classList.remove('abandon');
 	}
 }
 
@@ -273,7 +311,7 @@ socket.addEventListener('message', (event) => {
 		update_action_player(data.grosse_blind.username, 'grosse blind');
 		update_main_player(data.who_playing, 'on');
 		update_pot_mise(data.pot, data.mise_actuelle_requise);
-		affiche_carte(data.your_card);
+		affiche_your_carte(data.your_card);
 	}
 	// Nouveau main player
 	else if (data.type == 'next_player') {
@@ -319,10 +357,36 @@ socket.addEventListener('message', (event) => {
 	else if (data.type == 'new_cartes') {
 		var text_log_cartes = '';
 		for (var carte of data.cartes_new) {
-			text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
+			text_log_cartes += `\n - card: ${carte.numero} ${carte.symbole}`;
 		}
-		console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
+		console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 		affiche_carte(data.cartes_new);
+	}
+	// Winner
+	else if (data.type == 'winner') {
+		var text_log_winners = '';
+		for (var joueur of data.liste_usernames) {
+			text_log_winners += `${joueur} `;
+		}
+		console.log('%cWinner' + `%c ${text_log_winners} | ${data.how_win}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		set_winner(data.liste_usernames, data.how_win);
+	}
+	// Update argent_en_jeu
+	else if (data.type == 'update_argent_en_jeu') {
+		var text_log_argent_en_jeu = '';
+		for (var joueur of data.liste_joueurs) {
+			text_log_argent_en_jeu += `\n - ${joueur.username} ${joueur.argent_en_jeu}`;
+		}
+		console.log('%cUpdate argent_en_jeu:' + `%c${text_log_argent_en_jeu}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+
+		for (var joueur of data.liste_joueurs) {
+			update_argent_player(joueur.username, joueur.argent_en_jeu);
+		}
+	}
+	// Reset carte & winner
+	else if (data.type == 'restart_global') {
+		console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
+		restart_global();
 	}
 	// Autre cas
 	else {
@@ -338,7 +402,19 @@ socket.addEventListener('close', function (event) {
 
 // Debug info
 console.log(
-	'%cInfo color:' + '%c\n - ' + '%cServer info ' + '%c ' + '%c\n - ' + '%cBefore game ' + '%c ' + '%c\n - ' + '%cAfter game ' + '%c ',
+	'%cInfo color:' +
+		'%c\n - ' +
+		'%cServer info ' +
+		'%c ' +
+		'%c\n - ' +
+		'%cGame admin ' +
+		'%c ' +
+		'%c\n - ' +
+		'%cIn game ' +
+		'%c ' +
+		'%c\n - ' +
+		'%cClient action ' +
+		'%c ',
 	'text-decoration: underline;',
 	'',
 	'color: #004CFF;',
@@ -348,5 +424,8 @@ console.log(
 	'background: #F9FF00; color: #000000; padding: 0px 5px;',
 	'',
 	'color: #00AB00;',
-	'background: #00AB00; color: #000000; padding: 0px 5px;'
+	'background: #00AB00; color: #000000; padding: 0px 5px;',
+	'',
+	'color: #EA00B0;',
+	'background: #EA00B0; color: #000000; padding: 0px 5px;'
 );

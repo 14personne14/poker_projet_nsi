@@ -22,6 +22,7 @@
 
 * Start app : 
   ```cmd
+  $npm install
   $npm run app.js
   ```
 
