@@ -57,7 +57,7 @@ function log(titre, message = '', type = '') {
 	}
 	// Cas de base
 	else {
-		console.log('\n' + `${titre}`.bgWhite + `   ${message} `.white);
+		console.log('\n' + `${titre}`.bgWhite + ` ${message} `.white);
 	}
 }
 

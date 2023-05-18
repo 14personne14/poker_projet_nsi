@@ -1,37 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-        <%- include('includes/head'); %>
+<head>
+    <%- include('includes/head'); %>
 
-		<title>Pok'help | Home</title>
-	</head>
+    <title>Pok'help | Home</title>
+    </head>
 
-	<body>
-		<div class="container">
-			<!-- TITRE -->
-			<div class="d-flex justify-content-center">
-				<h1>Pok'help</h1>
-			</div>
-            
-            <%- include('includes/alert'); %>
+<body>
+    <div class="container">
+        <!-- TITRE -->
+        <div class="d-flex justify-content-center">
+            <h1>Pok'help</h1>
+        </div>
 
-			<!-- Connexion / Inscription -->
-			<div class="d-flex justify-content-center">
-				<div class="grid text-center">
-					<div class="g-col-12 g-col-lg-6">
-						<a href="connexion">
-							<button class="main_button">connexion</button>
-						</a>
-					</div>
-					<div class="g-col-12 g-col-lg-6">
-						<a href="inscription">
-							<button class="main_button">inscription</button>
-						</a>
-					</div>
-				</div>
-			</div>
+        <%- include('includes/alert'); %>
 
-            <%- include('includes/footer'); %>
-		</div>
-	</body>
+        <% if (connected == false) { %>
+        <!-- Connexion / Inscription -->
+        <div class="d-flex justify-content-center">
+            <div class="grid text-center">
+                <div class="g-col-12 g-col-lg-6">
+                    <a href="connexion">
+                        <button class="main_button">connexion</button>
+                    </a>
+                </div>
+                <div class="g-col-12 g-col-lg-6">
+                    <a href="inscription">
+                        <button class="main_button">inscription</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <% } else { %>
+        <!-- Game -->
+        <div class="d-flex justify-content-center">
+            <div class="grid text-center">
+                <div class="g-col-12">
+                    <form action="game" method="get">
+                        <div class="mb-3">
+                            <label for="exampleInputEmail1" class="form-label">Argent</label>
+                            <input type="number" class="form-control" name="argent" value="5000">
+                            <div class="form-text">Combien d'argent voulez vous mettre ?</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Rejoindre le jeu</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <%- include('includes/footer'); %>
+        </div>
+        </body>
+
 </html>

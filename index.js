@@ -54,7 +54,7 @@ const regex_username = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/;
  * La regex qui vérifie le mot de passe des joueurs (le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial. Il doit aussi être entre 8 et 16 caractères)
  * @type {RegExp}
  */
-const regex_password = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
+const regex_password = /^[a-zA-Z0-9]+_?[a-zA-Z0-9]*$/; // /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-+]).{8,16}$/;
 
 // ---------------------------- Variable true/false (for game) ----------------------------
 
@@ -401,9 +401,6 @@ function end_of_game() {
  */
 async function action_global() {
 	// Etape 0
-	if (etape_global == 0) {
-		nbr_joueur = PLAYERS.length;
-	}
 	// Etape 1
 	if (etape_global == 1) {
 		// Créé et melange jeu de cartes
@@ -436,11 +433,11 @@ async function action_global() {
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
 		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
 		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
 		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
 		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
@@ -474,11 +471,11 @@ async function action_global() {
 					mise_actuelle_requise: mise_actuelle_requise,
 					petite_blind: {
 						username: PLAYERS[indice_blind.petite].username,
-						argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+						argent: PLAYERS[indice_blind.petite].argent_restant,
 					},
 					grosse_blind: {
 						username: PLAYERS[indice_blind.grosse].username,
-						argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+						argent: PLAYERS[indice_blind.grosse].argent_restant,
 					},
 					your_card: cartes_joueur,
 					pot: pot,
@@ -514,11 +511,11 @@ async function action_global() {
 		var indice_blind = get_indice_player_blind();
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
 		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
 		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
 		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
@@ -538,11 +535,11 @@ async function action_global() {
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+				argent: PLAYERS[indice_blind.petite].argent_restant,
 			},
 			grosse_blind: {
 				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+				argent: PLAYERS[indice_blind.grosse].argent_restant,
 			},
 			cartes_new: cartes_flop_to_send,
 			pot: pot,
@@ -584,11 +581,11 @@ async function action_global() {
 		var indice_blind = get_indice_player_blind();
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
 		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
 		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
 		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
@@ -607,11 +604,11 @@ async function action_global() {
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+				argent: PLAYERS[indice_blind.petite].argent_restant,
 			},
 			grosse_blind: {
 				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+				argent: PLAYERS[indice_blind.grosse].argent_restant,
 			},
 			cartes_new: cartes_turn_to_send,
 			pot: pot,
@@ -653,11 +650,11 @@ async function action_global() {
 		var indice_blind = get_indice_player_blind();
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_en_jeu -= valeur_blind.petite;
+		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
 		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_en_jeu -= valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
 		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
 		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
@@ -676,11 +673,11 @@ async function action_global() {
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_en_jeu,
+				argent: PLAYERS[indice_blind.petite].argent_restant,
 			},
 			grosse_blind: {
 				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_en_jeu,
+				argent: PLAYERS[indice_blind.grosse].argent_restant,
 			},
 			cartes_new: cartes_river_to_send,
 			pot: pot,
@@ -780,7 +777,7 @@ async function action_global() {
 		// Ajoute pot aux winners
 		var nbr_winner = winner_infos.liste_indices.length;
 		for (var indice of winner_infos.liste_indices) {
-			PLAYERS[indice].argent_en_jeu += pot / nbr_winner;
+			PLAYERS[indice].argent_restant += pot / nbr_winner;
 		}
 
 		// Send winner
@@ -790,15 +787,15 @@ async function action_global() {
 			how_win: winner_infos.how_win,
 		});
 
-		// Send updated argent_en_jeu
+		// Send updated argent_restant
 		data = {
-			type: 'update_argent_en_jeu',
+			type: 'update_argent_restant',
 			liste_joueurs: [],
 		};
 		for (var joueur of PLAYERS) {
 			data.liste_joueurs.push({
 				username: joueur.username,
-				argent_en_jeu: joueur.argent_en_jeu,
+				argent_restant: joueur.argent_restant,
 			});
 		}
 		wss_send_joueur(data);
@@ -825,14 +822,14 @@ async function action_global() {
 		// Log
 		var text_discord_log = '**New game finished**';
 		for (var joueur of PLAYERS) {
-			text_discord_log += `\n:white_medium_small_square: \`${joueur.username}:\` ${joueur.argent_en_jeu}`;
+			text_discord_log += `\n:white_medium_small_square: \`${joueur.username}:\` ${joueur.argent_restant}`;
 		}
 		log_discord(`${text_discord_log}`, 'game');
 
 		// Requete database pour chaque joueur
 		for (var joueur of PLAYERS) {
 			database.all(
-				`UPDATE argent FROM players VALUES ${joueur.argent + joueur.argent_en_jeu} WHERE username = '${joueur.username}'; `,
+				`UPDATE argent FROM players VALUES ${joueur.argent + joueur.argent_restant} WHERE username = '${joueur.username}'; `,
 				(err, rows) => {
 					// Erreur
 					if (err) {
@@ -856,6 +853,7 @@ async function transition_global() {
 		etape_global = 1;
 		partie_en_cours = true;
 		log('Game', 'Init Game', 'game');
+		log_discord(`Game Start`, 'game');
 	}
 	// Etape 1 -> Etape 2
 	else if (etape_global == 1) {
@@ -997,8 +995,8 @@ async function action_mise() {
 				// Update liste
 				liste_joueur_playing[who_playing].last_action = 'suivre';
 				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_en_jeu
-				PLAYERS[who_playing].argent_en_jeu -= value_to_pay;
+				// Update pot & joueur.argent_restant
+				PLAYERS[who_playing].argent_restant -= value_to_pay;
 				pot += value_to_pay;
 			}
 			// Relance
@@ -1008,8 +1006,8 @@ async function action_mise() {
 				// Update liste
 				liste_joueur_playing[who_playing].last_action = 'relance';
 				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_en_jeu
-				PLAYERS[who_playing].argent_en_jeu -= value_to_pay;
+				// Update pot & joueur.argent_restant
+				PLAYERS[who_playing].argent_restant -= value_to_pay;
 				pot += value_to_pay;
 				// Update mise_actuelle_requise
 				mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
@@ -1019,12 +1017,12 @@ async function action_mise() {
 			// All-in
 			else if (player_choice.action == 'all-in') {
 				// Calcule valeur à payer par le joueur
-				var value_to_pay = PLAYERS[who_playing].argent_en_jeu;
+				var value_to_pay = PLAYERS[who_playing].argent_restant;
 				// Update liste
 				liste_joueur_playing[who_playing].last_action = 'all-in';
 				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_en_jeu
-				PLAYERS[who_playing].argent_en_jeu = 0;
+				// Update pot & joueur.argent_restant
+				PLAYERS[who_playing].argent_restant = 0;
 				pot += value_to_pay;
 				// Update mise_actuelle_requise
 				if (liste_joueur_playing[who_playing].argent_mise > mise_actuelle_requise) {
@@ -1044,7 +1042,7 @@ async function action_mise() {
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
 				action: `relance ${player_choice.value_relance}`,
-				argent_left: PLAYERS[who_playing].argent_en_jeu,
+				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
 			});
@@ -1053,7 +1051,7 @@ async function action_mise() {
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
 				action: liste_joueur_playing[who_playing].last_action,
-				argent_left: PLAYERS[who_playing].argent_en_jeu,
+				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
 			});
@@ -1190,53 +1188,50 @@ mise();
 wss.on('connection', (ws, req) => {
 	// Recupere session
 	sessionParser(req, {}, function () {
+		var argent_mit_en_jeu = req.session.argent_mit_en_jeu;
 		var argent = req.session.argent;
 		var username = req.session.username;
 
-		if (argent < argent_min_require || partie_en_cours == true) {
-			const data = JSON.stringify({
-				type: 'error',
-				message: `Vous ne pouvez pas joindre le jeu.`,
-			});
-			ws.send(data);
-		}
-		// Joueur ok
-		else {
-			log('Game', `Nouveau joueur -> ${username}`);
+		log('Game', `Nouveau joueur -> ${username}`, 'game');
 
-			nbr_joueur++;
-			PLAYERS.push({
+		PLAYERS.push({
+			username: username,
+			argent: argent,
+			ws: ws,
+
+			argent_mit_en_jeu: argent_mit_en_jeu,
+			argent_restant: argent_mit_en_jeu,
+			nbr_win: 0,
+			out: false,
+
+			last_action: 'aucune',
+			argent_mise: 0,
+			nbr_relance: 0,
+		});
+		nbr_joueur = PLAYERS.length;
+
+		// Prepare init list of players
+		var data = {
+			type: 'liste_player',
+			liste: [],
+		};
+		for (var joueur of PLAYERS) {
+			data.liste.push({
+				username: joueur.username,
+				argent_restant: joueur.argent_mit_en_jeu,
+			});
+		}
+		ws.send(JSON.stringify(data));
+
+		// Send new player
+		wss_send_joueur(
+			{
+				type: 'new_player',
 				username: username,
-				argent: argent,
-				argent_en_jeu: argent, // temp
-				ws: ws,
-				out: false,
-			});
-			// console.log(PLAYERS); // debug
-
-			// Prepare init list of players
-			var data = {
-				type: 'liste_player',
-				liste: [],
-			};
-			for (var joueur of PLAYERS) {
-				data.liste.push({
-					username: joueur.username,
-					argent_en_jeu: joueur.argent_en_jeu,
-				});
-			}
-			ws.send(JSON.stringify(data));
-
-			// Send new player
-			wss_send_joueur(
-				{
-					type: 'new_player',
-					username: username,
-					argent_en_jeu: argent, // temp -fake-
-				},
-				[username]
-			);
-		}
+				argent_restant: argent_mit_en_jeu,
+			},
+			[username]
+		);
 	});
 
 	// Message acceuil
@@ -1268,10 +1263,10 @@ wss.on('connection', (ws, req) => {
 					log('Game', `Delete joueur in-game -> ${req.session.username}`);
 
 					PLAYERS[i].ws = undefined;
-					PLAYERS[i].out = true;
+					PLAYERS[i].out = true; //////////////////////////////////////////// whereiam
 				} else {
 					PLAYERS.splice(i, 1);
-					nbr_joueur--;
+					nbr_joueur = PLAYERS.length;
 
 					wss_send_joueur({
 						type: 'delete_player',
@@ -1323,7 +1318,7 @@ app.post('/choice', (req, res) => {
 						valid: false,
 						error: 'Tu ne peux pas faire plus de 3 relances !',
 					});
-				} else if (value_to_pay > PLAYERS[who_playing].argent_en_jeu) {
+				} else if (value_to_pay > PLAYERS[who_playing].argent_restant) {
 					res.json({
 						valid: false,
 						error: "Tu n'as pas assez d'argent.",
@@ -1395,7 +1390,7 @@ app.post('/connexion', (req, res) => {
 				log('Connexion', `${username} | ${argent}`, 'info');
 				log_discord(`${username} | ${argent}`, 'connexion');
 
-				res.render('game', {
+				res.render('index', {
 					connected: true,
 					alert: {
 						message: `Bonjour '${username}', vous êtes connecté.`,
@@ -1511,7 +1506,7 @@ app.get('/', (req, res) => {
 
 	// Le joueur est deja connecter ?
 	if (session.connected) {
-		res.render('game', {
+		res.render('index', {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
@@ -1534,7 +1529,7 @@ app.get('/connexion', (req, res) => {
 
 	// Le joueur est deja connecter ?
 	if (session.connected) {
-		res.render('game', {
+		res.render('index', {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
@@ -1554,7 +1549,7 @@ app.get('/inscription', (req, res) => {
 
 	// Le joueur est deja connecter ?
 	if (session.connected) {
-		res.render('game', {
+		res.render('index', {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
@@ -1586,27 +1581,83 @@ app.get('/calcul_proba', (req, res) => {
 app.get('/game', (req, res) => {
 	// Récupère les données de session
 	var session = req.session;
+	var get_data = req.query;
 
-	// Le joueur est deja connecter ?
-	if (partie_en_cours == false) {
-		// temp delete connexion
-		alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-		session.connected = true; // temp
-		session.username = alphabet[ii].repeat(5); // temp
-		ii++; // temp
-		session.argent = 10000; // temp
-		// console.log(session); // temp // debug
-		res.render('game', {
-			connected: true,
-			alert: undefined,
-			PLAYERS: PLAYERS,
-			username: session.username,
-		}); //temp --edittt--
+	// Connected ?
+	if (session.connected == true) {
+		// Partie en cours ?
+		if (partie_en_cours == false) {
+			// Verif pas déjà in game
+			var in_game = false;
+			for (var joueur of PLAYERS) {
+				if (joueur.username == session.username) {
+					in_game = true;
+					res.render('index', {
+						connected: true,
+						alert: {
+							message: `Tu es déjà en train de jouer avec ce compte !`,
+						},
+					});
+				}
+			}
+			if (!in_game) {
+				// Verif argent joueur
+				database.all(`SELECT * FROM players WHERE username = '${session.username}'; `, (err, rows) => {
+					// Erreur
+					if (err) {
+						log('database', err, 'erreur');
+						log_discord(err, 'erreur');
+
+						res.render('index', {
+							connected: true,
+							alert: {
+								message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+							},
+						});
+					}
+					// Connexion validé
+					else if (rows.length > 0) {
+						var argent = rows[0].argent;
+
+						if (get_data.argent > argent) {
+							res.render('index', {
+								connected: true,
+								alert: {
+									message: "Tu n'as pas assez d'argent dans ton porte monnaie !",
+								},
+							});
+						} else if (get_data.argent < argent_min_require) {
+							res.render('index', {
+								connected: true,
+								alert: {
+									message: "Tu n'as pas mit assez d'argent en jeu !",
+								},
+							});
+						} else {
+							session.argent_mit_en_jeu = get_data.argent;
+							session.argent = argent;
+							res.render('game', {
+								connected: true,
+								alert: undefined,
+								username: session.username,
+							});
+						}
+					}
+				});
+			}
+		} else {
+			res.render('index', {
+				connected: true,
+				alert: {
+					message: 'Des joueurs sont deja en train de jouer !',
+				},
+			});
+		}
 	} else {
 		res.render('index', {
 			connected: false,
 			alert: {
-				message: 'Des joueurs sont deja en train de jouer !',
+				message: "Vous n'êtes pas connecté !",
 			},
 		});
 	}

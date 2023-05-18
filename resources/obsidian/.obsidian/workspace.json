@@ -42,9 +42,9 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": 74.49048248094415,
-                  "y": -854.0938637705448,
-                  "zoom": 0.3333333333333334
+                  "x": 270.42816075414976,
+                  "y": -653.3931663903941,
+                  "zoom": 0.3333333333333332
                 }
               }
             }
@@ -61,7 +61,8 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -135,7 +136,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "info/Object info.md",
+                "file": "grafcet/GLOBAL.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -152,7 +153,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "info/Object info.md",
+                "file": "grafcet/GLOBAL.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -175,7 +176,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "info/Object info.md"
+                "file": "grafcet/GLOBAL.canvas"
               }
             }
           }
@@ -196,11 +197,11 @@
       "command-palette:Ouvrir la palette de commandes": false
     }
   },
-  "active": "5e2c2854b25debb2",
+  "active": "c1562624676fa56d",
   "lastOpenFiles": [
-    "grafcet/GLOBAL.canvas",
     "grafcet/MISE.canvas",
     "info/Object info.md",
+    "grafcet/GLOBAL.canvas",
     "Statistiques.md",
     "images/GLOBAL.png",
     "images/stat1.png",

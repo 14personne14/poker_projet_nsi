@@ -55,9 +55,9 @@ function delete_player(username) {
 /**
  * Ajoute un joueur de la liste
  * @param {String} username L'username du joueur à ajouter
- * @param {Number} argent_en_jeu L'argent mit en jeu par le joueur
+ * @param {Number} argent_restant L'argent mit en jeu par le joueur
  */
-function add_player(username, argent_en_jeu) {
+function add_player(username, argent_restant) {
 	var new_div = document.createElement('div');
 	new_div.classList.add('player_block');
 	new_div.setAttribute('id', `player-${username}`);
@@ -65,7 +65,7 @@ function add_player(username, argent_en_jeu) {
 	new_div.innerHTML = `
 				<h2>Joueur: <span id="player-is_winner-${username}"></span></h2>
 				<p id="player-username-${username}">${username}</p>
-				<p id="player-argent_en_jeu-${username}">${argent_en_jeu}</p>
+				<p id="player-argent_restant-${username}">${argent_restant}</p>
 				<p id="player-last_action-${username}">aucune</p>
     `;
 
@@ -93,7 +93,7 @@ function update_main_player(username, status) {
  * @param {Number} new_argent Le nouvel argent à afficher
  */
 function update_argent_player(username, new_argent) {
-	var div = document.getElementById(`player-argent_en_jeu-${username}`);
+	var div = document.getElementById(`player-argent_restant-${username}`);
 	div.innerHTML = new_argent;
 }
 
@@ -286,15 +286,15 @@ socket.addEventListener('message', (event) => {
 	}
 	// Ajout d'un joueur
 	else if (data.type == 'new_player') {
-		console.log('%cNew player' + `%c ${data.username} | ${data.argent_en_jeu}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
-		add_player(data.username, data.argent_en_jeu);
+		console.log('%cNew player' + `%c ${data.username} | ${data.argent_restant}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
+		add_player(data.username, data.argent_restant);
 	}
 	// Init liste players
 	else if (data.type == 'liste_player') {
 		console.log('%cListe player', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
 		console.log(data.liste);
 		for (var joueur of data.liste) {
-			add_player(joueur.username, joueur.argent_en_jeu);
+			add_player(joueur.username, joueur.argent_restant);
 		}
 	}
 	// Init game
@@ -371,16 +371,16 @@ socket.addEventListener('message', (event) => {
 		console.log('%cWinner' + `%c ${text_log_winners} | ${data.how_win}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 		set_winner(data.liste_usernames, data.how_win);
 	}
-	// Update argent_en_jeu
-	else if (data.type == 'update_argent_en_jeu') {
-		var text_log_argent_en_jeu = '';
+	// Update argent_restant
+	else if (data.type == 'update_argent_restant') {
+		var text_log_argent_restant = '';
 		for (var joueur of data.liste_joueurs) {
-			text_log_argent_en_jeu += `\n - ${joueur.username} ${joueur.argent_en_jeu}`;
+			text_log_argent_restant += `\n - ${joueur.username} ${joueur.argent_restant}`;
 		}
-		console.log('%cUpdate argent_en_jeu:' + `%c${text_log_argent_en_jeu}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		console.log('%cUpdate argent_restant:' + `%c${text_log_argent_restant}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 
 		for (var joueur of data.liste_joueurs) {
-			update_argent_player(joueur.username, joueur.argent_en_jeu);
+			update_argent_player(joueur.username, joueur.argent_restant);
 		}
 	}
 	// Reset carte & winner
