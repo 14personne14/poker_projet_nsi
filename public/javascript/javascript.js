@@ -135,8 +135,8 @@ function affiche_your_carte(cartes) {
 function update_pot_mise(new_pot, new_mise) {
 	mise_actuelle = new_mise;
 
-	var div = document.getElementById(`valeur_pot`);
-	div.innerHTML = `pot: ${new_pot} | mise: ${mise_actuelle}`;
+	$('#valeur_pot').html(`pot: ${new_pot}`);
+	$('#valeur_mise').html(`mise: ${mise_actuelle}`);
 }
 
 /**
@@ -200,6 +200,9 @@ function set_winner(liste_usernames, how_win) {
 	}
 }
 
+/**
+ * Reinitialise le jeu pour repartir pour un nouveau tour
+ */
 function restart_global() {
 	// Delete your_card
 	document.getElementById('your_card').innerHTML = '';
@@ -217,6 +220,28 @@ function restart_global() {
 	for (var joueur of last_abandon) {
 		document.getElementById(`player-${joueur}`).classList.remove('abandon');
 	}
+}
+
+/**
+ * Affiche une alert au millieu de l'écran avec le message
+ * @param {String} message Le message à afficher
+ * @param {Number} duree La durée d'affichage du message en milli-secondes
+ */
+function alert(message, duree = 5000) {
+	$('#alert').show();
+	$('#alert').html(message);
+	setTimeout(function () {
+		$('#alert').hide();
+		$('#alert').html('');
+	}, duree);
+}
+
+/**
+ * Change le dernier message du jeu avce le nouveau
+ * @param {String} message Le nouveau message à afficher
+ */
+function update_info_game(message) {
+	$('#info').html(message);
 }
 
 /*
@@ -328,6 +353,7 @@ socket.addEventListener('message', (event) => {
 			'',
 			''
 		);
+		update_info_game(data.message);
 		update_main_player(data.username, 'off');
 		update_argent_player(data.username, data.argent_left);
 		update_action_player(data.username, data.action);

@@ -161,7 +161,7 @@ var nbr_joueur = 0;
  * Liste des joueurs qui ont commencés à miser (liste temporaire du jeu en cour)
  * @type {Array}
  */
-var liste_joueur_playing = [];
+var PLAYERS = [];
 
 /**
  * Le choix du joueur
@@ -323,37 +323,43 @@ function get_indice_player_blind() {
 }
 
 /**
- * Renvoie le nombre de joueur qui ont terminé de jouer, le nombre d'abandon et le nombre de joueur qui n'ont pas besoin de continuer de choisir pour jouer.
+ * Renvoie le nombre de joueur qui ont terminé de jouer, le nombre d'abandon, le nombre de 'out' et le nombre de joueur qui n'ont pas besoin de continuer de choisir pour jouer.
  * @returns {Object}
  */
 function calc_status_player() {
 	var nbr_end_player = 0;
 	var nbr_abandon = 0;
+	var nbr_out = 0;
 	var nbr_no_re_choice = 0;
 
-	for (var joueur of liste_joueur_playing) {
-		// Suivre avec la bonne mise
-		if (joueur.last_action == 'suivre' && joueur.argent_mise == mise_actuelle_requise) {
-			nbr_end_player++;
-		}
-		// Relance avec bonne valeur
-		else if (joueur.last_action == 'relance' && joueur.argent_mise == mise_actuelle_requise) {
-			nbr_end_player++;
-		}
-		// All-in
-		else if (joueur.last_action == 'all-in') {
-			nbr_end_player++;
-			nbr_no_re_choice++;
-		}
-		// Abandon
-		else if (joueur.last_action == 'abandon') {
-			nbr_end_player++;
-			nbr_no_re_choice++;
-			nbr_abandon++;
+	for (var joueur of PLAYERS) {
+		// out
+		if (joueur.out == true || joueur.leave == true) {
+			nbr_out++;
+		} else {
+			if (joueur.last_action == 'suivre' && joueur.argent_mise == mise_actuelle_requise) {
+				// Suivre avec la bonne mise
+				nbr_end_player++;
+			}
+			// Relance avec bonne valeur
+			else if (joueur.last_action == 'relance' && joueur.argent_mise == mise_actuelle_requise) {
+				nbr_end_player++;
+			}
+			// All-in
+			else if (joueur.last_action == 'all-in') {
+				nbr_end_player++;
+				nbr_no_re_choice++;
+			}
+			// Abandon
+			else if (joueur.last_action == 'abandon') {
+				nbr_end_player++;
+				nbr_no_re_choice++;
+				nbr_abandon++;
+			}
 		}
 	}
 
-	return { nbr_end_player: nbr_end_player, nbr_abandon: nbr_abandon, nbr_no_re_choice: nbr_no_re_choice };
+	return { nbr_end_player: nbr_end_player, nbr_abandon: nbr_abandon, nbr_no_re_choice: nbr_no_re_choice, nbr_out: nbr_out };
 }
 
 /**
@@ -362,7 +368,7 @@ function calc_status_player() {
  */
 function end_of_mise() {
 	var result = calc_status_player();
-	if (result.nbr_end_player == nbr_joueur || result.nbr_abandon == nbr_joueur - 1) {
+	if (result.nbr_end_player == nbr_joueur - result.nbr_out || result.nbr_abandon == nbr_joueur - 1 - result.nbr_out) {
 		return true;
 	}
 	return false;
@@ -374,7 +380,7 @@ function end_of_mise() {
  */
 function end_of_global() {
 	var result = calc_status_player();
-	if (result.nbr_no_re_choice >= nbr_joueur - 1) {
+	if (result.nbr_no_re_choice >= nbr_joueur - 1 - result.nbr_out) {
 		return true;
 	}
 	return false;
@@ -384,14 +390,9 @@ function end_of_global() {
  * Renvoie si le jeu est terminé. C'est à dire si il ne reste plus que un seul joueur encore en 'vie'
  */
 function end_of_game() {
-	var counter_out = 0;
-	for (var joueur of PLAYERS) {
-		if (joueur.out == true) {
-			counter_out++;
-		}
-	}
+	var result = calc_status_player();
 
-	return nbr_joueur + 1 == counter_out;
+	return result.nbr_out == nbr_joueur - 1;
 }
 
 // ---------------------------- ACTION GLOBAL ----------------------------
@@ -420,9 +421,9 @@ async function action_global() {
 		who_start = get_random_number(0, nbr_joueur - 1);
 		who_playing = who_start; // Décalage pour l'autoincrementation dans grafcet MISE
 
-		// Init liste liste_joueur_playing
+		// Init liste PLAYERS
 		for (var i = 0; i < nbr_joueur; i++) {
-			liste_joueur_playing[i] = {
+			PLAYERS[i] = {
 				username: PLAYERS[i].username,
 				last_action: 'aucune',
 				argent_mise: 0,
@@ -434,12 +435,12 @@ async function action_global() {
 		var indice_blind = get_indice_player_blind();
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
-		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		PLAYERS[indice_blind.petite].last_action = 'blind';
+		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
 		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
-		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].last_action = 'blind';
+		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse;
@@ -447,8 +448,8 @@ async function action_global() {
 		// Debug
 		// console.log('------------------');
 		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('liste_joueur_playing:');
-		// console.log(liste_joueur_playing);
+		// console.log('PLAYERS:');
+		// console.log(PLAYERS);
 		// console.log('pot: ', pot);
 		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		// console.log('------------------');
@@ -498,12 +499,12 @@ async function action_global() {
 			cartes_communes.push(carte);
 		}
 
-		// Reste liste_joueur_playing
+		// Reste PLAYERS
 		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
-				liste_joueur_playing[i].last_action = 'aucune';
-				liste_joueur_playing[i].argent_mise = 0;
-				liste_joueur_playing[i].nbr_relance = 0;
+			if (!(PLAYERS[i].last_action == 'all-in')) {
+				PLAYERS[i].last_action = 'aucune';
+				PLAYERS[i].argent_mise = 0;
+				PLAYERS[i].nbr_relance = 0;
 			}
 		}
 
@@ -512,12 +513,12 @@ async function action_global() {
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
-		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		PLAYERS[indice_blind.petite].last_action = 'blind';
+		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
 		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
-		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].last_action = 'blind';
+		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse; // Reset
@@ -551,8 +552,8 @@ async function action_global() {
 		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
 		// console.log('cartes_communes:');
 		// console.log(cartes_communes);
-		// console.log('liste_joueur_playing:');
-		// console.log(liste_joueur_playing);
+		// console.log('PLAYERS:');
+		// console.log(PLAYERS);
 		// console.log('pot: ', pot);
 		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		// console.log('------------------');
@@ -568,12 +569,12 @@ async function action_global() {
 		var carte_turn = jeu_cartes.pioche(1)[0];
 		cartes_communes.push(carte_turn);
 
-		// Reste liste_joueur_playing
+		// Reste PLAYERS
 		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
-				liste_joueur_playing[i].last_action = 'aucune';
-				liste_joueur_playing[i].argent_mise = 0;
-				liste_joueur_playing[i].nbr_relance = 0;
+			if (!(PLAYERS[i].last_action == 'all-in')) {
+				PLAYERS[i].last_action = 'aucune';
+				PLAYERS[i].argent_mise = 0;
+				PLAYERS[i].nbr_relance = 0;
 			}
 		}
 
@@ -582,12 +583,12 @@ async function action_global() {
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
-		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		PLAYERS[indice_blind.petite].last_action = 'blind';
+		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
 		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
-		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].last_action = 'blind';
+		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse; // Reset
@@ -620,8 +621,8 @@ async function action_global() {
 		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
 		// console.log('cartes_communes:');
 		// console.log(cartes_communes);
-		// console.log('liste_joueur_playing:');
-		// console.log(liste_joueur_playing);
+		// console.log('PLAYERS:');
+		// console.log(PLAYERS);
 		// console.log('pot: ', pot);
 		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		// console.log('------------------');
@@ -637,12 +638,12 @@ async function action_global() {
 		var carte_river = jeu_cartes.pioche(1)[0];
 		cartes_communes.push(carte_river);
 
-		// Reste liste_joueur_playing
+		// Reste PLAYERS
 		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(liste_joueur_playing[i].last_action == 'all-in')) {
-				liste_joueur_playing[i].last_action = 'aucune';
-				liste_joueur_playing[i].argent_mise = 0;
-				liste_joueur_playing[i].nbr_relance = 0;
+			if (!(PLAYERS[i].last_action == 'all-in')) {
+				PLAYERS[i].last_action = 'aucune';
+				PLAYERS[i].argent_mise = 0;
+				PLAYERS[i].nbr_relance = 0;
 			}
 		}
 
@@ -651,12 +652,12 @@ async function action_global() {
 		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		liste_joueur_playing[indice_blind.petite].last_action = 'blind';
-		liste_joueur_playing[indice_blind.petite].argent_mise = valeur_blind.petite;
+		PLAYERS[indice_blind.petite].last_action = 'blind';
+		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
 		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		liste_joueur_playing[indice_blind.grosse].last_action = 'blind';
-		liste_joueur_playing[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		PLAYERS[indice_blind.grosse].last_action = 'blind';
+		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse; // Reset
@@ -689,8 +690,8 @@ async function action_global() {
 		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
 		// console.log('cartes_communes:');
 		// console.log(cartes_communes);
-		// console.log('liste_joueur_playing:');
-		// console.log(liste_joueur_playing);
+		// console.log('PLAYERS:');
+		// console.log(PLAYERS);
 		// console.log('pot: ', pot);
 		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		// console.log('------------------');
@@ -764,7 +765,7 @@ async function action_global() {
 		// Prepare liste for function winner
 		var liste_joueur_cartes = [];
 		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(liste_joueur_playing[i].last_action == 'abandon')) {
+			if (!(PLAYERS[i].last_action == 'abandon')) {
 				liste_joueur_cartes.push({
 					username: PLAYERS[i].username,
 					cartes: PLAYERS[i].cartes,
@@ -979,65 +980,63 @@ async function action_mise() {
 		// Reset timer
 		clearTimeout(timer);
 
-		// Joueur attend timer
-		if (timer_choix_end == true) {
-			// Fait abandonner le joueur
-			liste_joueur_playing[who_playing].last_action = 'abandon';
-		}
+		var action_to_send;
 
 		// Joueur a fait un choix
-		else if (player_choice != undefined) {
+		if (player_choice != undefined) {
+			PLAYERS[who_playing].last_action = player_choice.action;
 			// Change en fonction de l'action du joueur :
 			// Suivre
 			if (player_choice.action == 'suivre') {
-				// Calcule valeur à payer par le joueur
-				var value_to_pay = mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise;
-				// Update liste
-				liste_joueur_playing[who_playing].last_action = 'suivre';
-				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_restant
+				var value_to_pay = mise_actuelle_requise - PLAYERS[who_playing].argent_mise;
+
+				// Update
+				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant -= value_to_pay;
 				pot += value_to_pay;
+				action_to_send = 'suit';
 			}
 			// Relance
 			else if (player_choice.action == 'relance') {
-				// Calcule valeur à payer par le joueur
-				var value_to_pay = player_choice.value_relance + (mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise);
-				// Update liste
-				liste_joueur_playing[who_playing].last_action = 'relance';
-				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_restant
+				var value_to_pay = player_choice.value_relance + (mise_actuelle_requise - PLAYERS[who_playing].argent_mise);
+
+				// Update
+				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant -= value_to_pay;
+				PLAYERS[who_playing].nbr_relance++;
 				pot += value_to_pay;
-				// Update mise_actuelle_requise
-				mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
-				// Update nbr relance of player
-				liste_joueur_playing[who_playing].nbr_relance++;
+				mise_actuelle_requise = PLAYERS[who_playing].argent_mise;
+				action_to_send = 'relance de';
 			}
 			// All-in
 			else if (player_choice.action == 'all-in') {
-				// Calcule valeur à payer par le joueur
 				var value_to_pay = PLAYERS[who_playing].argent_restant;
-				// Update liste
-				liste_joueur_playing[who_playing].last_action = 'all-in';
-				liste_joueur_playing[who_playing].argent_mise += value_to_pay;
-				// Update pot & joueur.argent_restant
+
+				// Update
+				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant = 0;
 				pot += value_to_pay;
-				// Update mise_actuelle_requise
-				if (liste_joueur_playing[who_playing].argent_mise > mise_actuelle_requise) {
-					mise_actuelle_requise = liste_joueur_playing[who_playing].argent_mise;
+				action_to_send = 'all-in';
+				// Update mise_actuelle_requise si besoin
+				if (PLAYERS[who_playing].argent_mise > mise_actuelle_requise) {
+					mise_actuelle_requise = PLAYERS[who_playing].argent_mise;
 				}
 			}
 			// Abandon
 			else if (player_choice.action == 'abandon') {
-				// Update liste
-				liste_joueur_playing[who_playing].last_action = 'abandon';
+				PLAYERS[who_playing].last_action = 'abandon';
+				action_to_send = 'abandonne';
 			}
+		}
+		// Joueur attend timer
+		else {
+			// Fait abandonner automatiquement le joueur
+			PLAYERS[who_playing].last_action = 'abandon';
+			action_to_send = 'abandonne';
 		}
 
 		// Envoie des données aux joueurs
-		if (liste_joueur_playing[who_playing].last_action == 'relance') {
+		if (PLAYERS[who_playing].last_action == 'relance') {
 			wss_send_joueur({
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
@@ -1045,15 +1044,17 @@ async function action_mise() {
 				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
+				message: `${PLAYERS[who_playing].username} ${action_to_send} ${player_choice.value_relance}`,
 			});
 		} else {
 			wss_send_joueur({
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
-				action: liste_joueur_playing[who_playing].last_action,
+				action: PLAYERS[who_playing].last_action,
 				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
+				message: `${PLAYERS[who_playing].username} ${action_to_send}`,
 			});
 		}
 
@@ -1068,11 +1069,13 @@ async function action_mise() {
 				}
 				// Verifie si player ok
 				if (
+					PLAYERS[who_playing].out == false &&
+					PLAYERS[who_playing].leave == false &&
 					!(
-						((liste_joueur_playing[who_playing].last_action == 'suivre' || liste_joueur_playing[who_playing].last_action == 'relance') &&
-							liste_joueur_playing[who_playing].argent_mise == mise_actuelle_requise) ||
-						liste_joueur_playing[who_playing].last_action == 'all-in' ||
-						liste_joueur_playing[who_playing].last_action == 'abandon'
+						((PLAYERS[who_playing].last_action == 'suivre' || PLAYERS[who_playing].last_action == 'relance') &&
+							PLAYERS[who_playing].argent_mise == mise_actuelle_requise) ||
+						PLAYERS[who_playing].last_action == 'all-in' ||
+						PLAYERS[who_playing].last_action == 'abandon'
 					)
 				) {
 					good_next_player = true;
@@ -1083,8 +1086,8 @@ async function action_mise() {
 		// Debug
 		// console.log('------------------');
 		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('liste_joueur_playing:');
-		// console.log(liste_joueur_playing);
+		// console.log('PLAYERS:');
+		// console.log(PLAYERS);
 		// console.log('pot: ', pot);
 		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
 		// console.log('------------------');
@@ -1195,15 +1198,19 @@ wss.on('connection', (ws, req) => {
 		log('Game', `Nouveau joueur -> ${username}`, 'game');
 
 		PLAYERS.push({
+			// Genéral
 			username: username,
 			argent: argent,
 			ws: ws,
 
+			// For game entiere
 			argent_mit_en_jeu: argent_mit_en_jeu,
 			argent_restant: argent_mit_en_jeu,
 			nbr_win: 0,
 			out: false,
+			leave: false,
 
+			// For tour
 			last_action: 'aucune',
 			argent_mise: 0,
 			nbr_relance: 0,
@@ -1258,12 +1265,12 @@ wss.on('connection', (ws, req) => {
 		for (var i = 0; i < nbr_joueur; i++) {
 			// Si il est inscrit
 			if (PLAYERS[i].username == req.session.username) {
-				// Partie en cour ?
 				if (partie_en_cours == true) {
 					log('Game', `Delete joueur in-game -> ${req.session.username}`);
 
 					PLAYERS[i].ws = undefined;
-					PLAYERS[i].out = true; //////////////////////////////////////////// whereiam
+					PLAYERS[i].out = true;
+					PLAYERS[i].leave = true;
 				} else {
 					PLAYERS.splice(i, 1);
 					nbr_joueur = PLAYERS.length;
@@ -1311,9 +1318,9 @@ app.post('/choice', (req, res) => {
 			if (data.action == 'relance') {
 				// Transforme en nombre
 				data.value_relance = Number(data.value_relance);
-				var value_to_pay = data.value_relance + (mise_actuelle_requise - liste_joueur_playing[who_playing].argent_mise);
+				var value_to_pay = data.value_relance + (mise_actuelle_requise - PLAYERS[who_playing].argent_mise);
 
-				if (liste_joueur_playing[who_playing].nbr_relance == 3) {
+				if (PLAYERS[who_playing].nbr_relance == 3) {
 					res.json({
 						valid: false,
 						error: 'Tu ne peux pas faire plus de 3 relances !',
@@ -1321,26 +1328,51 @@ app.post('/choice', (req, res) => {
 				} else if (value_to_pay > PLAYERS[who_playing].argent_restant) {
 					res.json({
 						valid: false,
-						error: "Tu n'as pas assez d'argent.",
+						error: "Tu n'as pas assez d'argent. Tu peux peut-être all-in ?",
 					});
 				} else if (data.value_relance <= 0) {
 					res.json({
 						valid: false,
 						error: 'Tu doit relancer avec un nombre positif',
 					});
-				} else {
-					// Valide le choix
+				} else if (value_to_pay == PLAYERS[who_playing].argent_restant) {
+					// All-in auto
+					player_choice = {
+						action: 'all-in',
+					};
 					res.json({
 						valid: true,
 					});
+				} else {
+					// Valide le choix
 					player_choice = data;
+					res.json({
+						valid: true,
+					});
+				}
+			} else if (data.action == 'suivre') {
+				var value_to_pay = mise_actuelle_requise - PLAYERS[who_playing].argent_mise;
+				if (value_to_pay > PLAYERS[who_playing].argent_restant) {
+					// All-in auto
+					player_choice = {
+						action: 'all-in',
+					};
+					res.json({
+						valid: true,
+					});
+				} else {
+					// Valide le choix
+					player_choice = data;
+					res.json({
+						valid: true,
+					});
 				}
 			} else {
 				// Valide le choix
+				player_choice = data;
 				res.json({
 					valid: true,
 				});
-				player_choice = data;
 			}
 		} else {
 			res.json({

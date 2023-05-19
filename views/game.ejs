@@ -1,51 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		
-		<!-- Icon -->
-		<link rel="icon" type="image" href="public/icons/poker.png" />
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-		<!-- Style -->
-		<link href="public/style/game.css" rel="stylesheet" />
+    <!-- Icon -->
+    <link rel="icon" type="image" href="public/icons/poker.png" />
 
-		<!-- JQuery -->
-		<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <!-- Style -->
+    <link href="public/style/game.css" rel="stylesheet" />
 
-		<title>Pok'help - Game</title>
-	</head>
-	<body>
-		<div class="container">
-			<%- include('includes/alert'); %>
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
 
-			<!-- Username -->
-			<p>Your are <%= username %></p>
+    <title>Pok'help - Game</title>
+    </head>
 
-			<!-- Button start -->
-			<button onclick="button_start()">Start</button>
+<body>
+    <div id="alert" style="display: none;"></div>
+    <div class="container">
+        <%- include('includes/alert'); %>
 
-			<!-- Pot & Mise actuelle -->
-			<p id="valeur_pot">pot: none | mise: none</p>
+        <!-- Username -->
+        <p>Your are <%= username %></p>
 
-			<!-- Card of player -->
-			<div id="your_card"></div>
+        <!-- Button start -->
+        <button onclick="button_start()">Start</button>
 
-			<!-- Card communes -->
-			<div id="cartes_communes"></div>
+        <!-- Info Jeu -->
+        <div id="info">Attente des joueurs</div>
 
-			<!-- Liste Joueurs -->
-			<div id="liste_players"></div>
+        <!-- Pot & Mise actuelle -->
+        <p class="pot_mise">pot: <span id="valeur_pot">none</span></p>
+		<p class="pot_mise">mise: <span id="valeur_mise">none</span></p>
 
-			<!-- Choix possible -->
-			<button onclick="player_choose_action('suivre')">Suivre</button>
-			<button onclick="player_choose_action('abandon')">Abandonner</button>
-			<button onclick="player_choose_action('relance')">Relancer</button
-			><input type="text" value="100" min="0" max="" placeholder="valeur relance" id="input_relance" />
-			<button onclick="player_choose_action('all-in')">All-in</button>
+        <!-- Card of player -->
+        <div id="your_card"></div>
 
-			<!-- Javascript -->
-			<script src="public/javascript/javascript.js"></script>
-		</div>
-	</body>
+        <!-- Card communes -->
+        <div id="cartes_communes"></div>
+
+        <!-- Liste Joueurs -->
+        <div id="liste_players"></div>
+
+        <!-- Choix possible -->
+        <button onclick="player_choose_action('suivre')">Suivre</button>
+        <button onclick="player_choose_action('abandon')">Abandonner</button>
+        <button onclick="player_choose_action('relance')">Relancer</button><input type="text" value="100" min="0" max="" placeholder="valeur relance" id="input_relance" />
+        <button onclick="player_choose_action('all-in')">All-in</button>
+
+        <!-- Javascript -->
+        <script src="public/javascript/javascript.js"></script>
+        </div>
+        </body>
+
 </html>

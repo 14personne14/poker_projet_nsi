@@ -4,13 +4,13 @@ body {
 	background: -webkit-linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
 	background: linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
 	background-attachment: scroll;
-	color: #ffffff; 
+	color: #ffffff;
 }
 
 .player_block {
 	border: #000000 solid 1px;
 	background-color: #ffffff;
-	color: #000000; 
+	color: #000000;
 	padding: 10px;
 	margin: 0;
 }
@@ -22,6 +22,7 @@ body {
 .player_block h2 {
 	margin: 0;
 }
+
 .main_player {
 	background-color: #008fa8;
 }
@@ -34,7 +35,7 @@ body {
 	padding: 10px;
 }
 
-#valeur_pot {
+.pot_mise {
 	text-decoration: underline;
 }
 
@@ -47,4 +48,28 @@ body {
 
 .winner {
 	background-color: #00ff00;
+}
+#alert {
+	position: fixed;
+	max-width: 90%;
+	padding: 20px;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+
+	color: #000000;
+	background: #006eff;
+
+	border: solid 2px #ffffff;
+	border-radius: 15px;
+}
+
+#info {
+	color: #000000;
+	background: #e7a100;
+	border: solid 2px #000000;
+	border-radius: 15px;
+	margin: 10px 0;
+	text-align: center;
+	padding: 10px;
 }
