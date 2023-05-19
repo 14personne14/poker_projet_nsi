@@ -152,6 +152,12 @@ h1 {
 .form-control {
 	font-size: 15px;
 }
+.money_button {
+	font-size: 30px;
+	font-family: 'Sigmar', cursive;
+	background: None;
+	border: None;
+}
 /* --- ALERT --- */
 /*.texte_defilant {
 	display: block;
