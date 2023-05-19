@@ -307,18 +307,37 @@ app.set('view engine', 'ejs');
 // ---------------------------- Function for Game ----------------------------
 
 /**
- * Obtenir l'indice des deux joueurs pour la grosse blind et la petite blind
+ * Obtenir l'indice des deux joueurs pour la petite blind et la grosse blind
  * @returns {Object}
  */
 function get_indice_player_blind() {
-	var indice_grosse = who_start - 1;
-	if (indice_grosse < 0) {
-		indice_grosse = nbr_joueur - 1;
+	var grosse_blind_is_good = false;
+	var petite_blind_is_good = false;
+
+	var indice_grosse = who_start;
+	while (!grosse_blind_is_good) {
+		indice_grosse--;
+		if (indice_grosse < 0) {
+			indice_grosse = nbr_joueur - 1;
+		}
+		grosse_blind_is_good = true;
+		if (PLAYERS[indice_grosse].out == true) {
+			grosse_blind_is_good = false;
+		}
 	}
-	var indice_petite = indice_grosse - 1;
-	if (indice_petite < 0) {
-		indice_petite = nbr_joueur - 1;
+
+	var indice_petite = indice_grosse;
+	while (!petite_blind_is_good) {
+		indice_petite--;
+		if (indice_petite < 0) {
+			indice_petite = nbr_joueur - 1;
+		}
+		petite_blind_is_good = true;
+		if (PLAYERS[indice_petite].out == true) {
+			petite_blind_is_good = false;
+		}
 	}
+
 	return { petite: indice_petite, grosse: indice_grosse };
 }
 
@@ -402,15 +421,26 @@ function end_of_game() {
  */
 async function action_global() {
 	// Etape 0
+	if (etape_global == 0) {
+		partie_en_cours = false;
+	}
 	// Etape 1
 	if (etape_global == 1) {
+		// Lance la partie
+		partie_en_cours = true;
+
 		// Créé et melange jeu de cartes
 		jeu_cartes = new JeuCartes();
 		jeu_cartes.melanger();
 
-		// Reset carte_communes
+		// Reset
 		cartes_communes = [];
 		pot = 0;
+		PLAYERS.forEach(function (part, indice) {
+			this[indice].last_action = 'aucune';
+			this[indice].argent_mise = 0;
+			this[indice].nbr_relance = 0;
+		}, PLAYERS);
 
 		// Distribution des cartes
 		for (var i = 0; i < nbr_joueur; i++) {
@@ -420,16 +450,6 @@ async function action_global() {
 		// Genere l'indice du joueur qui commence
 		who_start = get_random_number(0, nbr_joueur - 1);
 		who_playing = who_start; // Décalage pour l'autoincrementation dans grafcet MISE
-
-		// Init liste PLAYERS
-		for (var i = 0; i < nbr_joueur; i++) {
-			PLAYERS[i] = {
-				username: PLAYERS[i].username,
-				last_action: 'aucune',
-				argent_mise: 0,
-				nbr_relance: 0,
-			};
-		}
 
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
@@ -481,6 +501,7 @@ async function action_global() {
 					your_card: cartes_joueur,
 					pot: pot,
 					who_playing: PLAYERS[who_playing].username,
+					message: 'Lancement du jeu',
 				});
 				joueur.ws.send(data);
 			}
@@ -500,17 +521,16 @@ async function action_global() {
 		}
 
 		// Reste PLAYERS
-		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(PLAYERS[i].last_action == 'all-in')) {
-				PLAYERS[i].last_action = 'aucune';
-				PLAYERS[i].argent_mise = 0;
-				PLAYERS[i].nbr_relance = 0;
+		PLAYERS.forEach(function (joueur, indice) {
+			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+				this[indice].last_action = 'aucune';
+				this[indice].argent_mise = 0;
+				this[indice].nbr_relance = 0;
 			}
-		}
+		}, PLAYERS);
 
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
-		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		PLAYERS[indice_blind.petite].last_action = 'blind';
@@ -532,7 +552,7 @@ async function action_global() {
 			});
 		}
 		wss_send_joueur({
-			type: 'next_game',
+			type: 'game_next_part',
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
@@ -545,6 +565,7 @@ async function action_global() {
 			cartes_new: cartes_flop_to_send,
 			pot: pot,
 			who_playing: PLAYERS[who_playing].username,
+			message: 'Flop exécuter',
 		});
 
 		// Debug
@@ -570,17 +591,16 @@ async function action_global() {
 		cartes_communes.push(carte_turn);
 
 		// Reste PLAYERS
-		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(PLAYERS[i].last_action == 'all-in')) {
-				PLAYERS[i].last_action = 'aucune';
-				PLAYERS[i].argent_mise = 0;
-				PLAYERS[i].nbr_relance = 0;
+		PLAYERS.forEach(function (joueur, indice) {
+			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+				this[indice].last_action = 'aucune';
+				this[indice].argent_mise = 0;
+				this[indice].nbr_relance = 0;
 			}
-		}
+		}, PLAYERS);
 
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
-		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		PLAYERS[indice_blind.petite].last_action = 'blind';
@@ -601,7 +621,7 @@ async function action_global() {
 			},
 		];
 		wss_send_joueur({
-			type: 'next_game',
+			type: 'game_next_part',
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
@@ -614,6 +634,7 @@ async function action_global() {
 			cartes_new: cartes_turn_to_send,
 			pot: pot,
 			who_playing: PLAYERS[who_playing].username,
+			message: 'Turn exécuter',
 		});
 
 		// Debug
@@ -639,17 +660,16 @@ async function action_global() {
 		cartes_communes.push(carte_river);
 
 		// Reste PLAYERS
-		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(PLAYERS[i].last_action == 'all-in')) {
-				PLAYERS[i].last_action = 'aucune';
-				PLAYERS[i].argent_mise = 0;
-				PLAYERS[i].nbr_relance = 0;
+		PLAYERS.forEach(function (joueur, indice) {
+			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+				this[indice].last_action = 'aucune';
+				this[indice].argent_mise = 0;
+				this[indice].nbr_relance = 0;
 			}
-		}
+		}, PLAYERS);
 
 		// Prépare les blindes des joueurs
 		var indice_blind = get_indice_player_blind();
-		// console.log('indice blind: ', indice_blind.petite, ' ', indice_blind.grosse); // Debug
 		// Grosse blind :
 		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
 		PLAYERS[indice_blind.petite].last_action = 'blind';
@@ -670,7 +690,7 @@ async function action_global() {
 			},
 		];
 		wss_send_joueur({
-			type: 'next_game',
+			type: 'game_next_part',
 			mise_actuelle_requise: mise_actuelle_requise,
 			petite_blind: {
 				username: PLAYERS[indice_blind.petite].username,
@@ -683,6 +703,7 @@ async function action_global() {
 			cartes_new: cartes_river_to_send,
 			pot: pot,
 			who_playing: PLAYERS[who_playing].username,
+			message: 'River exécuter',
 		});
 
 		// Debug
@@ -719,6 +740,7 @@ async function action_global() {
 		wss_send_joueur({
 			type: 'new_cartes',
 			cartes_new: cartes_flop_to_send,
+			message: 'Flop',
 		});
 		await sleep(sleep_time_skip);
 	}
@@ -738,6 +760,7 @@ async function action_global() {
 		wss_send_joueur({
 			type: 'new_cartes',
 			cartes_new: cartes_turn_to_send,
+			message: 'Turn',
 		});
 		await sleep(sleep_time_skip);
 	}
@@ -757,6 +780,7 @@ async function action_global() {
 		wss_send_joueur({
 			type: 'new_cartes',
 			cartes_new: cartes_river_to_send,
+			message: 'River',
 		});
 		await sleep(sleep_time_skip);
 	}
@@ -772,13 +796,19 @@ async function action_global() {
 				});
 			}
 		}
-
 		var winner_infos = who_is_winner(liste_joueur_cartes, cartes_communes);
 
 		// Ajoute pot aux winners
+		var text_message_winner = '';
 		var nbr_winner = winner_infos.liste_indices.length;
+		if (nbr_winner > 1) {
+			text_message_winner += 'Les gagnants du tour sont ';
+		} else {
+			text_message_winner += 'Le gagnant du tour est';
+		}
 		for (var indice of winner_infos.liste_indices) {
 			PLAYERS[indice].argent_restant += pot / nbr_winner;
+			text_message_winner += PLAYERS[indice].username;
 		}
 
 		// Send winner
@@ -786,6 +816,7 @@ async function action_global() {
 			type: 'winner',
 			liste_usernames: winner_infos.liste_usernames,
 			how_win: winner_infos.how_win,
+			message: `Le gagant est ${winner_infos.liste_usernames}`,
 		});
 
 		// Send updated argent_restant
@@ -816,6 +847,7 @@ async function action_global() {
 		// Send winner
 		wss_send_joueur({
 			type: 'restart_global',
+			message: 'Nouveau tour',
 		});
 	}
 	// Etape 16 (END & reset)
@@ -830,7 +862,7 @@ async function action_global() {
 		// Requete database pour chaque joueur
 		for (var joueur of PLAYERS) {
 			database.all(
-				`UPDATE argent FROM players VALUES ${joueur.argent + joueur.argent_restant} WHERE username = '${joueur.username}'; `,
+				`UPDATE players SET argent = ${joueur.argent + joueur.argent_restant} WHERE username = '${joueur.username}'; `,
 				(err, rows) => {
 					// Erreur
 					if (err) {
@@ -852,7 +884,6 @@ async function transition_global() {
 	// Etape 0 -> Etape 1
 	if (etape_global == 0 && try_start == true && nbr_joueur >= nbr_joueur_min_require && nbr_joueur <= nbr_joueur_max_require) {
 		etape_global = 1;
-		partie_en_cours = true;
 		log('Game', 'Init Game', 'game');
 		log_discord(`Game Start`, 'game');
 	}
@@ -1407,6 +1438,7 @@ app.post('/connexion', (req, res) => {
 				res.render('connexion', {
 					alert: {
 						message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+						type: 'error',
 					},
 				});
 			}
@@ -1425,7 +1457,8 @@ app.post('/connexion', (req, res) => {
 				res.render('index', {
 					connected: true,
 					alert: {
-						message: `Bonjour '${username}', vous êtes connecté.`,
+						message: `Bonjour ${username}, vous êtes connecté.`,
+						type: 'success',
 					},
 				});
 			}
@@ -1434,6 +1467,7 @@ app.post('/connexion', (req, res) => {
 				res.render('connexion', {
 					alert: {
 						message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
+						type: 'error',
 					},
 				});
 			}
@@ -1442,6 +1476,7 @@ app.post('/connexion', (req, res) => {
 		res.render('connexion', {
 			alert: {
 				message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
+				type: 'error',
 			},
 		});
 	}
@@ -1465,12 +1500,14 @@ app.post('/inscription', (req, res) => {
 				res.render('inscription', {
 					alert: {
 						message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+						type: 'error',
 					},
 				});
 			} else if (rows.length > 0) {
 				res.render('inscription', {
 					alert: {
 						message: `Le nom d'utilisateur est deja utilisé par une autre personne !`,
+						type: 'error',
 					},
 				});
 			} else {
@@ -1485,6 +1522,7 @@ app.post('/inscription', (req, res) => {
 							res.render('inscription', {
 								alert: {
 									message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+									type: 'error',
 								},
 							});
 						} else {
@@ -1494,6 +1532,7 @@ app.post('/inscription', (req, res) => {
 							res.render('connexion', {
 								alert: {
 									message: `Vous avez bien été inscrit avec l'username : '${data.username}'.`,
+									type: 'success',
 								},
 							});
 						}
@@ -1505,6 +1544,7 @@ app.post('/inscription', (req, res) => {
 		res.render('inscription', {
 			alert: {
 				message: `Le nom d'utilisateur ou le mot de passe est incorrect !`,
+				type: 'error',
 			},
 		});
 	}
@@ -1540,16 +1580,12 @@ app.get('/', (req, res) => {
 	if (session.connected) {
 		res.render('index', {
 			connected: true,
-			alert: {
-				message: `Vous êtes déjà connecté !`,
-			},
+			alert: undefined,
 		});
 	} else {
 		res.render('index', {
 			connected: false,
-			alert: {
-				message: `Ceci est une alert pour test !`,
-			},
+			alert: undefined,
 		});
 	}
 });
@@ -1565,6 +1601,7 @@ app.get('/connexion', (req, res) => {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
+				type: 'error',
 			},
 		});
 	} else {
@@ -1585,6 +1622,7 @@ app.get('/inscription', (req, res) => {
 			connected: true,
 			alert: {
 				message: `Vous êtes déjà connecté !`,
+				type: 'error',
 			},
 		});
 	} else {
@@ -1628,6 +1666,7 @@ app.get('/game', (req, res) => {
 						connected: true,
 						alert: {
 							message: `Tu es déjà en train de jouer avec ce compte !`,
+							type: 'error',
 						},
 					});
 				}
@@ -1644,6 +1683,7 @@ app.get('/game', (req, res) => {
 							connected: true,
 							alert: {
 								message: `Erreur lors de la connexion à la base de données. Veuillez réessayer plus tard.`,
+								type: 'error',
 							},
 						});
 					}
@@ -1656,6 +1696,7 @@ app.get('/game', (req, res) => {
 								connected: true,
 								alert: {
 									message: "Tu n'as pas assez d'argent dans ton porte monnaie !",
+									type: 'error',
 								},
 							});
 						} else if (get_data.argent < argent_min_require) {
@@ -1663,6 +1704,7 @@ app.get('/game', (req, res) => {
 								connected: true,
 								alert: {
 									message: "Tu n'as pas mit assez d'argent en jeu !",
+									type: 'error',
 								},
 							});
 						} else {
@@ -1682,6 +1724,7 @@ app.get('/game', (req, res) => {
 				connected: true,
 				alert: {
 					message: 'Des joueurs sont deja en train de jouer !',
+					type: 'error',
 				},
 			});
 		}
@@ -1690,6 +1733,7 @@ app.get('/game', (req, res) => {
 			connected: false,
 			alert: {
 				message: "Vous n'êtes pas connecté !",
+				type: 'error',
 			},
 		});
 	}
@@ -1724,6 +1768,7 @@ app.get('/deconnexion', (req, res) => {
 		connected: false,
 		alert: {
 			message: `Déconnexion réussie !`,
+			type: 'success',
 		},
 	});
 });

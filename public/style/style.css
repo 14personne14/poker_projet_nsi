@@ -117,6 +117,7 @@ h1 {
 .espace {
 	margin-bottom: 50px;
 }
+
 .cadre {
 	background: linear-gradient(0deg, #58acfa 0%, #bdbdbd 100%);
 	padding: 30px;
@@ -152,12 +153,14 @@ h1 {
 .form-control {
 	font-size: 15px;
 }
+
 .money_button {
 	font-size: 30px;
 	font-family: 'Sigmar', cursive;
 	background: None;
 	border: None;
 }
+
 /* --- ALERT --- */
 /*.texte_defilant {
 	display: block;
@@ -198,7 +201,8 @@ h1 {
 
 /* Alert */
 .alert {
-	font-family: 'Baloo 2', cursive;
+	font-family: 'Oxanium', cursive;
+	font-size: 17px;
 
 	flex: 1 1 100%;
 	position: relative;
@@ -217,9 +221,11 @@ h1 {
 	transition-property: all;
 	transition-duration: 0.15s;
 	font-weight: 400;
-	font-size: 17px;
 	color: #ffffff;
-	margin-bottom: 10px;
+	margin-bottom: 40px;
+}
+.success_alert {
+	background-color: green;
 }
 .alert p {
 	padding: 0;
@@ -230,6 +236,7 @@ h1 {
 	transform: translateY(-2px);
 	box-shadow: 0 18px 35px rgba(255, 255, 255, 0.1), 0 8px 15px rgba(255, 255, 255, 0.07);
 }
+
 .alert__icon {
 	width: 100%;
 	padding: 0px 10px;
@@ -244,6 +251,10 @@ h1 {
 	animation-duration: 1s;
 }
 
+.animation--shake {
+	animation-name: shake;
+	animation-duration: 1s;
+}
 #home {
 	margin: 30px;
 	position: fixed;
@@ -251,6 +262,7 @@ h1 {
 	left: 0;
 	font-size: 30px;
 }
+
 #home a {
 	text-decoration: none;
 	color: #fff;
@@ -282,11 +294,6 @@ h1 {
 	to {
 		transform: scale3d(1, 1, 1);
 	}
-}
-
-.animation--shake {
-	animation-name: shake;
-	animation-duration: 1s;
 }
 
 @keyframes shake {
@@ -325,6 +332,7 @@ h1 {
 		margin: 50px 30px;
 		font-size: 15vw;
 	}
+
 	@keyframes defilement {
 		0%,
 		100% {
@@ -348,6 +356,7 @@ h1 {
 	.main_button {
 		font-size: 40px;
 		width: 350px;
+		margin-bottom: 10px;
 	}
 
 	.line_separation {
@@ -364,9 +373,11 @@ h1 {
 
 		border-width: 4px;
 	}
+
 	.space {
 		margin-bottom: 30px;
 	}
+
 	.cadre {
 		max-width: 550px;
 		width: auto;

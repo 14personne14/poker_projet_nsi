@@ -1,11 +1,18 @@
 <!-- ALERT -->
 <div class="alerts">
-    <% if (alert) { %>
-    <div class="d-flex justify-content-center">
-        <div class="alert animation--shake">
-            <div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <p><%= alert.message %></p>
-        </div>
-    </div>
-    <% } %>
+	<% if (alert) { %>
+	<div class="d-flex justify-content-center">
+		<% if (alert.type=="error") { %>
+		<div class="alert animation--shake">
+			<div class="alert__icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+			<p><%= alert.message %></p>
+		</div>
+		<% } else { %>
+		<div class="alert animation--shake success_alert">
+			<div class="alert__icon"><i class="fa-solid fa-check"></i></div>
+			<p><%= alert.message %></p>
+		</div>
+		<% } %>
+	</div>
+	<% } %>
 </div>

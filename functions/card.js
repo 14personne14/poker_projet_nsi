@@ -19,11 +19,15 @@ class Card {
 
 	/**
 	 * Obtenir l'url de la carte
-	 * @param {String} graphic Le type de carte à afficher ['classic', 'original']
+	 * @param {String} graphic Le type de carte à afficher ['classic', 'original', 'png']
 	 * @returns {String} L'url de la carte
 	 */
-	get_url(graphic = 'classic') {
-		return `public/images/cards/${graphic}/${this.numero}_${this.symbole}.svg`;
+	get_url(graphic = 'png') {
+		if (graphic == 'png') {
+			return `public/images/cards/${graphic}/${this.numero}_${this.symbole}.png`;
+		} else {
+			return `public/images/cards/${graphic}/${this.numero}_${this.symbole}.svg`;
+		}
 	}
 }
 

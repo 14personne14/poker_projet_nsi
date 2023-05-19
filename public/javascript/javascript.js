@@ -59,14 +59,22 @@ function delete_player(username) {
  */
 function add_player(username, argent_restant) {
 	var new_div = document.createElement('div');
-	new_div.classList.add('player_block');
+	new_div.classList.add('col-6');
+	new_div.classList.add('col-lg-3');
 	new_div.setAttribute('id', `player-${username}`);
 
 	new_div.innerHTML = `
-				<h2>Joueur: <span id="player-is_winner-${username}"></span></h2>
-				<p id="player-username-${username}">${username}</p>
-				<p id="player-argent_restant-${username}">${argent_restant}</p>
-				<p id="player-last_action-${username}">aucune</p>
+				<div class="justify-content-center text-center">
+					<div class="card text-bg-dark border-light mb-3" style="max-width: 200px">
+						<div class="card-body">
+							<h5 class="card-title" id="player-username-${username}">${username}</h5>
+							<h6 class="card-subtitle mb-2 text-body-secondary" id="player-argent_restant-${username}">${argent_restant}</h6>
+						</div>
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item text-bg-dark border-light" id="player-last_action-${username}">Suivre</li>
+						</ul>
+					</div>
+				</div>
     `;
 
 	document.getElementById('liste_players').appendChild(new_div);
@@ -120,7 +128,7 @@ function update_action_player(username, new_action) {
 function affiche_your_carte(cartes) {
 	for (var carte of cartes) {
 		var new_img = document.createElement('img');
-		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
+		new_img.setAttribute('src', `public/images/cards/png/${carte.numero}_${carte.symbole}.png`);
 		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
 
 		document.getElementById('your_card').appendChild(new_img);
@@ -135,8 +143,8 @@ function affiche_your_carte(cartes) {
 function update_pot_mise(new_pot, new_mise) {
 	mise_actuelle = new_mise;
 
-	$('#valeur_pot').html(`pot: ${new_pot}`);
-	$('#valeur_mise').html(`mise: ${mise_actuelle}`);
+	$('#valeur_pot').html(new_pot);
+	$('#valeur_mise').html(mise_actuelle);
 }
 
 /**
@@ -330,6 +338,7 @@ socket.addEventListener('message', (event) => {
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
+		update_info_game(data.message);
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
@@ -360,7 +369,7 @@ socket.addEventListener('message', (event) => {
 		update_pot_mise(data.pot, data.mise);
 	}
 	// Next game
-	else if (data.type == 'next_game') {
+	else if (data.type == 'game_next_part') {
 		var text_log_cartes = '';
 		for (var carte of data.cartes_new) {
 			text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
@@ -371,6 +380,7 @@ socket.addEventListener('message', (event) => {
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
+		update_info_game(data.message);
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
@@ -386,6 +396,7 @@ socket.addEventListener('message', (event) => {
 			text_log_cartes += `\n - card: ${carte.numero} ${carte.symbole}`;
 		}
 		console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		update_info_game(data.message);
 		affiche_carte(data.cartes_new);
 	}
 	// Winner
@@ -395,6 +406,7 @@ socket.addEventListener('message', (event) => {
 			text_log_winners += `${joueur} `;
 		}
 		console.log('%cWinner' + `%c ${text_log_winners} | ${data.how_win}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+		update_info_game(data.message);
 		set_winner(data.liste_usernames, data.how_win);
 	}
 	// Update argent_restant
@@ -412,6 +424,7 @@ socket.addEventListener('message', (event) => {
 	// Reset carte & winner
 	else if (data.type == 'restart_global') {
 		console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
+		update_info_game(data.message);
 		restart_global();
 	}
 	// Autre cas
@@ -455,3 +468,9 @@ console.log(
 	'color: #EA00B0;',
 	'background: #EA00B0; color: #000000; padding: 0px 5px;'
 );
+
+// Instantiate all tooltips in a docs or StackBlitz
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((tooltip) => {
+	console.log('coucou'); 
+	new bootstrap.Tooltip(tooltip);
+});

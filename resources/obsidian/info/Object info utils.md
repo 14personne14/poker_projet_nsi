@@ -10,6 +10,7 @@ PLAYERS = [
 		// For game entiere
 		argent_mit_en_jeu: 2000, 
 		argent_restant: 1800,
+		cartes: 
 		nbr_win: 0, 
 		out: false,
 		leave: false,
