@@ -31,6 +31,7 @@ var local_user_info;
 var mise_actuelle;
 var last_winner;
 var last_abandon = [];
+var list_tooltips_card = [];
 
 // --- Fonctions ---
 
@@ -60,21 +61,21 @@ function delete_player(username) {
 function add_player(username, argent_restant) {
 	var new_div = document.createElement('div');
 	new_div.classList.add('col-6');
-	new_div.classList.add('col-lg-3');
+	new_div.classList.add('col-md-3');
 	new_div.setAttribute('id', `player-${username}`);
 
 	new_div.innerHTML = `
-				<div class="justify-content-center text-center">
-					<div class="card text-bg-dark border-light mb-3" style="max-width: 200px">
-						<div class="card-body">
-							<h5 class="card-title" id="player-username-${username}">${username}</h5>
-							<h6 class="card-subtitle mb-2 text-body-secondary" id="player-argent_restant-${username}">${argent_restant}</h6>
+					<div class="d-flex justify-content-center text-center">
+						<div class="card text-bg-dark border-light" id="player-status-${username}">
+							<div class="card-body">
+								<h5 class="card-title username" id="player-username-${username}">${username}</h5>
+								<h6 class="card-subtitle mb-2 text-body-secondary" id="player-argent_restant-${username}">${argent_restant}</h6>
+							</div>
+							<ul class="list-group list-group-flush">
+								<li class="list-group-item text-bg-dark border-light last-action" id="player-last_action-${username}">Suivre</li>
+							</ul>
 						</div>
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item text-bg-dark border-light" id="player-last_action-${username}">Suivre</li>
-						</ul>
 					</div>
-				</div>
     `;
 
 	document.getElementById('liste_players').appendChild(new_div);
@@ -87,10 +88,10 @@ function add_player(username, argent_restant) {
  */
 function update_main_player(username, status) {
 	if (status == 'off') {
-		var last_div = document.getElementById(`player-${username}`);
+		var last_div = document.getElementById(`player-status-${username}`);
 		last_div.classList.remove('main_player');
 	} else if (status == 'on') {
-		var div = document.getElementById(`player-${username}`);
+		var div = document.getElementById(`player-status-${username}`);
 		div.classList.add('main_player');
 	}
 }
@@ -108,7 +109,7 @@ function update_argent_player(username, new_argent) {
 /**
  * Change la derniere action du joueur
  * @param {String} username L'username du joueur à qui l'action change
- * @param {Number} new_action Le nouvel argent à afficher
+ * @param {Number} new_action Le nouvelle action à afficher
  */
 function update_action_player(username, new_action) {
 	var div = document.getElementById(`player-last_action-${username}`);
@@ -116,7 +117,7 @@ function update_action_player(username, new_action) {
 
 	if (new_action == 'abandon') {
 		last_abandon.push(username);
-		var div_player = document.getElementById(`player-${username}`);
+		var div_player = document.getElementById(`player-status-${username}`);
 		div_player.classList.add('abandon');
 	}
 }
@@ -129,10 +130,20 @@ function affiche_your_carte(cartes) {
 	for (var carte of cartes) {
 		var new_img = document.createElement('img');
 		new_img.setAttribute('src', `public/images/cards/png/${carte.numero}_${carte.symbole}.png`);
-		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
+		new_img.setAttribute('alt', `${carte.text}`);
+		new_img.setAttribute('data-bs-toggle', `tooltip`);
+		new_img.setAttribute('data-bs-placement', `bottom`);
+		new_img.setAttribute('data-bs-title', `${carte.text}`);
+		new_img.setAttribute('data-bs-custom-class', `custom-tooltip`);
 
 		document.getElementById('your_card').appendChild(new_img);
 	}
+
+	// Instantiate all tooltips in a docs or StackBlitz
+	document.querySelectorAll('img[data-bs-toggle="tooltip"]').forEach((tooltip) => {
+		var temp = new bootstrap.Tooltip(tooltip);
+		list_tooltips_card.push(temp);
+	});
 }
 
 /**
@@ -187,24 +198,33 @@ function affiche_carte(cartes) {
 		var new_img = document.createElement('img');
 		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
 		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
+		new_img.setAttribute('data-bs-toggle', `tooltip`);
+		new_img.setAttribute('data-bs-placement', `bottom`);
+		new_img.setAttribute('data-bs-title', `${carte.text}`);
+		new_img.setAttribute('data-bs-custom-class', `custom-tooltip`);
 
 		document.getElementById('cartes_communes').appendChild(new_img);
 	}
+
+	// Instantiate all tooltips in a docs or StackBlitz
+	document.querySelectorAll('img[data-bs-toggle="tooltip"]').forEach((tooltip) => {
+		var temp = new bootstrap.Tooltip(tooltip);
+		list_tooltips_card.push(temp);
+	});
 }
 
 /**
  * Affiche le ou les winners et comment ils ont gagnés
  * @param {Array} liste_usernames La liste des noms du ou des gagnants
- * @param {String} how_win Comment le ou les gagnants ont gagnés
+ * @param {String} how_win Comment le ou les joueurs gagnent
  */
 function set_winner(liste_usernames, how_win) {
 	last_winner = liste_usernames;
 	for (var username of liste_usernames) {
-		var div_player = document.getElementById(`player-${username}`);
+		var div_player = document.getElementById(`player-status-${username}`);
 		div_player.classList.add('winner');
 
-		var div = document.getElementById(`player-is_winner-${username}`);
-		div.innerHTML = how_win;
+		update_action_player(username, how_win);
 	}
 }
 
@@ -220,13 +240,17 @@ function restart_global() {
 
 	// Delete winner
 	for (var winner of last_winner) {
-		document.getElementById(`player-${winner}`).classList.remove('winner');
-		document.getElementById(`player-is_winner-${winner}`).innerHTML = '';
+		document.getElementById(`player-status-${winner}`).classList.remove('winner');
 	}
 
 	// Delete abandon
 	for (var joueur of last_abandon) {
-		document.getElementById(`player-${joueur}`).classList.remove('abandon');
+		document.getElementById(`player-status-${joueur}`).classList.remove('abandon');
+	}
+
+	// Remove tooltip 
+	for (var tooltip of list_tooltips_card) {
+		tooltip.hide();
 	}
 }
 
@@ -237,10 +261,10 @@ function restart_global() {
  */
 function alert(message, duree = 5000) {
 	$('#alert').show();
-	$('#alert').html(message);
+	$('#alert-text').html(message);
 	setTimeout(function () {
 		$('#alert').hide();
-		$('#alert').html('');
+		$('#alert-text').html('');
 	}, duree);
 }
 
@@ -250,6 +274,27 @@ function alert(message, duree = 5000) {
  */
 function update_info_game(message) {
 	$('#info').html(message);
+}
+
+/**
+ * Affiche ou cache les bouton d'aide pour le joueur 
+ */
+function toogle_help() {
+	for (var button of document.getElementsByClassName('help-button')) {
+		if (button.style.display == 'none') {
+			button.style.display = 'initial'; 
+		} else {
+			button.style.display = 'none'; 
+		}
+	}
+}
+
+/**
+ * Change les probabilité à afficher 
+ * @param {String} proba Les nouvelle probabilités à afficher
+ */
+function set_proba(proba) {
+	$('#proba').html(`${proba}%`);
 }
 
 /*
@@ -334,11 +379,14 @@ socket.addEventListener('message', (event) => {
 	else if (data.type == 'init_game') {
 		console.log(
 			'%cInit Game' +
-				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
+				`%c\n        proba: ${data.proba} \n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
 			'background: #F9FF00; color: #000000; padding: 0px 5px;',
 			''
 		);
+		$('#start_button').hide();
+		bootstrap.Tooltip.getInstance('#start_button').hide();
 		update_info_game(data.message);
+		set_proba(data.proba); 
 		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
 		update_action_player(data.petite_blind.username, 'petite blind');
 		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
@@ -471,6 +519,5 @@ console.log(
 
 // Instantiate all tooltips in a docs or StackBlitz
 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((tooltip) => {
-	console.log('coucou'); 
 	new bootstrap.Tooltip(tooltip);
 });

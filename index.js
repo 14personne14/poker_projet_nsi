@@ -483,8 +483,10 @@ async function action_global() {
 					cartes_joueur.push({
 						symbole: carte.symbole,
 						numero: carte.numero,
+						text: carte.text, 
 					});
 				}
+				var proba = get_proba(joueur.cartes, nbr_joueur);
 
 				// Envoie des données d'initialisation
 				var data = JSON.stringify({
@@ -502,6 +504,7 @@ async function action_global() {
 					pot: pot,
 					who_playing: PLAYERS[who_playing].username,
 					message: 'Lancement du jeu',
+					proba: proba,
 				});
 				joueur.ws.send(data);
 			}
@@ -549,6 +552,7 @@ async function action_global() {
 			cartes_flop_to_send.push({
 				symbole: carte.symbole,
 				numero: carte.numero,
+				text: carte.text, 
 			});
 		}
 		wss_send_joueur({
@@ -618,6 +622,7 @@ async function action_global() {
 			{
 				symbole: carte_turn.symbole,
 				numero: carte_turn.numero,
+				text: carte_turn.text, 
 			},
 		];
 		wss_send_joueur({
@@ -687,6 +692,7 @@ async function action_global() {
 			{
 				symbole: carte_river.symbole,
 				numero: carte_river.numero,
+				text: carte_river.numero,
 			},
 		];
 		wss_send_joueur({
@@ -734,6 +740,7 @@ async function action_global() {
 			cartes_flop_to_send.push({
 				symbole: carte.symbole,
 				numero: carte.numero,
+				text: carte.text,
 			});
 		}
 		// Send
@@ -754,6 +761,7 @@ async function action_global() {
 			{
 				symbole: carte_turn.symbole,
 				numero: carte_turn.numero,
+				text: carte_turn.text, 
 			},
 		];
 		// Send
@@ -774,6 +782,7 @@ async function action_global() {
 			{
 				symbole: carte_river.symbole,
 				numero: carte_river.numero,
+				text: carte_river.text, 
 			},
 		];
 		// Send

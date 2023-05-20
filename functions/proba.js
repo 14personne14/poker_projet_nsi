@@ -28,7 +28,7 @@ function get_proba(cartes, nb_joueurs) {
 		cartes_parsed.push(carte.parsed);
 	}
 
-	return proba.hs(cartes_parsed, nb_joueurs);
+	return Math.round(proba.hs(cartes_parsed, nb_joueurs) * 10000) / 100;
 }
 
 /**

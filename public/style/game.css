@@ -8,35 +8,114 @@ body {
 	min-height: 100vh;
 }
 
-.player_block {
-	border: #000000 solid 1px;
-	background-color: #ffffff;
-	color: #000000;
-	padding: 10px;
-	margin: 0;
-}
-
-.player_block p {
-	margin: 0;
-}
-
-.player_block h2 {
-	margin: 0;
-}
-
-.main_player {
-	background-color: #008fa8;
-}
-
-#your_card {
-	padding: 10px;
-}
-
-#your_card img {
+.box-game img {
 	width: 80px;
-	border-radius: 5px;
+	border-radius: 2px;
+	margin: 5px;
 }
 
+.box-game {
+	border-radius: 20px;
+	border: solid 2px #ffffff;
+	background-color: #0d1142;
+	width: 90%;
+	margin-bottom: 20px;
+	padding: 10px;
+}
+
+#aidez-moi {
+	font-family: 'Creepster', cursive;
+	font-size: 30px;
+}
+
+.last-action {
+	font-family: 'Rowdies', cursive;
+}
+
+.username {
+	font-family: 'Carter One', cursive;
+}
+
+.help-button {
+	color: #ffffff;
+	font-size: 25px;
+	margin: 0 0 0 10px;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.probabilite {
+	padding: 10px;
+	margin: 10px;
+	border-radius: 15px;
+	background-color: #ffffff;
+}
+
+.custom-tooltip {
+	--bs-tooltip-bg: #ffffff !important;
+	--bs-tooltip-color: #000000 !important;
+	--bs-tooltip-arrow-width: auto;
+}
+
+.bouton-choix {
+	font-family: 'Carter One', cursive !important;
+	margin: 5px 0;
+}
+
+/* Block Serveur info */
+.info {
+	border-radius: 10px;
+	border: solid 2px #000000;
+	background-color: #ffbb00;
+	width: 90%;
+	margin: 5px 0; 
+	padding: 10px;
+}
+.pot_mise {
+	font-family: 'Lilita One', cursive;
+}
+.info-text {
+	font-size: 25px;
+	font-family: 'Bruno Ace', cursive;
+}
+.spinner-border {
+	--bs-spinner-width: 25px !important;
+	--bs-spinner-height: 25px !important;
+}
+.margin-top-perso {
+	margin-top: 20px;
+}
+.margin-bottom-perso {
+	margin-bottom: 20px;
+}
+
+/* Carte & Status joueur */
+.card {
+	--bs-card-border-width: 2px !important;
+	width: 100%;
+	margin-bottom: 25px;
+}
+.abandon div {
+	background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='white' stroke-width='2'/><path d='M0 0 L100 100 ' stroke='white' stroke-width='2'/></svg>");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% 100%, auto;
+}
+.winner div,
+.winner li {
+	background-color: #368e36 !important;
+}
+.out div,
+.out li {
+	background-color: #ac2929 !important;
+}
+.main_player div,
+.main_player li {
+	background-color: #008ccd !important;
+}
+
+/* Bouton choix */
 #input_relance {
 	font-family: 'Carter One', cursive;
 	display: inline;
@@ -48,53 +127,10 @@ body {
 	margin-left: 10px;
 }
 
-.custom-tooltip {
-	--bs-tooltip-bg: #ffffff !important;
-	--bs-tooltip-color: #000000 !important;
-}
-
-.pot_mise {
-	text-decoration: underline;
-}
-
-.abandon {
-	background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='black' stroke-width='1'/><path d='M0 0 L100 100 ' stroke='black' stroke-width='1'/></svg>");
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-size: 100% 100%, auto;
-}
-
-.winner {
-	background-color: #00ff00;
-}
-
-#info {
-	color: #000000;
-	background: #e7a100;
-	border: solid 2px #000000;
-	border-radius: 15px;
-	margin: 10px 0;
-	text-align: center;
-	padding: 10px;
-}
-
-.bouton {
-	font-family: 'Carter One', cursive !important;
-	margin: 5px 0;
-}
-
-.choix_possible {
-	border-radius: 20px;
-	border: solid 2px #ffffff;
-	background-color: #0d1142;
-	min-width: 400px;
-}
-
 /* Alert */
 .block-alert_perso {
 	position: fixed;
-
-	left: calc(50% - 150px - 20px);
+	left: calc(50% - 150px);
 	top: 50%;
 }
 
@@ -136,17 +172,11 @@ body {
 .alert_perso:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 18px 35px rgba(255, 255, 255, 0.1), 0 8px 15px rgba(255, 255, 255, 0.07);
+	animation-name: shake;
+	animation-duration: 1s;
 }
 
-.alert__icon {
-	width: 100%;
-	padding: 0px 10px;
-	color: #ffffff;
-	text-align: center;
-	font-size: 20px;
-	margin-right: 5px;
-}
-
+/* Animation */
 .animation--boom {
 	animation-name: boom;
 	animation-duration: 1s;
@@ -212,5 +242,20 @@ body {
 
 	to {
 		transform: none;
+	}
+}
+
+/* --- FOR TELEPHONE --- */
+@media only screen and (max-width: 992px) {
+	.info-text {
+		font-size: 15px;
+	}
+	.spinner-border {
+		--bs-spinner-width: 15px !important;
+		--bs-spinner-height: 15px !important;
+	}
+	#cartes_communes img {
+		width: 18%;
+		border-radius: 2px;
 	}
 }

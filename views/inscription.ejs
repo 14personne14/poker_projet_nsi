@@ -6,7 +6,7 @@
 		<title>Inscription</title>
 	</head>
 	<body>
-        <%- include('includes/home_icon'); %>
+		<%- include('includes/home_icon'); %>
 
 		<div class="container">
 			<!-- TITRE -->
@@ -27,8 +27,7 @@
 							name="username"
 							placeholder="davidou_38"
 							aria-describedby="username"
-							required
-						/>
+							required />
 						<div id="username" class="form-text">
 							Le nom d'utilisateur ne peux contenir que des lettres, des chiffres ou un tiret du bas.
 						</div>
@@ -42,18 +41,18 @@
 							name="password"
 							placeholder="Mathis1+beau"
 							aria-describedby="password"
-							required
-						/>
+							required />
 						<div id="password" class="form-text">
 							Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial. Il
-							doit aussi être entre 8 et 16 caractères.
+							doit aussi être entre 8 et 16 caractères.<br />
+							Le mot de passe ne pourras pas être changé apres l'inscription.
 						</div>
 					</div>
 
 					<div class="mb-3 form-check">
 						<button type="submit" value="S'inscrire" class="btn btn-success">S'inscrire <i class="fa-solid fa-user-plus"></i></button>
-                        <br>
-                        <a class="icon-link" href="/connexion"> Déjà inscris? </a>
+						<br />
+						<a class="icon-link" href="/connexion"> Déjà inscris? </a>
 					</div>
 				</form>
 			</div>

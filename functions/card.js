@@ -1,4 +1,19 @@
 const proba = require('./proba/src/index.js');
+const TEXT_CARD = {
+	'A': 'As',
+	'2': '2',
+	'3': '3',
+	'4': '4',
+	'5': '5',
+	'6': '6',
+	'7': '7',
+	'8': '8',
+	'9': '9',
+	'10': '10',
+	'V': 'Valet',
+	'D': 'Dame',
+	'R': 'Roi',
+}
 
 class Card {
 	/**
@@ -13,8 +28,8 @@ class Card {
 		this.numero = numero;
 		this.valeur = valeur;
 		this.numero2 = numero2;
-		this.text = numero + ' ' + symbole;
 		this.parsed = proba.parse(numero2 + valeur);
+		this.text = TEXT_CARD[numero] + ' de ' + symbole;
 	}
 
 	/**

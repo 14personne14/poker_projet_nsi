@@ -25,98 +25,172 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link href="https://fonts.googleapis.com/css2?family=Oxanium&display=swap" rel="stylesheet" />
 		<link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Sigmar&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Rowdies&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Bruno+Ace&display=swap" rel="stylesheet" />
 
 		<title>Pok'help | Game</title>
 	</head>
 
 	<body>
-		<div class="block-alert_perso" id="alert" style="display: none">
-			<div class="alert_perso animation--boom center-text">
-				<i class="fa-solid fa-triangle-exclamation"></i>
-				<p id="alert-text">coucou</p>
-			</div>
-		</div>
-
 		<div class="container">
-			<%- include('includes/alert'); %>
+			<!-- Info Jeu  -->
+			<div class="d-flex justify-content-center text-center margin-top-perso">
+				<div class="info">
+					<div class="info-text" id="info">
+						<div class="spinner-border" role="status">
+							<span class="visually-hidden">Loading...</span>
+						</div>
+						attente des joueurs
+					</div>
+				</div>
+			</div>
+			<div class="d-flex justify-content-center text-center margin-bottom-perso">
+				<div class="info">
+					<!-- Pot & Mise actuelle -->
+					<div class="row">
+						<div class="col-6 pot_mise">
+							<div>POT</div>
+							<div id="valeur_pot"><i class="fa-solid fa-square-xmark"></i></div>
+						</div>
+						<div class="col-6 pot_mise">
+							<div>MISE MIN</div>
+							<div id="valeur_mise"><i class="fa-solid fa-square-xmark"></i></div>
+						</div>
+					</div>
 
-			<!-- Username -->
-			<p>Your are <%= username %></p>
-
-			<!-- Button start -->
-			<button onclick="button_start()">Start</button>
-
-			<!-- Info Jeu -->
-			<div id="info">Attente des joueurs</div>
-
-			<!-- Pot & Mise actuelle -->
-			<p class="pot_mise">pot: <span id="valeur_pot">none</span></p>
-			<p class="pot_mise">mise: <span id="valeur_mise">none</span></p>
+					<!-- Button start -->
+					<button
+						id="start_button"
+						class="btn btn-primary"
+						type="button"
+						onclick="button_start()"
+						data-bs-toggle="tooltip"
+						data-bs-placement="right"
+						data-bs-title="Lancer le jeu"
+						data-bs-custom-class="custom-tooltip">
+						Gooo
+					</button>
+				</div>
+			</div>
 
 			<!-- Card communes -->
-			<div id="cartes_communes"></div>
+			<div class="d-flex justify-content-center text-center">
+				<div class="box-game" id="cartes_communes"></div>
+			</div>
 
 			<!-- Liste Joueurs -->
-			<div id="liste_players" class="row justify-content-center text-center"></div> <!-- Nooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo -->
+			<div id="liste_players" class="row justify-content-center text-center"></div>
 
-			<!-- Choix possible -->
-			<div class="d-flex justify-content-center">
-				<div class="choix_possible justify-content-center text-center">
-					<div>
-						<button
-							type="button"
-							class="btn btn-success bouton"
-							onclick="player_choose_action('suivre')"
-							data-bs-toggle="tooltip"
-							data-bs-placement="right"
-							data-bs-title="Mettre la même somme que le joueur precedent"
-							data-bs-custom-class="custom-tooltip">
-							Suivre
-						</button>
+			<!-- Choix possible & Card of player -->
+			<div class="row">
+				<div class="col-12 col-md-6">
+					<!-- Choix possible -->
+					<div class="d-flex justify-content-center text-center">
+						<div class="text-center box-game">
+							<div style="position: relative">
+								<button type="button" class="btn btn-success bouton-choix" onclick="player_choose_action('suivre')">Suivre</button>
+								<span
+									class="help-button"
+									style="display: none"
+									data-bs-toggle="tooltip"
+									data-bs-placement="right"
+									data-bs-title="Mettre la même somme que le joueur precedent"
+									data-bs-custom-class="custom-tooltip">
+									<i class="fa-solid fa-circle-question"></i>
+								</span>
+							</div>
+							<div style="position: relative">
+								<button type="button" class="btn btn-danger bouton-choix" onclick="player_choose_action('abandon')">
+									Abandonner
+								</button>
+								<span
+									class="help-button"
+									style="display: none"
+									data-bs-toggle="tooltip"
+									data-bs-placement="right"
+									data-bs-title="Abandonner le tour"
+									data-bs-custom-class="custom-tooltip">
+									<i class="fa-solid fa-circle-question"></i>
+								</span>
+							</div>
+							<div style="position: relative">
+								<button type="button" class="btn btn-primary bouton-choix" onclick="player_choose_action('relance')">
+									Relancer de:<input
+										class="form-control"
+										type="text"
+										value="100"
+										min="0"
+										max=""
+										placeholder="Nbr"
+										id="input_relance" />
+								</button>
+								<span
+									class="help-button"
+									style="display: none"
+									data-bs-toggle="tooltip"
+									data-bs-placement="right"
+									data-bs-title="Relance la mise avec l'argent choisit"
+									data-bs-custom-class="custom-tooltip">
+									<i class="fa-solid fa-circle-question"></i>
+								</span>
+							</div>
+							<div style="position: relative">
+								<button type="button" class="btn btn-light bouton-choix" onclick="player_choose_action('all-in')">All-in</button>
+								<span
+									class="help-button"
+									style="display: none"
+									data-bs-toggle="tooltip"
+									data-bs-placement="right"
+									data-bs-title="Mettre tout son argent en jeu"
+									data-bs-custom-class="custom-tooltip">
+									<i class="fa-solid fa-circle-question"></i>
+								</span>
+							</div>
+						</div>
 					</div>
-					<div>
-						<button
-							type="button"
-							class="btn btn-danger bouton"
-							onclick="player_choose_action('abandon')"
-							data-bs-toggle="tooltip"
-							data-bs-placement="right"
-							data-bs-title="Abandonner le tour"
-							data-bs-custom-class="custom-tooltip">
-							Abandonner
-						</button>
+				</div>
+				<div class="col-12 col-md-6">
+					<!-- Card of player -->
+					<div class="d-flex justify-content-center text-center">
+						<div class="box-game">
+							<div id="your_card"></div>
+							<div class="d-flex justify-content-center text-center">
+								<div class="collapse collapse-horizontal" id="collapseWidthExample">
+									<div class="probabilite" id="proba"><i class="fa-solid fa-square-xmark"></i></div>
+								</div>
+							</div>
+						</div>
 					</div>
-					<div>
-						<button
-							type="button"
-							class="btn btn-primary bouton"
-							onclick="player_choose_action('relance')"
+					<!-- Afficher l'aide -->
+					<div class="d-flex justify-content-center text-center">
+						<div
 							data-bs-toggle="tooltip"
 							data-bs-placement="right"
-							data-bs-title="Relance la mise avec l'argent choisit"
+							data-bs-title="Afficher les probabilités disponibles"
 							data-bs-custom-class="custom-tooltip">
-							Relancer de:<input class="form-control" type="text" value="100" min="0" max="" placeholder="Nbr" id="input_relance" />
-						</button>
-					</div>
-					<div>
-						<button
-							type="button"
-							class="btn btn-light bouton"
-							onclick="player_choose_action('all-in')"
-							data-bs-toggle="tooltip"
-							data-bs-placement="right"
-							data-bs-title="Mettre tout son argent en jeu"
-							data-bs-custom-class="custom-tooltip">
-							All-in
-						</button>
+							<button
+								class="btn btn-primary"
+								id="aidez-moi"
+								type="button"
+								onclick="toogle_help()"
+								data-bs-toggle="collapse"
+								data-bs-target="#collapseWidthExample"
+								aria-expanded="false"
+								aria-controls="collapseWidthExample">
+								Aidez-moi
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Card of player -->
-			<div class="d-flex justify-content-center text-center">
-				<div id="your_card">
-					<img src="public/images/cards/png/2_carreau.png" alt="" />
+			<div class="block-alert_perso" id="alert" style="display: none">
+				<div class="alert_perso animation--boom center-text">
+					<i class="fa-solid fa-triangle-exclamation"></i>
+					<p id="alert-text">coucou</p>
 				</div>
 			</div>
 

@@ -161,6 +161,14 @@ h1 {
 	border: None;
 }
 
+.deco {
+	background-color:red;
+}
+
+.deco:hover {
+	background-color: #900202;
+}
+
 /* --- ALERT --- */
 /*.texte_defilant {
 	display: block;
