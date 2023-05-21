@@ -4,6 +4,14 @@
   ],
   "hints": {
     "detect-css-reflows/composite": "off",
-    "detect-css-reflows/paint": "off"
+    "detect-css-reflows/paint": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "-moz-appearance"
+        ]
+      }
+    ]
   }
 }

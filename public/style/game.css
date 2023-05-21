@@ -1,11 +1,20 @@
 /* --- FOND --- */
 body {
-	background: #2b2f77;
-	background: -webkit-linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
-	background: linear-gradient(0deg, #2b2f77 0%, #141852 50%, #070b34 100%);
+	background: #1488cc;
+	background: -webkit-linear-gradient(0deg, #1488cc 0%, #2b32b2 100%);
+	background: linear-gradient(0deg, #1488cc 0%, #2b32b2 100%);
 	background-attachment: scroll;
 	color: #ffffff;
 	min-height: 100vh;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+input[type='number'] {
+	-moz-appearance: textfield;
 }
 
 .box-game img {
@@ -26,14 +35,14 @@ body {
 #aidez-moi {
 	font-family: 'Creepster', cursive;
 	font-size: 30px;
+	border: solid 1px #000000;
+	margin-bottom: 10px;
 }
-
-.last-action {
-	font-family: 'Rowdies', cursive;
-}
-
-.username {
-	font-family: 'Carter One', cursive;
+#hide-card {
+	font-family: 'Creepster', cursive;
+	font-size: 30px;
+	border: solid 1px #000000;
+	margin-bottom: 10px;
 }
 
 .help-button {
@@ -58,18 +67,15 @@ body {
 	--bs-tooltip-arrow-width: auto;
 }
 
-.bouton-choix {
-	font-family: 'Carter One', cursive !important;
-	margin: 5px 0;
-}
-
 /* Block Serveur info */
 .info {
 	border-radius: 10px;
 	border: solid 2px #000000;
-	background-color: #ffbb00;
+	background: #a0e9ff;
+	background: -webkit-radial-gradient(circle, #a0e9ff 0%, #c6f5ff 100%);
+	background: radial-gradient(circle, #a0e9ff 0%, #c6f5ff 100%);
 	width: 90%;
-	margin: 5px 0; 
+	margin: 5px 0;
 	padding: 10px;
 }
 .pot_mise {
@@ -96,6 +102,10 @@ body {
 	width: 100%;
 	margin-bottom: 25px;
 }
+.d-flex .card_of_me {
+	--bs-card-border-width: 3px !important;
+	border-color: #ffdc19 !important;
+}
 .abandon div {
 	background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='white' stroke-width='2'/><path d='M0 0 L100 100 ' stroke='white' stroke-width='2'/></svg>");
 	background-repeat: no-repeat;
@@ -114,6 +124,17 @@ body {
 .main_player li {
 	background-color: #008ccd !important;
 }
+.main_player {
+	animation-name: shake;
+	animation-iteration-count: 1;
+	animation-duration: 1s;
+}
+.last-action {
+	font-family: 'Rowdies', cursive;
+}
+.username {
+	font-family: 'Carter One', cursive;
+}
 
 /* Bouton choix */
 #input_relance {
@@ -126,6 +147,45 @@ body {
 	background-color: #0d6efd;
 	margin-left: 10px;
 }
+.bouton-choix {
+	font-family: 'Carter One', cursive !important;
+	margin: 5px 0;
+}
+
+/* Card flip */
+.flip-card {
+	background-color: transparent;
+	width: 100px;
+	height: 130px;
+	perspective: 1000px;
+}
+.flip-card-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	transition: transform 0.6s;
+	transform-style: preserve-3d;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+.hide_my_card {
+	transform: rotateY(180deg);
+}
+.flip-card-front,
+.flip-card-back {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+}
+.flip-card-front {
+	background-color: transparent;
+}
+.flip-card-back {
+	background-color: transparent;
+	transform: rotateY(180deg);
+}
 
 /* Alert */
 .block-alert_perso {
@@ -133,7 +193,6 @@ body {
 	left: calc(50% - 150px);
 	top: 50%;
 }
-
 .alert_perso {
 	font-family: 'Oxanium', cursive;
 	font-size: 30px;
@@ -154,37 +213,45 @@ body {
 	box-shadow: 0 15px 35px rgba(255, 255, 255, 0.1), 0 5px 15px rgba(255, 255, 255, 0.07);
 
 	width: 300px;
-	height: 150px;
+	height: auto;
+	padding: 20px;
 
 	transition-property: all;
 	transition-duration: 0.15s;
 }
-
 .success_alert {
 	background-color: green;
 }
-
 .alert_perso p {
+	font-family: 'Concert One', cursive;
+	font-size: 20px;
 	padding: 0;
 	margin: 0;
 }
-
-.alert_perso:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 18px 35px rgba(255, 255, 255, 0.1), 0 8px 15px rgba(255, 255, 255, 0.07);
-	animation-name: shake;
-	animation-duration: 1s;
+.btn-close {
+	position: absolute;
+	width: 10px !important;
+	height: 10px !important;
+	margin: 10px 10px 0 0;
+	top: 0px;
+	right: 0px;
 }
 
 /* Animation */
 .animation--boom {
 	animation-name: boom;
+	animation-iteration-count: 1;
 	animation-duration: 1s;
 }
 
 .animation--shake {
 	animation-name: shake;
+	animation-iteration-count: 1;
 	animation-duration: 1s;
+}
+
+.alert-infinity {
+	animation-iteration-count: infinite;
 }
 
 @keyframes boom {
@@ -255,7 +322,7 @@ body {
 		--bs-spinner-height: 15px !important;
 	}
 	#cartes_communes img {
-		width: 18%;
+		width: 16%;
 		border-radius: 2px;
 	}
 }

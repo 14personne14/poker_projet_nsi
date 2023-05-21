@@ -1,32 +1,5 @@
-// Websocket
-var socket;
-if (window.location.host === 'poker.azerty.tk') {
-	// azerty.tk
-	socket = new WebSocket(`wss://poker.azerty.tk/`); // wss://poker.azerty.tk/
-} else {
-	socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
-}
-
-/*
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
-
 // --- Variable ---
+var socket;
 var local_user_info;
 var mise_actuelle;
 var last_winner;
@@ -79,6 +52,11 @@ function add_player(username, argent_restant) {
     `;
 
 	document.getElementById('liste_players').appendChild(new_div);
+
+	// Client est le joueur
+	if (local_user_info.username == username) {
+		document.getElementById(`player-status-${username}`).classList.add('card_of_me');
+	}
 }
 
 /**
@@ -128,13 +106,31 @@ function update_action_player(username, new_action) {
  */
 function affiche_your_carte(cartes) {
 	for (var carte of cartes) {
-		var new_img = document.createElement('img');
-		new_img.setAttribute('src', `public/images/cards/png/${carte.numero}_${carte.symbole}.png`);
-		new_img.setAttribute('alt', `${carte.text}`);
-		new_img.setAttribute('data-bs-toggle', `tooltip`);
-		new_img.setAttribute('data-bs-placement', `bottom`);
-		new_img.setAttribute('data-bs-title', `${carte.text}`);
-		new_img.setAttribute('data-bs-custom-class', `custom-tooltip`);
+		var new_img = document.createElement('div');
+		new_img.setAttribute('class', `flip-card`);
+
+		new_img.innerHTML = `
+							<div class="flip-card-inner">
+								<div class="flip-card-front">
+									<img
+										src="public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png"
+										alt="${carte.text}"
+										data-bs-toggle="tooltip"
+										data-bs-placement="bottom"
+										data-bs-title="${carte.text}"
+										data-bs-custom-class="custom-tooltip" />
+								</div>
+								<div class="flip-card-back">
+									<img
+										src="public/images/cards/png_80x116/back_card.png"
+										alt=""
+										data-bs-toggle="tooltip"
+										data-bs-placement="bottom"
+										data-bs-title="secret"
+										data-bs-custom-class="custom-tooltip" />
+								</div>
+							</div>
+		`;
 
 		document.getElementById('your_card').appendChild(new_img);
 	}
@@ -185,6 +181,7 @@ function player_choose_action(action) {
 		// Affiche le resultat
 		if (data.valid == false) {
 			console.log('%cChoice response error' + `%c ${data.error}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
+			alert_client(data.error);
 		}
 	});
 }
@@ -248,7 +245,7 @@ function restart_global() {
 		document.getElementById(`player-status-${joueur}`).classList.remove('abandon');
 	}
 
-	// Remove tooltip 
+	// Remove tooltip
 	for (var tooltip of list_tooltips_card) {
 		tooltip.hide();
 	}
@@ -259,7 +256,13 @@ function restart_global() {
  * @param {String} message Le message à afficher
  * @param {Number} duree La durée d'affichage du message en milli-secondes
  */
-function alert(message, duree = 5000) {
+function alert_client(message, duree = 5000, secousse_infinity = false) {
+	if (secousse_infinity == true) {
+		$('#alert-animation').addClass('alert-infinity');
+	} else {
+		$('#alert-animation').removeClass('alert-infinity');
+	}
+
 	$('#alert').show();
 	$('#alert-text').html(message);
 	setTimeout(function () {
@@ -277,24 +280,54 @@ function update_info_game(message) {
 }
 
 /**
- * Affiche ou cache les bouton d'aide pour le joueur 
+ * Affiche ou cache les bouton d'aide pour le joueur
  */
 function toogle_help() {
 	for (var button of document.getElementsByClassName('help-button')) {
 		if (button.style.display == 'none') {
-			button.style.display = 'initial'; 
+			button.style.display = 'initial';
 		} else {
-			button.style.display = 'none'; 
+			button.style.display = 'none';
 		}
 	}
 }
 
 /**
- * Change les probabilité à afficher 
+ * Affiche ou cache les cartes du joueur
+ */
+function hide_my_card() {
+	for (var card of document.getElementsByClassName('flip-card-inner')) {
+		card.classList.toggle('hide_my_card');
+	}
+}
+
+/**
+ * Change les probabilité à afficher
  * @param {String} proba Les nouvelle probabilités à afficher
  */
 function set_proba(proba) {
 	$('#proba').html(`${proba}%`);
+}
+
+function hide_all(raison = 'fin du jeu') {
+	$('#info').html(`${raison}`);
+
+	$('#block-info-pot-mise').hide();
+	$('#block-cartes-communes').hide();
+	$('#liste_players').hide();
+	$('#block-choice-and-card').hide();
+}
+
+function hide_alert() {
+	$('#alert').hide();
+	$('#alert-text').html('');
+}
+
+function out_player(username) {
+	var div_player = document.getElementById(`player-status-${username}`);
+	div_player.classList.add('out');
+
+	update_action_player(username, 'OUT');
 }
 
 /*
@@ -327,6 +360,7 @@ $.getJSON('/get_user_info', function (data) {
 			''
 		);
 		local_user_info = data;
+		start();
 	}
 });
 
@@ -349,173 +383,191 @@ $.getJSON('/get_user_info', function (data) {
  *
  */
 
-// Ecouter les messages ws
-socket.addEventListener('message', (event) => {
-	const data = JSON.parse(event.data);
+function start() {
+	// Websocket
+	if (window.location.host === 'poker.azerty.tk') {
+		// azerty.tk
+		socket = new WebSocket(`wss://poker.azerty.tk/`); // wss://poker.azerty.tk/
+	} else {
+		socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
+	}
 
-	// Connection établie avec le serveur
-	if (data.type == 'connected') {
-		console.log('%cBienvenue' + `%c ${data.message}`, 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;', '');
-	}
-	// Supression d'un joueur
-	else if (data.type == 'delete_player') {
-		console.log('%cDelete player' + `%c ${data.username}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
-		delete_player(data.username);
-	}
-	// Ajout d'un joueur
-	else if (data.type == 'new_player') {
-		console.log('%cNew player' + `%c ${data.username} | ${data.argent_restant}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
-		add_player(data.username, data.argent_restant);
-	}
-	// Init liste players
-	else if (data.type == 'liste_player') {
-		console.log('%cListe player', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
-		console.log(data.liste);
-		for (var joueur of data.liste) {
-			add_player(joueur.username, joueur.argent_restant);
-		}
-	}
-	// Init game
-	else if (data.type == 'init_game') {
-		console.log(
-			'%cInit Game' +
-				`%c\n        proba: ${data.proba} \n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
-			'background: #F9FF00; color: #000000; padding: 0px 5px;',
-			''
-		);
-		$('#start_button').hide();
-		bootstrap.Tooltip.getInstance('#start_button').hide();
-		update_info_game(data.message);
-		set_proba(data.proba); 
-		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
-		update_action_player(data.petite_blind.username, 'petite blind');
-		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
-		update_action_player(data.grosse_blind.username, 'grosse blind');
-		update_main_player(data.who_playing, 'on');
-		update_pot_mise(data.pot, data.mise_actuelle_requise);
-		affiche_your_carte(data.your_card);
-	}
-	// Nouveau main player
-	else if (data.type == 'next_player') {
-		console.log('%cUpdate main player' + `%c ${data.next_player}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
-		update_main_player(data.next_player, 'on');
-	}
-	// Nouveau choix d'un joueur
-	else if (data.type == 'player_choice') {
-		console.log(
-			'%cChoice player' +
-				`%c ${data.username}` +
-				`%c\n - action: ${data.action} \n - argent_left: ${data.argent_left} \n - pot: ${data.pot} \n - mise: ${data.mise}`,
-			'background: #00AB00; color: #000000; padding: 0px 5px;',
-			'',
-			''
-		);
-		update_info_game(data.message);
-		update_main_player(data.username, 'off');
-		update_argent_player(data.username, data.argent_left);
-		update_action_player(data.username, data.action);
-		update_pot_mise(data.pot, data.mise);
-	}
-	// Next game
-	else if (data.type == 'game_next_part') {
-		var text_log_cartes = '';
-		for (var carte of data.cartes_new) {
-			text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
-		}
-		console.log(
-			'%cNext Game' +
-				`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
-			'background: #F9FF00; color: #000000; padding: 0px 5px;',
-			''
-		);
-		update_info_game(data.message);
-		update_argent_player(data.petite_blind.username, data.petite_blind.argent);
-		update_action_player(data.petite_blind.username, 'petite blind');
-		update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
-		update_action_player(data.grosse_blind.username, 'grosse blind');
-		update_main_player(data.who_playing, 'on');
-		update_pot_mise(data.pot, data.mise_actuelle_requise);
-		affiche_carte(data.cartes_new);
-	}
-	// Affiche cartes
-	else if (data.type == 'new_cartes') {
-		var text_log_cartes = '';
-		for (var carte of data.cartes_new) {
-			text_log_cartes += `\n - card: ${carte.numero} ${carte.symbole}`;
-		}
-		console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
-		update_info_game(data.message);
-		affiche_carte(data.cartes_new);
-	}
-	// Winner
-	else if (data.type == 'winner') {
-		var text_log_winners = '';
-		for (var joueur of data.liste_usernames) {
-			text_log_winners += `${joueur} `;
-		}
-		console.log('%cWinner' + `%c ${text_log_winners} | ${data.how_win}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
-		update_info_game(data.message);
-		set_winner(data.liste_usernames, data.how_win);
-	}
-	// Update argent_restant
-	else if (data.type == 'update_argent_restant') {
-		var text_log_argent_restant = '';
-		for (var joueur of data.liste_joueurs) {
-			text_log_argent_restant += `\n - ${joueur.username} ${joueur.argent_restant}`;
-		}
-		console.log('%cUpdate argent_restant:' + `%c${text_log_argent_restant}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+	// Ecouter les messages ws
+	socket.addEventListener('message', (event) => {
+		const data = JSON.parse(event.data);
 
-		for (var joueur of data.liste_joueurs) {
-			update_argent_player(joueur.username, joueur.argent_restant);
+		// Connection établie avec le serveur
+		if (data.type == 'connected') {
+			console.log('%cBienvenue' + `%c ${data.message}`, 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;', '');
 		}
-	}
-	// Reset carte & winner
-	else if (data.type == 'restart_global') {
-		console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
-		update_info_game(data.message);
-		restart_global();
-	}
-	// Autre cas
-	else {
-		console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;');
-		console.log(data);
-	}
-});
+		// Supression d'un joueur
+		else if (data.type == 'delete_player') {
+			console.log('%cDelete player' + `%c ${data.username}`, 'background: #F9FF00; color: #000000; padding: 0px 5px;', '');
+			delete_player(data.username);
+		}
+		// Ajout d'un joueur
+		else if (data.type == 'new_player') {
+			console.log(
+				'%cNew player' + `%c ${data.username} | ${data.argent_restant}`,
+				'background: #F9FF00; color: #000000; padding: 0px 5px;',
+				''
+			);
+			add_player(data.username, data.argent_restant);
+		}
+		// Init liste players
+		else if (data.type == 'liste_player') {
+			console.log('%cListe player', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
+			console.log(data.liste);
+			for (var joueur of data.liste) {
+				add_player(joueur.username, joueur.argent_restant);
+			}
+		}
+		// Init game
+		else if (data.type == 'init_game') {
+			console.log(
+				'%cInit Game' +
+					`%c\n        proba: ${data.proba} \n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
+				'background: #F9FF00; color: #000000; padding: 0px 5px;',
+				''
+			);
+			$('#start_button').hide();
+			bootstrap.Tooltip.getInstance('#start_button').hide();
+			update_info_game(data.message);
+			set_proba(data.proba);
+			update_argent_player(data.petite_blind.username, data.petite_blind.argent);
+			update_action_player(data.petite_blind.username, 'petite blind');
+			update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
+			update_action_player(data.grosse_blind.username, 'grosse blind');
+			update_main_player(data.who_playing, 'on');
+			update_pot_mise(data.pot, data.mise_actuelle_requise);
+			affiche_your_carte(data.your_card);
+		}
+		// Nouveau main player
+		else if (data.type == 'next_player') {
+			console.log('%cUpdate main player' + `%c ${data.next_player}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+			update_main_player(data.next_player, 'on');
+		}
+		// Nouveau choix d'un joueur
+		else if (data.type == 'player_choice') {
+			console.log(
+				'%cChoice player' +
+					`%c ${data.username}` +
+					`%c\n - action: ${data.action} \n - argent_left: ${data.argent_left} \n - pot: ${data.pot} \n - mise: ${data.mise}`,
+				'background: #00AB00; color: #000000; padding: 0px 5px;',
+				'',
+				''
+			);
+			update_info_game(data.message);
+			update_main_player(data.username, 'off');
+			update_argent_player(data.username, data.argent_left);
+			update_action_player(data.username, data.action);
+			update_pot_mise(data.pot, data.mise);
+		}
+		// Next game
+		else if (data.type == 'game_next_part') {
+			var text_log_cartes = '';
+			for (var carte of data.cartes_new) {
+				text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
+			}
+			console.log(
+				'%cNext Game' +
+					`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
+				'background: #F9FF00; color: #000000; padding: 0px 5px;',
+				''
+			);
+			update_info_game(data.message);
+			update_argent_player(data.petite_blind.username, data.petite_blind.argent);
+			update_action_player(data.petite_blind.username, 'petite blind');
+			update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
+			update_action_player(data.grosse_blind.username, 'grosse blind');
+			update_main_player(data.who_playing, 'on');
+			update_pot_mise(data.pot, data.mise_actuelle_requise);
+			affiche_carte(data.cartes_new);
+		}
+		// Affiche cartes
+		else if (data.type == 'new_cartes') {
+			var text_log_cartes = '';
+			for (var carte of data.cartes_new) {
+				text_log_cartes += `\n - card: ${carte.numero} ${carte.symbole}`;
+			}
+			console.log('%cNew carte:' + `%c${text_log_cartes}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+			update_info_game(data.message);
+			affiche_carte(data.cartes_new);
+		}
+		// Winner
+		else if (data.type == 'winner') {
+			var text_log_winners = '';
+			for (var joueur of data.liste_usernames) {
+				text_log_winners += `${joueur} `;
+			}
+			console.log('%cWinner' + `%c ${text_log_winners} | ${data.how_win}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+			update_info_game(data.message);
+			set_winner(data.liste_usernames, data.how_win);
+		}
+		// Update argent_restant
+		else if (data.type == 'update_argent_restant') {
+			var text_log_argent_restant = '';
+			for (var joueur of data.liste_joueurs) {
+				text_log_argent_restant += `\n - ${joueur.username} ${joueur.argent_restant}`;
+			}
+			console.log('%cUpdate argent_restant:' + `%c${text_log_argent_restant}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 
-socket.addEventListener('close', function (event) {
-	// Erreur deconnexion de la websocket.
-	$('.container').hide();
-});
+			for (var joueur of data.liste_joueurs) {
+				if (joueur.out == true) {
+					out_player(joueur.username);
+				} else {
+					update_argent_player(joueur.username, joueur.argent_restant);
+				}
+			}
+		}
+		// Reset carte & winner
+		else if (data.type == 'restart_global') {
+			console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
+			restart_global();
+		}
+		// Autre cas
+		else {
+			console.log('%cEvent:', 'background: #004CFF; color: #FFFFFF; padding: 0px 5px;');
+			console.log(data);
+		}
+	});
 
-// Debug info
-console.log(
-	'%cInfo color:' +
-		'%c\n - ' +
-		'%cServer info ' +
-		'%c ' +
-		'%c\n - ' +
-		'%cGame admin ' +
-		'%c ' +
-		'%c\n - ' +
-		'%cIn game ' +
-		'%c ' +
-		'%c\n - ' +
-		'%cClient action ' +
-		'%c ',
-	'text-decoration: underline;',
-	'',
-	'color: #004CFF;',
-	'background: #004CFF; color: #FFFFFF; padding: 0px 5px;',
-	'',
-	'color: #F9FF00;',
-	'background: #F9FF00; color: #000000; padding: 0px 5px;',
-	'',
-	'color: #00AB00;',
-	'background: #00AB00; color: #000000; padding: 0px 5px;',
-	'',
-	'color: #EA00B0;',
-	'background: #EA00B0; color: #000000; padding: 0px 5px;'
-);
+	socket.addEventListener('close', function (event) {
+		// Erreur deconnexion de la websocket.
+		alert_client('La connexion avec le serveur à été perdu. Veuiller quitter cette page', 360000, true);
+		hide_all('connexion Websoket perdu');
+	});
+
+	// Debug info
+	console.log(
+		'%cInfo color:' +
+			'%c\n - ' +
+			'%cServer info ' +
+			'%c ' +
+			'%c\n - ' +
+			'%cGame admin ' +
+			'%c ' +
+			'%c\n - ' +
+			'%cIn game ' +
+			'%c ' +
+			'%c\n - ' +
+			'%cClient action ' +
+			'%c ',
+		'text-decoration: underline;',
+		'',
+		'color: #004CFF;',
+		'background: #004CFF; color: #FFFFFF; padding: 0px 5px;',
+		'',
+		'color: #F9FF00;',
+		'background: #F9FF00; color: #000000; padding: 0px 5px;',
+		'',
+		'color: #00AB00;',
+		'background: #00AB00; color: #000000; padding: 0px 5px;',
+		'',
+		'color: #EA00B0;',
+		'background: #EA00B0; color: #000000; padding: 0px 5px;'
+	);
+}
 
 // Instantiate all tooltips in a docs or StackBlitz
 document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((tooltip) => {

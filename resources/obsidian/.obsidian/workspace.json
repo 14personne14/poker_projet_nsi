@@ -27,9 +27,9 @@
               "state": {
                 "file": "grafcet/MISE.canvas",
                 "viewState": {
-                  "x": -470.5,
-                  "y": 110.5,
-                  "zoom": -0.7403509027833914
+                  "x": 42.99809338395471,
+                  "y": 263.10241556386563,
+                  "zoom": -1.0736842361167247
                 }
               }
             }
@@ -42,9 +42,9 @@
               "state": {
                 "file": "grafcet/GLOBAL.canvas",
                 "viewState": {
-                  "x": 48.16557402850927,
-                  "y": 4580.078068761534,
-                  "zoom": 0.3333333333333334
+                  "x": 350.68292991386954,
+                  "y": -643.6924185992241,
+                  "zoom": 1.1102230246251565e-16
                 }
               }
             }
@@ -62,7 +62,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -136,7 +136,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "grafcet/GLOBAL.canvas",
+                "file": "grafcet/MISE.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -153,7 +153,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "grafcet/GLOBAL.canvas",
+                "file": "grafcet/MISE.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -176,7 +176,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "grafcet/GLOBAL.canvas"
+                "file": "grafcet/MISE.canvas"
               }
             }
           }
@@ -197,11 +197,11 @@
       "command-palette:Ouvrir la palette de commandes": false
     }
   },
-  "active": "c1562624676fa56d",
+  "active": "3b10bd524fb36be5",
   "lastOpenFiles": [
-    "grafcet/MISE.canvas",
     "grafcet/GLOBAL.canvas",
     "info/Object info utils.md",
+    "grafcet/MISE.canvas",
     "Statistiques.md",
     "images/GLOBAL.png",
     "images/stat1.png",
