@@ -462,18 +462,18 @@ async function action_global() {
 		if (who_donneur > nbr_joueur - 1) {
 			who_donneur = 0; 
 		}
-		who_playing = who_donneur; 
 
 		// Prépare les blindes des joueurs
-		var indice_blind = get_indice_blind_and_start();
+		var indice_info = get_indice_blind_and_start();
+        who_playing = indice_info.who_start; 
 		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		PLAYERS[indice_blind.petite].last_action = 'blind';
-		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
+		PLAYERS[indice_info.petite].argent_restant -= valeur_blind.petite;
+		PLAYERS[indice_info.petite].last_action = 'blind';
+		PLAYERS[indice_info.petite].argent_mise = valeur_blind.petite;
 		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		PLAYERS[indice_blind.grosse].last_action = 'blind';
-		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
+		PLAYERS[indice_info.grosse].argent_restant -= valeur_blind.grosse;
+		PLAYERS[indice_info.grosse].last_action = 'blind';
+		PLAYERS[indice_info.grosse].argent_mise = valeur_blind.grosse;
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse;
@@ -506,12 +506,12 @@ async function action_global() {
 					type: 'init_game',
 					mise_actuelle_requise: mise_actuelle_requise,
 					petite_blind: {
-						username: PLAYERS[indice_blind.petite].username,
-						argent: PLAYERS[indice_blind.petite].argent_restant,
+						username: PLAYERS[indice_info.petite].username,
+						argent: PLAYERS[indice_info.petite].argent_restant,
 					},
 					grosse_blind: {
-						username: PLAYERS[indice_blind.grosse].username,
-						argent: PLAYERS[indice_blind.grosse].argent_restant,
+						username: PLAYERS[indice_info.grosse].username,
+						argent: PLAYERS[indice_info.grosse].argent_restant,
 					},
 					your_card: cartes_joueur,
 					pot: pot,
@@ -1671,6 +1671,16 @@ app.get('/regles_du_jeu', (req, res) => {
 // Quand le client demande '/calcul_proba'
 app.get('/calcul_proba', (req, res) => {
 	res.render('calcul_proba');
+});
+
+// Quand le client demande '/remerciements'
+app.get('/remerciements', (req, res) => {
+	res.render('remerciements');
+});
+
+// Quand le client demande '/sponsors'
+app.get('/sponsors', (req, res) => {
+	res.render('sponsors');
 });
 
 // Quand le client demande '/game'

@@ -15,10 +15,18 @@
 				<h1>Calcul probas</h1>
 			</div>
             
-            <p>Voici les probas pour chaque main de départ avec chaque nombre de joueurs (de 2 à 9) :</p>
-			<div class="d-flex justify-content-center text-center espace"></div>
-				<%- include('includes/proba_html'); %>
+            <div class="tab-normal">
+                            <div class="d-flex justify-content-center text-center espace">
+				<div class="faiseurs">
+					Voici les probas pour chaque main de départ avec chaque nombre de joueurs de 2 à 8. Si la paire de carte est suivi d'un <b>s</b>, cela signifie que les deux cartes sont de la même couleur. Si la paire de carte est suivi d'un <b>o</b>, cela signifie que les deux cartes ne sont pas de la même couleur.
+				</div>
 			</div>
+                <%- include('includes/proba_html'); %>
+            </div>
+            
+            <div class="tab-telephone">
+                <p style="text-align: center;">Pour le format télephone, aller <a href="https://41semicolon.github.io/41poker/preflop-hs.html">ici</a>.<p>
+            </div>
 
             <%- include('includes/footer'); %>
 		</div>
