@@ -71,6 +71,10 @@ function update_main_player(username, status) {
 	} else if (status == 'on') {
 		var div = document.getElementById(`player-status-${username}`);
 		div.classList.add('main_player');
+
+		if (username == local_user_info.username) {
+			alert_client('A ton tour de jouer ! Tu as 60 secondes maximum.', 5000, false, 'green');
+		}
 	}
 }
 
@@ -255,19 +259,23 @@ function restart_global() {
  * Affiche une alert au millieu de l'écran avec le message
  * @param {String} message Le message à afficher
  * @param {Number} duree La durée d'affichage du message en milli-secondes
+ * @param {Boolean} secousse_infinity Si la box doit bouger à l'infini
+ * @param {String} color La couleur de l'alerte
  */
-function alert_client(message, duree = 5000, secousse_infinity = false) {
+function alert_client(message, duree = 5000, secousse_infinity = false, color = 'red') {
 	if (secousse_infinity == true) {
 		$('#alert-animation').addClass('alert-infinity');
 	} else {
 		$('#alert-animation').removeClass('alert-infinity');
 	}
 
+	$('#alert-animation').addClass(`alert-${color}`);
 	$('#alert').show();
 	$('#alert-text').html(message);
 	setTimeout(function () {
 		$('#alert').hide();
 		$('#alert-text').html('');
+		$('#alert-animation').removeClass(`alert-${color}`);
 	}, duree);
 }
 
@@ -471,17 +479,14 @@ function start() {
 			}
 			console.log(
 				'%cNext Game' +
-					`%c\n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
+					`%c\n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
 				'background: #F9FF00; color: #000000; padding: 0px 5px;',
 				''
 			);
 			update_info_game(data.message);
-			update_argent_player(data.petite_blind.username, data.petite_blind.argent);
-			update_action_player(data.petite_blind.username, 'petite blind');
-			update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
-			update_action_player(data.grosse_blind.username, 'grosse blind');
 			update_main_player(data.who_playing, 'on');
 			update_pot_mise(data.pot, data.mise_actuelle_requise);
+			set_proba(data.proba);
 			affiche_carte(data.cartes_new);
 		}
 		// Affiche cartes

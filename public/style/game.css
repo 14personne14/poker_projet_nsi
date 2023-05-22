@@ -197,7 +197,7 @@ input[type='number'] {
 	font-family: 'Oxanium', cursive;
 	font-size: 30px;
 	color: #ffffff;
-	background-color: #ff0000;
+	background-color: #0000ff;
 	text-align: center;
 	justify-content: center;
 
@@ -218,6 +218,12 @@ input[type='number'] {
 
 	transition-property: all;
 	transition-duration: 0.15s;
+}
+.alert-green {
+	background-color: green !important;
+}
+.alert-red {
+	background-color: red !important;
 }
 .success_alert {
 	background-color: green;

@@ -19,16 +19,26 @@ function get_valeurs_cartes(cartes) {
 /**
  * Calcule la probabilité du joueur de gagner avec les cartes et le nombre de joueur.
  * @param {Array} cartes Liste des cartes du joueur
+ * @param {Array} cartes_communes Liste des cartes du jeu communes aux joueurs
  * @param {Number} nb_joueurs Le nombre de joueur
  * @returns {Number}
  */
-function get_proba(cartes, nb_joueurs) {
+function get_proba(cartes, cartes_communes, nb_joueurs) {
 	var cartes_parsed = [];
+
 	for (var carte of cartes) {
 		cartes_parsed.push(carte.parsed);
 	}
 
-	return Math.round(proba.hs(cartes_parsed, nb_joueurs) * 10000) / 100;
+	if (cartes_communes.length == 0) {
+		return Math.round(proba.hs(cartes_parsed, nb_joueurs) * 10000) / 100;
+	} else {
+		var cartes_communes_parsed = [];
+		for (var carte of cartes_communes) {
+			cartes_communes_parsed.push(carte.parsed);
+		}
+		return Math.round(proba.hs(cartes_parsed, nb_joueurs, cartes_communes_parsed) * 10000) / 100;
+	}
 }
 
 /**

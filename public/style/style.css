@@ -138,6 +138,26 @@ h1 {
     margin: 0; 
 }
 
+.tableau-sponsor{
+	background: #a0e9ff;
+	background: -webkit-linear-gradient(0deg, #a0e9ff 0%, #a8f0ff 50%, #c6f5ff 100%);
+	background: linear-gradient(0deg, #a0e9ff 0%, #a8f0ff 50%, #c6f5ff 100%);
+}
+
+#easter-egg{
+	color: #000;
+	text-decoration: None;
+}
+
+#easter-egg:hover{
+	color: #000;
+	text-decoration: None;
+}
+
+.easter-title{
+	font-size: 50px;
+}
+
 /* --- LIGNE --- */
 .line_separation {
 	color: rgba(0, 0, 0, 0);

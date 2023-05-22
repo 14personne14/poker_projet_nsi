@@ -92,28 +92,28 @@ const argent_min_require = 1000;
 const valeur_blind = { petite: 100, grosse: 200 };
 
 /**
- * Temps d'attente entre chaque topu de boucle pour la fluidité et rapidité du jeu
+ * Temps d'attente entre chaque tour de boucle pour la fluidité et rapidité du jeu
  * @type {Number}
  */
 const sleep_time = 100;
 
 /**
- * Temps d'attente quand on skip des tour de mise
- * @type {Number}
+ * Les temps d'attente du jeu en millisecondes
+ * @type {Object}
  */
-const sleep_time_skip = 2000;
+const sleep_time_game = {
+	nouveau_tour: 2000,
+	tirage_cartes: 5000,
+	tirage_skip: 5000,
+	end_tour: 10000,
+	end: 60000,
+};
 
 /**
  * Durée du timer en millisecondes
  * @type {Number}
  */
 const duree_timer = 60000;
-
-/**
- * Durée de timer_reset en millisecondes
- * @type {Number}
- */
-const duree_timer_reset = 5000;
 
 /**
  * Nombre minimum de joueur
@@ -219,12 +219,6 @@ var timer_choix_end = false;
  */
 var timer_reset;
 
-/**
- * Si le timer_reset est terminé ou non
- * @type {Boolean}
- */
-var timer_reset_end = false;
-
 // ---------------------------- Fonction websocket ----------------------------
 
 /**
@@ -309,7 +303,7 @@ app.set('view engine', 'ejs');
 function get_indice_blind_and_start() {
 	var grosse_blind_is_good = false;
 	var petite_blind_is_good = false;
-	var good_who_start = false; 
+	var good_who_start = false;
 
 	var indice_petite = who_donneur;
 	while (!petite_blind_is_good) {
@@ -342,12 +336,26 @@ function get_indice_blind_and_start() {
 			indice_who_start = 0;
 		}
 		good_who_start = true;
-		if (PLAYERS[indice_grosse].out == true) {
+		if (PLAYERS[indice_who_start].out == true) {
 			good_who_start = false;
 		}
 	}
 
 	return { petite: indice_petite, grosse: indice_grosse, who_start: indice_who_start };
+}
+
+/**
+ * Renvoie le nombre de joueur qui sont en train de jouer et qui ne sont pas out
+ * @returns {Number} Le nombre de joueur
+ */
+function get_nbr_joueur_in_life() {
+	var nbr_in_life = 0;
+	for (var joueur of PLAYERS) {
+		if (joueur.out == false) {
+			nbr_in_life++;
+		}
+	}
+	return nbr_in_life;
 }
 
 /**
@@ -457,15 +465,22 @@ async function action_global() {
 			PLAYERS[i].cartes = jeu_cartes.pioche(2);
 		}
 
-		// Genere l'indice du joueur qui commence
-		who_donneur += 1; 
-		if (who_donneur > nbr_joueur - 1) {
-			who_donneur = 0; 
+		// Change donneur
+		var good_who_donneur = false;
+		while (!good_who_donneur) {
+			who_donneur++;
+			if (who_donneur > nbr_joueur - 1) {
+				who_donneur = 0;
+			}
+			good_who_donneur = true;
+			if (PLAYERS[who_donneur].out == true) {
+				good_who_donneur = false;
+			}
 		}
 
 		// Prépare les blindes des joueurs
 		var indice_info = get_indice_blind_and_start();
-        who_playing = indice_info.who_start; 
+		who_playing = indice_info.who_start;
 		// Grosse blind :
 		PLAYERS[indice_info.petite].argent_restant -= valeur_blind.petite;
 		PLAYERS[indice_info.petite].last_action = 'blind';
@@ -477,15 +492,6 @@ async function action_global() {
 		// Ajoute les blind au pot et le minimum requit
 		pot += valeur_blind.petite + valeur_blind.grosse;
 		mise_actuelle_requise = valeur_blind.grosse;
-
-		// Debug
-		// console.log('------------------');
-		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('PLAYERS:');
-		// console.log(PLAYERS);
-		// console.log('pot: ', pot);
-		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
-		// console.log('------------------');
 
 		// Envoie des données aux joueurs
 		for (var joueur of PLAYERS) {
@@ -499,7 +505,7 @@ async function action_global() {
 						text: carte.text,
 					});
 				}
-				var proba = get_proba(joueur.cartes, nbr_joueur);
+				var proba = get_proba(joueur.cartes, cartes_communes, get_nbr_joueur_in_life());
 
 				// Envoie des données d'initialisation
 				var data = JSON.stringify({
@@ -523,6 +529,8 @@ async function action_global() {
 			}
 		}
 
+		await sleep(sleep_time_game.nouveau_tour);
+
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
 	}
@@ -538,26 +546,25 @@ async function action_global() {
 
 		// Reste PLAYERS
 		PLAYERS.forEach(function (joueur, indice) {
-			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+			if (!(joueur.last_action == 'all-in' || joueur.last_action == 'abandon' || joueur.out == true)) {
 				this[indice].last_action = 'aucune';
-				this[indice].argent_mise = 0;
-				this[indice].nbr_relance = 0;
 			}
 		}, PLAYERS);
 
-		// Prépare les blindes des joueurs
-		var indice_game = get_indice_blind_and_start();
-		// Grosse blind :
-		PLAYERS[indice_game.petite].argent_restant -= valeur_blind.petite;
-		PLAYERS[indice_game.petite].last_action = 'blind';
-		PLAYERS[indice_game.petite].argent_mise = valeur_blind.petite;
-		// Grande blind :
-		PLAYERS[indice_game.grosse].argent_restant -= valeur_blind.grosse;
-		PLAYERS[indice_game.grosse].last_action = 'blind';
-		PLAYERS[indice_game.grosse].argent_mise = valeur_blind.grosse;
-		// Ajoute les blind au pot et le minimum requit
-		pot += valeur_blind.petite + valeur_blind.grosse;
-		mise_actuelle_requise = valeur_blind.grosse; 
+		// Change who_playing
+		var good_who_start = false;
+		who_start = who_donneur;
+		while (!good_who_start) {
+			who_start++;
+			if (who_start > nbr_joueur - 1) {
+				who_start = 0;
+			}
+			good_who_start = true;
+			if (PLAYERS[who_start].out == true || PLAYERS[who_start].last_action == 'abandon' || PLAYERS[who_start].last_action == 'all-in') {
+				good_who_start = false;
+			}
+		}
+		who_playing = who_start;
 
 		// Prepare send carte flop
 		var cartes_flop_to_send = [];
@@ -568,33 +575,35 @@ async function action_global() {
 				text: carte.text,
 			});
 		}
-		wss_send_joueur({
-			type: 'game_next_part',
-			mise_actuelle_requise: mise_actuelle_requise,
-			petite_blind: {
-				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_restant,
-			},
-			grosse_blind: {
-				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_restant,
-			},
-			cartes_new: cartes_flop_to_send,
-			pot: pot,
-			who_playing: PLAYERS[who_playing].username,
-			message: 'tirage du flop',
-		});
 
-		// Debug
-		// console.log('------------------');
-		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('cartes_communes:');
-		// console.log(cartes_communes);
-		// console.log('PLAYERS:');
-		// console.log(PLAYERS);
-		// console.log('pot: ', pot);
-		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
-		// console.log('------------------');
+		// Envoie des données aux joueurs
+		for (var joueur of PLAYERS) {
+			if (joueur.ws != undefined) {
+				// Change type des cartes for send
+				var cartes_joueur = [];
+				for (var carte of joueur.cartes) {
+					cartes_joueur.push({
+						symbole: carte.symbole,
+						numero: carte.numero,
+						text: carte.text,
+					});
+				}
+				var proba = get_proba(joueur.cartes, cartes_communes, get_nbr_joueur_in_life());
+
+				data = JSON.stringify({
+					type: 'game_next_part',
+					mise_actuelle_requise: mise_actuelle_requise,
+					cartes_new: cartes_flop_to_send,
+					pot: pot,
+					who_playing: PLAYERS[who_playing].username,
+					message: 'tirage du flop',
+					proba: proba,
+				});
+				joueur.ws.send(data);
+			}
+		}
+
+		await sleep(sleep_time_game.tirage_cartes);
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
@@ -609,26 +618,24 @@ async function action_global() {
 
 		// Reste PLAYERS
 		PLAYERS.forEach(function (joueur, indice) {
-			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+			if (!(joueur.last_action == 'all-in' || joueur.last_action == 'abandon' || joueur.out == true)) {
 				this[indice].last_action = 'aucune';
-				this[indice].argent_mise = 0;
-				this[indice].nbr_relance = 0;
 			}
 		}, PLAYERS);
 
-		// Prépare les blindes des joueurs
-		var indice_blind = get_indice_blind_and_start();
-		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		PLAYERS[indice_blind.petite].last_action = 'blind';
-		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
-		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		PLAYERS[indice_blind.grosse].last_action = 'blind';
-		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
-		// Ajoute les blind au pot et le minimum requit
-		pot += valeur_blind.petite + valeur_blind.grosse;
-		mise_actuelle_requise = valeur_blind.grosse; // Reset
+		// Change who_playing
+		var good_who_start = false;
+		while (!good_who_start) {
+			who_start++;
+			if (who_start > nbr_joueur - 1) {
+				who_start = 0;
+			}
+			good_who_start = true;
+			if (PLAYERS[who_start].out == true || PLAYERS[who_start].last_action == 'abandon' || PLAYERS[who_start].last_action == 'all-in') {
+				good_who_start = false;
+			}
+		}
+		who_playing = who_start;
 
 		// Prepare send carte flop
 		var cartes_turn_to_send = [
@@ -638,33 +645,35 @@ async function action_global() {
 				text: carte_turn.text,
 			},
 		];
-		wss_send_joueur({
-			type: 'game_next_part',
-			mise_actuelle_requise: mise_actuelle_requise,
-			petite_blind: {
-				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_restant,
-			},
-			grosse_blind: {
-				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_restant,
-			},
-			cartes_new: cartes_turn_to_send,
-			pot: pot,
-			who_playing: PLAYERS[who_playing].username,
-			message: 'tirage du turn',
-		});
 
-		// Debug
-		// console.log('------------------');
-		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('cartes_communes:');
-		// console.log(cartes_communes);
-		// console.log('PLAYERS:');
-		// console.log(PLAYERS);
-		// console.log('pot: ', pot);
-		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
-		// console.log('------------------');
+		// Envoie des données aux joueurs
+		for (var joueur of PLAYERS) {
+			if (joueur.ws != undefined) {
+				// Change type des cartes for send
+				var cartes_joueur = [];
+				for (var carte of joueur.cartes) {
+					cartes_joueur.push({
+						symbole: carte.symbole,
+						numero: carte.numero,
+						text: carte.text,
+					});
+				}
+				var proba = get_proba(joueur.cartes, cartes_communes, get_nbr_joueur_in_life());
+
+				data = JSON.stringify({
+					type: 'game_next_part',
+					mise_actuelle_requise: mise_actuelle_requise,
+					cartes_new: cartes_turn_to_send,
+					pot: pot,
+					who_playing: PLAYERS[who_playing].username,
+					message: 'tirage du turn',
+					proba: proba,
+				});
+				joueur.ws.send(data);
+			}
+		}
+
+		await sleep(sleep_time_game.tirage_cartes);
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
@@ -679,26 +688,24 @@ async function action_global() {
 
 		// Reste PLAYERS
 		PLAYERS.forEach(function (joueur, indice) {
-			if (!(joueur.last_action == 'all-in' || joueur.out == true)) {
+			if (!(joueur.last_action == 'all-in' || joueur.last_action == 'abandon' || joueur.out == true)) {
 				this[indice].last_action = 'aucune';
-				this[indice].argent_mise = 0;
-				this[indice].nbr_relance = 0;
 			}
 		}, PLAYERS);
 
-		// Prépare les blindes des joueurs
-		var indice_blind = get_indice_blind_and_start();
-		// Grosse blind :
-		PLAYERS[indice_blind.petite].argent_restant -= valeur_blind.petite;
-		PLAYERS[indice_blind.petite].last_action = 'blind';
-		PLAYERS[indice_blind.petite].argent_mise = valeur_blind.petite;
-		// Grande blind :
-		PLAYERS[indice_blind.grosse].argent_restant -= valeur_blind.grosse;
-		PLAYERS[indice_blind.grosse].last_action = 'blind';
-		PLAYERS[indice_blind.grosse].argent_mise = valeur_blind.grosse;
-		// Ajoute les blind au pot et le minimum requit
-		pot += valeur_blind.petite + valeur_blind.grosse;
-		mise_actuelle_requise = valeur_blind.grosse; // Reset
+		// Change who_playing
+		var good_who_start = false;
+		while (!good_who_start) {
+			who_start++;
+			if (who_start > nbr_joueur - 1) {
+				who_start = 0;
+			}
+			good_who_start = true;
+			if (PLAYERS[who_start].out == true || PLAYERS[who_start].last_action == 'abandon' || PLAYERS[who_start].last_action == 'all-in') {
+				good_who_start = false;
+			}
+		}
+		who_playing = who_start;
 
 		// Prepare send carte flop
 		var cartes_river_to_send = [
@@ -708,33 +715,35 @@ async function action_global() {
 				text: carte_river.numero,
 			},
 		];
-		wss_send_joueur({
-			type: 'game_next_part',
-			mise_actuelle_requise: mise_actuelle_requise,
-			petite_blind: {
-				username: PLAYERS[indice_blind.petite].username,
-				argent: PLAYERS[indice_blind.petite].argent_restant,
-			},
-			grosse_blind: {
-				username: PLAYERS[indice_blind.grosse].username,
-				argent: PLAYERS[indice_blind.grosse].argent_restant,
-			},
-			cartes_new: cartes_river_to_send,
-			pot: pot,
-			who_playing: PLAYERS[who_playing].username,
-			message: 'tirage de la river',
-		});
 
-		// Debug
-		// console.log('------------------');
-		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('cartes_communes:');
-		// console.log(cartes_communes);
-		// console.log('PLAYERS:');
-		// console.log(PLAYERS);
-		// console.log('pot: ', pot);
-		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
-		// console.log('------------------');
+		// Envoie des données aux joueurs
+		for (var joueur of PLAYERS) {
+			if (joueur.ws != undefined) {
+				// Change type des cartes for send
+				var cartes_joueur = [];
+				for (var carte of joueur.cartes) {
+					cartes_joueur.push({
+						symbole: carte.symbole,
+						numero: carte.numero,
+						text: carte.text,
+					});
+				}
+				var proba = get_proba(joueur.cartes, cartes_communes, get_nbr_joueur_in_life());
+
+				data = JSON.stringify({
+					type: 'game_next_part',
+					mise_actuelle_requise: mise_actuelle_requise,
+					cartes_new: cartes_river_to_send,
+					pot: pot,
+					who_playing: PLAYERS[who_playing].username,
+					message: 'tirage de la river',
+					proba: proba,
+				});
+				joueur.ws.send(data);
+			}
+		}
+
+		await sleep(sleep_time_game.tirage_cartes);
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
@@ -742,104 +751,133 @@ async function action_global() {
 	// Etape 11
 	// Etape 121 (skip flop)
 	else if (etape_global == 121) {
-		// Carte du flop
-		var cartes_flop = jeu_cartes.pioche(3);
-		for (var carte of cartes_flop) {
-			cartes_communes.push(carte);
-		}
-		// Prepare send carte flop
-		var cartes_flop_to_send = [];
-		for (var carte of cartes_flop) {
-			cartes_flop_to_send.push({
-				symbole: carte.symbole,
-				numero: carte.numero,
-				text: carte.text,
+		if (!(calc_status_player().nbr_abandon == nbr_joueur - 1)) {
+			// Carte du flop
+			var cartes_flop = jeu_cartes.pioche(3);
+			for (var carte of cartes_flop) {
+				cartes_communes.push(carte);
+			}
+			// Prepare send carte flop
+			var cartes_flop_to_send = [];
+			for (var carte of cartes_flop) {
+				cartes_flop_to_send.push({
+					symbole: carte.symbole,
+					numero: carte.numero,
+					text: carte.text,
+				});
+			}
+			// Send
+			wss_send_joueur({
+				type: 'new_cartes',
+				cartes_new: cartes_flop_to_send,
+				message: 'tirage du flop',
 			});
+			await sleep(sleep_time_game.tirage_skip);
 		}
-		// Send
-		wss_send_joueur({
-			type: 'new_cartes',
-			cartes_new: cartes_flop_to_send,
-			message: 'tirage du flop',
-		});
-		await sleep(sleep_time_skip);
 	}
 	// Etape 122 (skip turn)
 	else if (etape_global == 122) {
-		// Carte turn
-		var carte_turn = jeu_cartes.pioche(1)[0];
-		cartes_communes.push(carte_turn);
-		// Prepare send carte flop
-		var cartes_turn_to_send = [
-			{
-				symbole: carte_turn.symbole,
-				numero: carte_turn.numero,
-				text: carte_turn.text,
-			},
-		];
-		// Send
-		wss_send_joueur({
-			type: 'new_cartes',
-			cartes_new: cartes_turn_to_send,
-			message: 'tirage du turn',
-		});
-		await sleep(sleep_time_skip);
+		if (!(calc_status_player().nbr_abandon == nbr_joueur - 1)) {
+			// Carte turn
+			var carte_turn = jeu_cartes.pioche(1)[0];
+			cartes_communes.push(carte_turn);
+			// Prepare send carte flop
+			var cartes_turn_to_send = [
+				{
+					symbole: carte_turn.symbole,
+					numero: carte_turn.numero,
+					text: carte_turn.text,
+				},
+			];
+			// Send
+			wss_send_joueur({
+				type: 'new_cartes',
+				cartes_new: cartes_turn_to_send,
+				message: 'tirage du turn',
+			});
+			await sleep(sleep_time_game.tirage_skip);
+		}
 	}
 	// Etape 123 (skip river)
 	else if (etape_global == 123) {
-		// Carte river
-		var carte_river = jeu_cartes.pioche(1)[0];
-		cartes_communes.push(carte_river);
-		// Prepare send carte flop
-		var cartes_river_to_send = [
-			{
-				symbole: carte_river.symbole,
-				numero: carte_river.numero,
-				text: carte_river.text,
-			},
-		];
-		// Send
-		wss_send_joueur({
-			type: 'new_cartes',
-			cartes_new: cartes_river_to_send,
-			message: 'tirage de la river',
-		});
-		await sleep(sleep_time_skip);
+		if (!(calc_status_player().nbr_abandon == nbr_joueur - 1)) {
+			// Carte river
+			var carte_river = jeu_cartes.pioche(1)[0];
+			cartes_communes.push(carte_river);
+			// Prepare send carte flop
+			var cartes_river_to_send = [
+				{
+					symbole: carte_river.symbole,
+					numero: carte_river.numero,
+					text: carte_river.text,
+				},
+			];
+			// Send
+			wss_send_joueur({
+				type: 'new_cartes',
+				cartes_new: cartes_river_to_send,
+				message: 'tirage de la river',
+			});
+			await sleep(sleep_time_game.tirage_skip);
+		}
 	}
 	// Etape 13 (end)
 	else if (etape_global == 13) {
-		// Prepare liste for function winner
-		var liste_joueur_cartes = [];
-		for (var i = 0; i < nbr_joueur; i++) {
-			if (!(PLAYERS[i].last_action == 'abandon')) {
-				liste_joueur_cartes.push({
-					username: PLAYERS[i].username,
-					cartes: PLAYERS[i].cartes,
-				});
+		if (!(calc_status_player().nbr_abandon == nbr_joueur - 1)) {
+			// Prepare liste for function winner
+			var liste_joueur_cartes = [];
+			for (var i = 0; i < nbr_joueur; i++) {
+				if (!(PLAYERS[i].last_action == 'abandon')) {
+					liste_joueur_cartes.push({
+						username: PLAYERS[i].username,
+						cartes: PLAYERS[i].cartes,
+					});
+				}
 			}
-		}
-		var winner_infos = who_is_winner(liste_joueur_cartes, cartes_communes);
+			var winner_infos = who_is_winner(liste_joueur_cartes, cartes_communes);
 
-		// Ajoute pot aux winners
-		var text_message_winner = '';
-		var nbr_winner = winner_infos.liste_indices.length;
-		if (nbr_winner > 1) {
-			text_message_winner += 'gagnants:';
+			// Ajoute pot aux winners
+			var text_message_winner = '';
+			var nbr_winner = winner_infos.liste_indices.length;
+			if (nbr_winner > 1) {
+				text_message_winner += 'gagnants:';
+			} else {
+				text_message_winner += 'gagnant:';
+			}
+			for (var indice of winner_infos.liste_indices) {
+				PLAYERS[indice].argent_restant += pot / nbr_winner;
+				text_message_winner += ` ${PLAYERS[indice].username}`;
+			}
+
+			// Send winner
+			wss_send_joueur({
+				type: 'winner',
+				liste_usernames: winner_infos.liste_usernames,
+				how_win: winner_infos.how_win,
+				message: text_message_winner,
+			});
 		} else {
-			text_message_winner += 'gagnant:';
-		}
-		for (var indice of winner_infos.liste_indices) {
-			PLAYERS[indice].argent_restant += pot / nbr_winner;
-			text_message_winner += ` ${PLAYERS[indice].username}`;
+			var winner_username;
+			var winner_indice;
+			for (var i = 0; i < nbr_joueur; i++) {
+				if (!(PLAYERS[i].last_action == 'abandon')) {
+					winner_username = PLAYERS[i].username;
+					winner_indice = i;
+				}
+			}
+
+			PLAYERS[winner_indice].argent_restant += pot;
+
+			// Send winner
+			wss_send_joueur({
+				type: 'winner',
+				liste_usernames: winner_username,
+				how_win: 'last survival',
+				message: `gagnant: ${winner_username}`,
+			});
 		}
 
-		// Send winner
-		wss_send_joueur({
-			type: 'winner',
-			liste_usernames: winner_infos.liste_usernames,
-			how_win: winner_infos.how_win,
-			message: text_message_winner,
-		});
+		await sleep(sleep_time_game.end_tour);
 
 		// Send updated argent_restant &&&& Delete out players
 		data = {
@@ -857,11 +895,6 @@ async function action_global() {
 			});
 		}
 		wss_send_joueur(data);
-
-		// Démarre timer_reset
-		timer_reset = setTimeout(() => {
-			timer_reset_end = true;
-		}, duree_timer_reset);
 	}
 	// Etape 14
 	// Etape 15
@@ -897,6 +930,8 @@ async function action_global() {
 				}
 			);
 		}
+
+		await sleep(sleep_time_game.end);
 	}
 }
 
@@ -991,7 +1026,7 @@ async function transition_global() {
 		etape_global = 14;
 	}
 	// Etape 14 -> Etape 15
-	else if (etape_global == 14 && timer_reset_end == true) {
+	else if (etape_global == 14) {
 		etape_global = 15;
 	}
 	// Etape 15 -> Etape 16
@@ -1139,15 +1174,6 @@ async function action_mise() {
 				}
 			}
 		}
-
-		// Debug
-		// console.log('------------------');
-		// console.log('who_playing:', who_playing, '|', PLAYERS[who_playing].username);
-		// console.log('PLAYERS:');
-		// console.log(PLAYERS);
-		// console.log('pot: ', pot);
-		// console.log('mise_actuelle_requise: ', mise_actuelle_requise);
-		// console.log('------------------');
 
 		// Reset timer 2 & player_choice
 		timer_choix_end = false;
@@ -1671,6 +1697,11 @@ app.get('/regles_du_jeu', (req, res) => {
 // Quand le client demande '/calcul_proba'
 app.get('/calcul_proba', (req, res) => {
 	res.render('calcul_proba');
+});
+
+// Quand le client demande '/alexis'
+app.get('/alexis', (req, res) => {
+	res.render('alexis');
 });
 
 // Quand le client demande '/remerciements'
