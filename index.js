@@ -105,7 +105,7 @@ const sleep_time_game = {
 	nouveau_tour: 2000,
 	tirage_cartes: 5000,
 	tirage_skip: 5000,
-    mise: 2000,
+	mise: 2000,
 	end_tour: 10000,
 	end: 60000,
 };
@@ -907,17 +907,17 @@ async function action_global() {
 	}
 	// Etape 16 (END & reset)
 	else if (etape_global == 16) {
-        for (var joueur of PLAYERS) {
-            if (!(joueur.out == true)) {
-                // Send END
-                wss_send_joueur({
-                    type: 'end',
-                    username: joueur.username,
-                    message: `FIN DU JEU : le gagnant est ${joueur.username}`,
-                });
-            } 
-        }
-        
+		for (var joueur of PLAYERS) {
+			if (!(joueur.out == true)) {
+				// Send END
+				wss_send_joueur({
+					type: 'end',
+					username: joueur.username,
+					message: `FIN DU JEU : le gagnant est ${joueur.username}`,
+				});
+			}
+		}
+
 		// Log
 		var text_discord_log = '**New game finished**';
 		for (var joueur of PLAYERS) {
@@ -1186,8 +1186,8 @@ async function action_mise() {
 		// Reset timer 2 & player_choice
 		timer_choix_end = false;
 		player_choice = undefined;
-        
-        await sleep(sleep_time_game.mise);
+
+		await sleep(sleep_time_game.mise);
 	}
 	// Etape 4
 	else if (etape_mise == 4) {

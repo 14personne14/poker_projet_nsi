@@ -5,7 +5,7 @@ var mise_actuelle;
 var last_winner;
 var last_abandon = [];
 var list_tooltips_card = [];
-var nbr_cartes_devoile = 1; 
+var nbr_cartes_devoile = 1;
 
 // --- Fonctions ---
 
@@ -200,11 +200,11 @@ function affiche_carte(cartes) {
 		var img = document.getElementById(`carte_communes_img_${nbr_cartes_devoile}`);
 		img.src = `public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png`;
 		img.setAttribute('data-bs-title', `${carte.text}`);
-        
-        var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`); 
-        card.classList.add('hide_my_card');
-        
-        nbr_cartes_devoile++;
+
+		var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
+		card.classList.add('hide_my_card');
+
+		nbr_cartes_devoile++;
 	}
 
 	// Instantiate all tooltips in a docs or StackBlitz
@@ -233,12 +233,12 @@ function set_winner(liste_usernames, how_win) {
  * Reinitialise le jeu pour repartir pour un nouveau tour
  */
 function restart_global() {
-    for (var i = 1; i < nbr_cartes_devoile; i++) {
-        var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
-        card.classList.remove('hide_my_card');
-    }
-    nbr_cartes_devoile = 1; 
-    
+	for (var i = 1; i < nbr_cartes_devoile; i++) {
+		var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
+		card.classList.remove('hide_my_card');
+	}
+	nbr_cartes_devoile = 1;
+
 	// Delete your_card
 	document.getElementById('your_card').innerHTML = '';
 
@@ -480,8 +480,7 @@ function start() {
 				text_log_cartes += `\n         card: ${carte.numero} ${carte.symbole}`;
 			}
 			console.log(
-				'%cNext Game' +
-					`%c\n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
+				'%cNext Game' + `%c\n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
 				'background: #F9FF00; color: #000000; padding: 0px 5px;',
 				''
 			);
@@ -531,12 +530,11 @@ function start() {
 			console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
 			restart_global();
 		}
-        // Reset carte & winner
+		// Reset carte & winner
 		else if (data.type == 'end') {
 			console.log('%cEND OF GAME:' + `%c${data.username} win`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
-            update_info_game(data.message);
+			update_info_game(data.message);
 			set_winner([data.username], 'WINNER');
-            
 		}
 		// Autre cas
 		else {

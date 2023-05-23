@@ -1,3 +1,4 @@
 25/04/2023 - Finir recupération de l'event 'Init game' par le client (javascript). 
 30/04/2023 - Finir partie flop du jeu !
 16/05/2023 - Continuer action/transition global (cf grafcet)
+23/05/2023 - Bah il faut rendre demain donc vite vite Eloi...

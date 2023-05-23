@@ -20,7 +20,7 @@ function encode_sha256(chaine) {
 }
 
 /**
- * Mettre en pause le programme un certain temps 
+ * Mettre en pause le programme un certain temps
  * @param {Number} ms Le temps en milliseconde à attendre
  * @returns {Promise}
  */

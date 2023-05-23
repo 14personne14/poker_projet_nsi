@@ -26,34 +26,33 @@ Vous pouvez jouer au jeu sur le site [poker.azerty.tk](https://poker.azerty.tk).
 
 Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec une connexion internet obligatoire) :
 
--   Installez [NodeJS](https://nodejs.org/en/download) sur votre ordinateur.
--   Ouvrir un terminal copier le code ci-dessous (cela peut prendre du temps à s'éxécuter)
+1.  Installez [NodeJS](https://nodejs.org/en/download) sur votre ordinateur.
+2.  Ouvrir un terminal copier le code ci-dessous (cela peut prendre du temps à s'éxécuter)
+
     ```console
     npm install
     ```
--   Lancer ensuite le jeu avec la commande ci-dessous
 
-    ```bash
-    npm run local
-    ```
-
-    Si la ligne ci-dessous apparait c'est que le jeu est lancé
-
+3.  Lancer ensuite le jeu avec la commande : `npm run local`
+    <br>
+    Si la ligne ci-dessous apparait, cela signifie que le jeu est s'est bien lancé.
+    <br>
     ![IMG_ligne_code](./public/images/screenshots/code_line.png)
 
--   Aller sur ce lien pour y voir le site : [localhost:8103](http://localhost:8103/). Si le lien ne fonctionne pas vérifier le nom du port afficher dans la console de votre terminal.
+4.  Aller sur ce lien pour y voir le site : [localhost:8103](http://localhost:8103/). <br>
+    Si le lien ne fonctionne pas vérifier le nom du port afficher dans la console de votre terminal.
 
 <br/>
 
 **Comment jouer au jeu :**
 
--   Créer un comte en respectant bien les consignes indiquées
+1.  Créer un comte en respectant bien les consignes indiquées
 
--   Se connecter dans la page de connexion
+2.  Se connecter dans la page de connexion
 
--   Indiquer le montant voulu pour entrer en jeu
+3.  Indiquer le montant voulu pour entrer en jeu
 
--   Commencer la partie une fois 2 joueurs connectés au minimum (vous pouvez ajouter un second joueur en utilisant un autre navigateur web et en créant un autre compte)
+4.  Commencer la partie une fois 2 joueurs connectés au minimum (vous pouvez ajouter un second joueur en utilisant un <ins>autre navigateur web</ins> et en créant un <ins>autre compte</ins>)
 
 ---
 
@@ -61,7 +60,12 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 ## 📲 <ins>**Screenshot**</ins>
 
+Page de connexion :
 ![Image_1](./public/images/screenshots/connexion_example.png)
+
+<br/>
+
+Example du jeu :
 ![Image_2](./public/images/screenshots/game_example.png)
 
 ---
@@ -82,13 +86,15 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 [![Sqlite][Sqlite]][Sqlite-url]
 
+*(et d'autre petite chose pour aller plus vite...)*
+
 ---
 
 <!-- AUTHOR -->
 
 ## 🙇 <ins>**Auteur**</ins>
 
-#### @personne14
+#### @personne14 
 
 -   <ins>Discord:</ins> `personne14#7817`
 -   <ins>Website:</ins> [azerty.tk][Website-url]

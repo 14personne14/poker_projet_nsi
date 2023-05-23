@@ -260,7 +260,7 @@ input[type='number'] {
 	animation-iteration-count: infinite;
 }
 #cartes_communes {
-    height: 150px;
+	height: 150px;
 }
 
 @keyframes boom {
@@ -331,10 +331,10 @@ input[type='number'] {
 		--bs-spinner-height: 15px !important;
 	}
 	#cartes_communes img {
- 		width: 90%; 
+		width: 90%;
 		border-radius: 2px;
 	}
-    #cartes_communes {
-        height: 120px;
-    }
+	#cartes_communes {
+		height: 120px;
+	}
 }
