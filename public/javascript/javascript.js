@@ -5,6 +5,7 @@ var mise_actuelle;
 var last_winner;
 var last_abandon = [];
 var list_tooltips_card = [];
+var nbr_cartes_devoile = 1; 
 
 // --- Fonctions ---
 
@@ -114,7 +115,7 @@ function affiche_your_carte(cartes) {
 		new_img.setAttribute('class', `flip-card`);
 
 		new_img.innerHTML = `
-							<div class="flip-card-inner">
+							<div class="flip-card-inner card-to-hide">
 								<div class="flip-card-front">
 									<img
 										src="public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png"
@@ -196,15 +197,14 @@ function player_choose_action(action) {
  */
 function affiche_carte(cartes) {
 	for (var carte of cartes) {
-		var new_img = document.createElement('img');
-		new_img.setAttribute('src', `public/images/cards/original/${carte.numero}_${carte.symbole}.svg`);
-		new_img.setAttribute('alt', `${carte.numero} de ${carte.symbole}`);
-		new_img.setAttribute('data-bs-toggle', `tooltip`);
-		new_img.setAttribute('data-bs-placement', `bottom`);
-		new_img.setAttribute('data-bs-title', `${carte.text}`);
-		new_img.setAttribute('data-bs-custom-class', `custom-tooltip`);
-
-		document.getElementById('cartes_communes').appendChild(new_img);
+		var img = document.getElementById(`carte_communes_img_${nbr_cartes_devoile}`);
+		img.src = `public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png`;
+		img.setAttribute('data-bs-title', `${carte.text}`);
+        
+        var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`); 
+        card.classList.add('hide_my_card');
+        
+        nbr_cartes_devoile++;
 	}
 
 	// Instantiate all tooltips in a docs or StackBlitz
@@ -233,11 +233,14 @@ function set_winner(liste_usernames, how_win) {
  * Reinitialise le jeu pour repartir pour un nouveau tour
  */
 function restart_global() {
+    for (var i = 1; i < nbr_cartes_devoile; i++) {
+        var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
+        card.classList.remove('hide_my_card');
+    }
+    nbr_cartes_devoile = 1; 
+    
 	// Delete your_card
 	document.getElementById('your_card').innerHTML = '';
-
-	// Delete carte communes
-	document.getElementById('cartes_communes').innerHTML = '';
 
 	// Delete winner
 	for (var winner of last_winner) {
@@ -304,7 +307,7 @@ function toogle_help() {
  * Affiche ou cache les cartes du joueur
  */
 function hide_my_card() {
-	for (var card of document.getElementsByClassName('flip-card-inner')) {
+	for (var card of document.getElementsByClassName('card-to-hide')) {
 		card.classList.toggle('hide_my_card');
 	}
 }
@@ -434,7 +437,7 @@ function start() {
 		else if (data.type == 'init_game') {
 			console.log(
 				'%cInit Game' +
-					`%c\n        proba: ${data.proba} \n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username} \n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
+					`%c\n        proba: ${data.proba} \n           PB: ${data.petite_blind.username} \n           GB: ${data.grosse_blind.username}\n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} \n       card 1: ${data.your_card[0].numero} ${data.your_card[0].symbole} \n       card 2: ${data.your_card[1].numero} ${data.your_card[1].symbole}`,
 				'background: #F9FF00; color: #000000; padding: 0px 5px;',
 				''
 			);
@@ -446,7 +449,6 @@ function start() {
 			update_action_player(data.petite_blind.username, 'petite blind');
 			update_argent_player(data.grosse_blind.username, data.grosse_blind.argent);
 			update_action_player(data.grosse_blind.username, 'grosse blind');
-			update_main_player(data.who_playing, 'on');
 			update_pot_mise(data.pot, data.mise_actuelle_requise);
 			affiche_your_carte(data.your_card);
 		}
@@ -479,12 +481,11 @@ function start() {
 			}
 			console.log(
 				'%cNext Game' +
-					`%c\n  who_playing: ${data.who_playing} \n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
+					`%c\n          pot: ${data.pot} \nmise_actuelle: ${data.mise_actuelle_requise} ${text_log_cartes}`,
 				'background: #F9FF00; color: #000000; padding: 0px 5px;',
 				''
 			);
 			update_info_game(data.message);
-			update_main_player(data.who_playing, 'on');
 			update_pot_mise(data.pot, data.mise_actuelle_requise);
 			set_proba(data.proba);
 			affiche_carte(data.cartes_new);
@@ -529,6 +530,13 @@ function start() {
 		else if (data.type == 'restart_global') {
 			console.log('%cRestart global', 'background: #F9FF00; color: #000000; padding: 0px 5px;');
 			restart_global();
+		}
+        // Reset carte & winner
+		else if (data.type == 'end') {
+			console.log('%cEND OF GAME:' + `%c${data.username} win`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
+            update_info_game(data.message);
+			set_winner([data.username], 'WINNER');
+            
 		}
 		// Autre cas
 		else {
