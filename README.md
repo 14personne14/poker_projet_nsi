@@ -2,7 +2,7 @@
 <br/>
 <div align="center">
   <a href="https://github.com/14personne14/poker_projet_nsi">
-    <img src="files/images/logo.png" alt="Logo" width="80" height="80">
+    <img src="public/icons/poker.png" alt="Icon" width="80" height="80">
   </a>
 
   <h3 align="center">
@@ -10,7 +10,7 @@
   </h3>
 
   <p align="center">
-    A poker game online for french people.
+    Un jeu de poker fun, pour tous (mais surtout les français) et disponible partout en ligne.
   </p>
 </div>
 
@@ -20,7 +20,10 @@
 <!-- USAGE -->
 ## 💻 About 
 
-* Start app : 
+* Comment démarrer le site : 
+
+- ouvrir un terminal puis taper :
+
   ```cmd
   $npm install
   $npm run app.js
@@ -29,8 +32,8 @@
 
 <!-- SCREENSHOT -->
 ## 📲 Screenshot 
-![Screenshot][screenshot]
 
+![Image_1](./public/screenshot/connexion_example.png)
 
 <!-- BUILT WHIT -->
 ## 🔧 Built With
@@ -65,7 +68,7 @@ Distributed under the <ins>*MIT License*</ins>. See [LICENSE][Licence-url] for m
 [Github-url]: https://github.com/14personne14
 [Github-url-2]: https://github.com/kohibachiden
 [Licence-url]: https://en.wikipedia.org/wiki/MIT_License
-[screenshot]: files/images/screenshot.png
+[screenshot]: public/screenshot/connexion_example.png
 [Python]: https://img.shields.io/badge/python-346E9E?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://python.org/
 [Php]: https://img.shields.io/badge/PHP-20232A?style=for-the-badge&logo=php&logoColor=white
