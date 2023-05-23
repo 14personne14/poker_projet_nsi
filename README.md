@@ -6,7 +6,7 @@
   </a>
 
   <h2 align="center">
-    🔵 Pok'help 🔵
+    🔵 <b>Pok'help</b> 🔵
   </h2>
 
   <p align="center">
@@ -18,9 +18,11 @@
 
 <!-- USAGE -->
 
-## 💻 **Informations**
+## 💻 <ins>**Informations**</ins>
 
 Vous pouvez jouer au jeu sur le site [poker.azerty.tk](https://poker.azerty.tk).
+
+<br/>
 
 Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec une connexion internet obligatoire) :
 
@@ -41,6 +43,8 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 -   Aller sur ce lien pour y voir le site : [localhost:8103](http://localhost:8103/). Si le lien ne fonctionne pas vérifier le nom du port afficher dans la console de votre terminal.
 
+<br/>
+
 **Comment jouer au jeu :**
 
 -   Créer un comte en respectant bien les consignes indiquées
@@ -55,7 +59,7 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 <!-- SCREENSHOT -->
 
-## 📲 **Screenshot**
+## 📲 <ins>**Screenshot**</ins>
 
 ![Image_1](./public/images/screenshots/connexion_example.png)
 ![Image_2](./public/images/screenshots/game_example.png)
@@ -64,28 +68,35 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 <!-- BUILT WHIT -->
 
-## 🔧 **Built With**
+## 🔧 <ins>**Créé avec :**</ins>
 
--   [![Bootstrap][Bootstrap]][Bootstrap-url]
--   [![NodeJS][Nodejs]][Nodejs-url]
--   [![HTML][Html]][Html-url]
--   [![Javascript][Javascript]][Javascript-url]
--   [![Sqlite][Sqlite]][Sqlite-url]
--   [![Css][Css]][Css-url]
+[![Bootstrap][Bootstrap]][Bootstrap-url]
+
+[![NodeJS][Nodejs]][Nodejs-url]
+
+[![HTML][Html]][Html-url]
+
+[![Css][Css]][Css-url]
+
+[![Javascript][Javascript]][Javascript-url]
+
+[![Sqlite][Sqlite]][Sqlite-url]
 
 ---
 
 <!-- AUTHOR -->
 
-## 🙇 **Author**
+## 🙇 <ins>**Auteur**</ins>
 
-#### personne14
+#### @personne14
 
 -   <ins>Discord:</ins> `personne14#7817`
 -   <ins>Website:</ins> [azerty.tk][Website-url]
 -   <ins>Github:</ins> [@14personne14][Github-url]
 
-#### kohibachiden
+<br/>
+
+#### @kohibachiden
 
 -   <ins>Discord:</ins> `kohibachiden#9256`
 -   <ins>Github:</ins> [@kohibachiden][Github-url-2]
@@ -94,7 +105,7 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 <!-- LICENCE -->
 
-## ➤ **License**
+## ➤ <ins>**License**</ins>
 
 Distributed under the <ins>_MIT License_</ins>. See [LICENSE][Licence-url] for more information.
 
