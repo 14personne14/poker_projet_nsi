@@ -528,8 +528,7 @@ async function action_global() {
 				joueur.ws.send(data);
 			}
 		}
-
-		await sleep(sleep_time_game.nouveau_tour);
+        await sleep(sleep_time_game.nouveau_tour);
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
@@ -925,7 +924,8 @@ async function action_global() {
 		}
 		log_discord(`${text_discord_log}`, 'game');
 
-		// Requete database pour chaque joueur
+		// Requete database pour chaque joueur [pas activé]
+        /*
 		for (var joueur of PLAYERS) {
 			database.all(
 				`UPDATE players SET argent = ${joueur.argent + joueur.argent_restant} WHERE username = '${joueur.username}'; `,
@@ -938,8 +938,13 @@ async function action_global() {
 				}
 			);
 		}
+        */
 
 		await sleep(sleep_time_game.end);
+        
+        for (joueur of PLAYERS) {
+            joueur.ws.close(); 
+        }
 	}
 }
 
@@ -1114,9 +1119,7 @@ async function action_mise() {
 				// Update
 				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant = 0;
-				console.log(`\n\n\n\n\n\n\n\n\n${pot}\n${value_to_pay}\n\n\n\n\n\n\n`);
 				pot += value_to_pay;
-				console.log(`\n\n\n\n\n\n\n\n\n${pot}\n\n\n\n\n\n\n\n`);
 				action_to_send = 'all-in';
 				// Update mise_actuelle_requise si besoin
 				if (PLAYERS[who_playing].argent_mise > mise_actuelle_requise) {
@@ -1186,8 +1189,8 @@ async function action_mise() {
 		// Reset timer 2 & player_choice
 		timer_choix_end = false;
 		player_choice = undefined;
-
-		await sleep(sleep_time_game.mise);
+    
+        await sleep(sleep_time_game.mise);
 	}
 	// Etape 4
 	else if (etape_mise == 4) {
@@ -1217,7 +1220,7 @@ async function transition_mise() {
 		etape_mise = 3;
 	}
 	// Etape 3 -> Etape 4
-	else if (etape_mise == 3 && end_of_mise() == true) {
+	else if (etape_mise == 3 && end_of_mise() == true ) {
 		console.log('| \n|--- End of MISE ---|\n|___________________|');
 		etape_mise = 4;
 	}
@@ -1712,6 +1715,16 @@ app.get('/calcul_proba', (req, res) => {
 // Quand le client demande '/alexis'
 app.get('/alexis', (req, res) => {
 	res.render('alexis');
+});
+
+// Quand le client demande '/jc_corporation'
+app.get('/jc_corporation', (req, res) => {
+	res.render('jc_corporation');
+});
+
+// Quand le client demande '/jc_corporation'
+app.get('/jb_fc', (req, res) => {
+	res.render('jb_fc');
 });
 
 // Quand le client demande '/remerciements'

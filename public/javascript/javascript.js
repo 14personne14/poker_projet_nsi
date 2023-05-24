@@ -6,6 +6,7 @@ var last_winner;
 var last_abandon = [];
 var list_tooltips_card = [];
 var nbr_cartes_devoile = 1;
+var a_mon_tour = false; 
 
 // --- Fonctions ---
 
@@ -69,12 +70,17 @@ function update_main_player(username, status) {
 	if (status == 'off') {
 		var last_div = document.getElementById(`player-status-${username}`);
 		last_div.classList.remove('main_player');
+        
+        if (username == local_user_info.username) {
+            a_mon_tour = false; 
+		}
 	} else if (status == 'on') {
 		var div = document.getElementById(`player-status-${username}`);
 		div.classList.add('main_player');
 
 		if (username == local_user_info.username) {
 			alert_client('A ton tour de jouer ! Tu as 60 secondes maximum.', 5000, false, 'green');
+            a_mon_tour = true; 
 		}
 	}
 }
@@ -164,31 +170,35 @@ function update_pot_mise(new_pot, new_mise) {
  * @param {String} action L'action réaliser par le joueur
  */
 function player_choose_action(action) {
-	// Prepare les données
-	var data = {
-		action: action,
-	};
-	if (action == 'relance') {
-		var value_relance = Number(document.getElementById('input_relance').value);
-		if (isNaN(value_relance) || value_relance == 0) {
-			// Mauvaise input du client
-			return;
-		} else {
-			data.value_relance = value_relance;
-			console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
-		}
-	} else {
-		console.log('%cChoice send' + `%c ${data.action}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
-	}
+    if (a_mon_tour == true) {
+        // Prepare les données
+        var data = {
+            action: action,
+        };
+        if (action == 'relance') {
+            var value_relance = Number(document.getElementById('input_relance').value);
+            if (isNaN(value_relance) || value_relance == 0) {
+                // Mauvaise input du client
+                return;
+            } else {
+                data.value_relance = value_relance;
+                console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
+            }
+        } else {
+            console.log('%cChoice send' + `%c ${data.action}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
+        }
 
-	// Envoie en POST les données
-	$.post('/choice', data, function (data) {
-		// Affiche le resultat
-		if (data.valid == false) {
-			console.log('%cChoice response error' + `%c ${data.error}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
-			alert_client(data.error);
-		}
-	});
+        // Envoie en POST les données
+        $.post('/choice', data, function (data) {
+            // Affiche le resultat
+            if (data.valid == false) {
+                console.log('%cChoice response error' + `%c ${data.error}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
+                alert_client(data.error);
+            }
+        });
+    } else {
+        alert_client("Ce n'est pas à ton tour de jouer !");
+    }
 }
 
 /**
@@ -234,7 +244,8 @@ function set_winner(liste_usernames, how_win) {
  */
 function restart_global() {
 	for (var i = 1; i < nbr_cartes_devoile; i++) {
-		var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
+        console.log('y oyo o ');
+		var card = document.getElementById(`carte_communes_inner_${i}`);
 		card.classList.remove('hide_my_card');
 	}
 	nbr_cartes_devoile = 1;

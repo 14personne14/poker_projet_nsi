@@ -40,7 +40,7 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
     ![IMG_ligne_code](./public/images/screenshots/code_line.png)
 
 4.  Aller sur ce lien pour y voir le site : [localhost:8103](http://localhost:8103/). <br>
-    Si le lien ne fonctionne pas vérifier le nom du port afficher dans la console de votre terminal.
+    Si le lien ne fonctionne pas vérifier le nom du port affiché dans la console de votre terminal.
 
 <br/>
 
