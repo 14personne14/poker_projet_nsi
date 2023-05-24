@@ -14,6 +14,7 @@ PLAYERS = [
 		nbr_win: 0, 
 		out: false,
 		leave: false,
+		nbr_afk: 0, 
 		
 		// For tour 
 		last_action: 'aucune',

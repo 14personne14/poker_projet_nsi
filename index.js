@@ -103,10 +103,11 @@ const sleep_time = 100;
  */
 const sleep_time_game = {
 	nouveau_tour: 2000,
-	tirage_cartes: 5000,
+	tirage_cartes: 1000,
 	tirage_skip: 5000,
-	mise: 2000,
+	mise: 1000,
 	end_tour: 10000,
+	before_winner: 2000,
 	end: 60000,
 };
 
@@ -153,12 +154,6 @@ var cartes_communes = [];
  * @type {Number}
  */
 var nbr_joueur = 0;
-
-/**
- * Liste des joueurs qui ont commencés à miser (liste temporaire du jeu en cour)
- * @type {Array}
- */
-var PLAYERS = [];
 
 /**
  * Le choix du joueur
@@ -396,7 +391,12 @@ function calc_status_player() {
 		}
 	}
 
-	return { nbr_end_player: nbr_end_player, nbr_abandon: nbr_abandon, nbr_no_re_choice: nbr_no_re_choice, nbr_out: nbr_out };
+	return {
+		nbr_end_player: nbr_end_player,
+		nbr_abandon: nbr_abandon,
+		nbr_no_re_choice: nbr_no_re_choice,
+		nbr_out: nbr_out,
+	};
 }
 
 /**
@@ -528,7 +528,7 @@ async function action_global() {
 				joueur.ws.send(data);
 			}
 		}
-        await sleep(sleep_time_game.nouveau_tour);
+		await sleep(sleep_time_game.nouveau_tour);
 
 		// Lance le grafcet MISE
 		GRAFCET_MISE = true;
@@ -820,6 +820,14 @@ async function action_global() {
 	// Etape 13 (end)
 	else if (etape_global == 13) {
 		if (!(calc_status_player().nbr_abandon == nbr_joueur - 1)) {
+			// Send winner
+			wss_send_joueur({
+				type: 'suspence',
+				message: 'recherche du gagnant',
+			});
+
+			await sleep(sleep_time_game.before_winner);
+
 			// Prepare liste for function winner
 			var liste_joueur_cartes = [];
 			for (var i = 0; i < nbr_joueur; i++) {
@@ -835,14 +843,25 @@ async function action_global() {
 			// Ajoute pot aux winners
 			var text_message_winner = '';
 			var nbr_winner = winner_infos.liste_indices.length;
+
+			// Plusieurs gagnants
 			if (nbr_winner > 1) {
-				text_message_winner += 'gagnants:';
-			} else {
-				text_message_winner += 'gagnant:';
+				var ii = false;
+				for (var indice of winner_infos.liste_indices) {
+					PLAYERS[indice].argent_restant += pot / nbr_winner;
+					if (ii == false) {
+						text_message_winner += `${PLAYERS[indice].username}`;
+					} else {
+						text_message_winner += `et ${PLAYERS[indice].username}`;
+					}
+				}
+				text_message_winner += `gagnent chacun ${pot / nbr_winner}<i class="fa-solid fa-euro-sign"></i>`;
 			}
-			for (var indice of winner_infos.liste_indices) {
-				PLAYERS[indice].argent_restant += pot / nbr_winner;
-				text_message_winner += ` ${PLAYERS[indice].username}`;
+			// Un seul gagnant
+			else {
+				var indice = winner_infos.liste_indices[0];
+				PLAYERS[indice].argent_restant += pot;
+				text_message_winner += `${PLAYERS[indice].username} gagne ${pot}<i class="fa-solid fa-euro-sign"></i>`;
 			}
 
 			// Send winner
@@ -925,7 +944,7 @@ async function action_global() {
 		log_discord(`${text_discord_log}`, 'game');
 
 		// Requete database pour chaque joueur [pas activé]
-        /*
+		/*
 		for (var joueur of PLAYERS) {
 			database.all(
 				`UPDATE players SET argent = ${joueur.argent + joueur.argent_restant} WHERE username = '${joueur.username}'; `,
@@ -941,10 +960,14 @@ async function action_global() {
         */
 
 		await sleep(sleep_time_game.end);
-        
-        for (joueur of PLAYERS) {
-            joueur.ws.close(); 
-        }
+
+		for (var joueur of PLAYERS) {
+			if (joueur.ws != undefined) {
+				joueur.ws.close();
+			}
+		}
+		PLAYERS = [];
+		nbr_joueur = 0;
 	}
 }
 
@@ -1085,6 +1108,7 @@ async function action_mise() {
 		clearTimeout(timer);
 
 		var action_to_send;
+		var action_resume_to_send;
 
 		// Joueur a fait un choix
 		if (player_choice != undefined) {
@@ -1098,7 +1122,8 @@ async function action_mise() {
 				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant -= value_to_pay;
 				pot += value_to_pay;
-				action_to_send = 'suit';
+				action_to_send = `${PLAYERS[who_playing].username} suit avec ${value_to_pay}<i class="fa-solid fa-euro-sign"></i>`;
+				action_resume_to_send = 'Suivre';
 			}
 			// Relance
 			else if (player_choice.action == 'relance') {
@@ -1110,7 +1135,8 @@ async function action_mise() {
 				PLAYERS[who_playing].nbr_relance++;
 				pot += value_to_pay;
 				mise_actuelle_requise = PLAYERS[who_playing].argent_mise;
-				action_to_send = 'relance de';
+				action_to_send = `${PLAYERS[who_playing].username} relance de ${player_choice.value_relance}<i class="fa-solid fa-euro-sign"></i> (coup total: ${value_to_pay}<i class="fa-solid fa-euro-sign"></i>)`;
+				action_resume_to_send = `Relance de ${player_choice.value_relance}`;
 			}
 			// All-in
 			else if (player_choice.action == 'all-in') {
@@ -1120,7 +1146,8 @@ async function action_mise() {
 				PLAYERS[who_playing].argent_mise += value_to_pay;
 				PLAYERS[who_playing].argent_restant = 0;
 				pot += value_to_pay;
-				action_to_send = 'all-in';
+				action_to_send = `${PLAYERS[who_playing].username} ALL-IN avec ${value_to_pay}<i class="fa-solid fa-euro-sign"></i>`;
+				action_resume_to_send = `ALL-IN`;
 				// Update mise_actuelle_requise si besoin
 				if (PLAYERS[who_playing].argent_mise > mise_actuelle_requise) {
 					mise_actuelle_requise = PLAYERS[who_playing].argent_mise;
@@ -1129,36 +1156,48 @@ async function action_mise() {
 			// Abandon
 			else if (player_choice.action == 'abandon') {
 				PLAYERS[who_playing].last_action = 'abandon';
-				action_to_send = 'abandonne';
+				action_to_send = `${PLAYERS[who_playing].username} abandonne`;
+				action_resume_to_send = `Abandonner`;
 			}
+
+			PLAYERS[who_playing].nbr_afk = 0;
 		}
 		// Joueur attend timer
 		else {
 			// Fait abandonner automatiquement le joueur
 			PLAYERS[who_playing].last_action = 'abandon';
-			action_to_send = 'abandonne';
+			action_to_send = `${PLAYERS[who_playing].username} abandonne`;
+			action_resume_to_send = `Abandonner`;
+
+			PLAYERS[who_playing].nbr_afk++;
 		}
 
-		// Envoie des données aux joueurs
-		if (PLAYERS[who_playing].last_action == 'relance') {
+		console.log(PLAYERS[who_playing].nbr_afk);
+
+		if (PLAYERS[who_playing].nbr_afk == 3) {
+			// Out le joueur
+			PLAYERS[who_playing].out = true;
+
+			// Envoie des données aux joueurs
 			wss_send_joueur({
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
-				action: `relance ${player_choice.value_relance}`,
+				action: 'OUT',
 				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
-				message: `${PLAYERS[who_playing].username} ${action_to_send} ${player_choice.value_relance}`,
+				message: `${PLAYERS[who_playing].username} a été banni du jeu`,
 			});
 		} else {
+			// Envoie des données aux joueurs
 			wss_send_joueur({
 				type: 'player_choice',
 				username: PLAYERS[who_playing].username,
-				action: PLAYERS[who_playing].last_action,
+				action: action_resume_to_send,
 				argent_left: PLAYERS[who_playing].argent_restant,
 				pot: pot,
 				mise: mise_actuelle_requise,
-				message: `${PLAYERS[who_playing].username} ${action_to_send}`,
+				message: action_to_send,
 			});
 		}
 
@@ -1189,8 +1228,8 @@ async function action_mise() {
 		// Reset timer 2 & player_choice
 		timer_choix_end = false;
 		player_choice = undefined;
-    
-        await sleep(sleep_time_game.mise);
+
+		await sleep(sleep_time_game.mise);
 	}
 	// Etape 4
 	else if (etape_mise == 4) {
@@ -1220,7 +1259,7 @@ async function transition_mise() {
 		etape_mise = 3;
 	}
 	// Etape 3 -> Etape 4
-	else if (etape_mise == 3 && end_of_mise() == true ) {
+	else if (etape_mise == 3 && end_of_mise() == true) {
 		console.log('| \n|--- End of MISE ---|\n|___________________|');
 		etape_mise = 4;
 	}
@@ -1305,6 +1344,7 @@ wss.on('connection', (ws, req) => {
 			nbr_win: 0,
 			out: false,
 			leave: false,
+			nbr_afk: 0,
 
 			// For tour
 			last_action: 'aucune',
@@ -1725,6 +1765,11 @@ app.get('/jc_corporation', (req, res) => {
 // Quand le client demande '/jc_corporation'
 app.get('/jb_fc', (req, res) => {
 	res.render('jb_fc');
+});
+
+// Quand le client demande '/hippo'
+app.get('/hippo', (req, res) => {
+	res.render('hippo');
 });
 
 // Quand le client demande '/remerciements'

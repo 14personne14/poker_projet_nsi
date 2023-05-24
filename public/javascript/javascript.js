@@ -6,7 +6,9 @@ var last_winner;
 var last_abandon = [];
 var list_tooltips_card = [];
 var nbr_cartes_devoile = 1;
-var a_mon_tour = false; 
+var a_mon_tour = false;
+var last_player_bar;
+var bar_en_cour = false;
 
 // --- Fonctions ---
 
@@ -47,7 +49,16 @@ function add_player(username, argent_restant) {
 								<h6 class="card-subtitle mb-2 text-body-secondary" id="player-argent_restant-${username}">${argent_restant}</h6>
 							</div>
 							<ul class="list-group list-group-flush">
-								<li class="list-group-item text-bg-dark border-light last-action" id="player-last_action-${username}">Suivre</li>
+								<li class="list-group-item text-bg-dark border-light last-action">
+									<span id="player-last_action-${username}">Suivre</span>
+									<div id="defi-progress-bar" style="margin-top: 5px;">
+										<div class="block-barre space">
+											<div class="myprogress" id="myprogress-js-${username}">
+												<div class="myprogress-bar"></div>
+											</div>
+										</div>
+									</div>
+								</li>
 							</ul>
 						</div>
 					</div>
@@ -58,6 +69,7 @@ function add_player(username, argent_restant) {
 	// Client est le joueur
 	if (local_user_info.username == username) {
 		document.getElementById(`player-status-${username}`).classList.add('card_of_me');
+		document.getElementById(`player-argent_restant-${username}`).classList.add('card_of_me');
 	}
 }
 
@@ -70,9 +82,9 @@ function update_main_player(username, status) {
 	if (status == 'off') {
 		var last_div = document.getElementById(`player-status-${username}`);
 		last_div.classList.remove('main_player');
-        
-        if (username == local_user_info.username) {
-            a_mon_tour = false; 
+
+		if (username == local_user_info.username) {
+			a_mon_tour = false;
 		}
 	} else if (status == 'on') {
 		var div = document.getElementById(`player-status-${username}`);
@@ -80,7 +92,7 @@ function update_main_player(username, status) {
 
 		if (username == local_user_info.username) {
 			alert_client('A ton tour de jouer ! Tu as 60 secondes maximum.', 5000, false, 'green');
-            a_mon_tour = true; 
+			a_mon_tour = true;
 		}
 	}
 }
@@ -170,35 +182,43 @@ function update_pot_mise(new_pot, new_mise) {
  * @param {String} action L'action réaliser par le joueur
  */
 function player_choose_action(action) {
-    if (a_mon_tour == true) {
-        // Prepare les données
-        var data = {
-            action: action,
-        };
-        if (action == 'relance') {
-            var value_relance = Number(document.getElementById('input_relance').value);
-            if (isNaN(value_relance) || value_relance == 0) {
-                // Mauvaise input du client
-                return;
-            } else {
-                data.value_relance = value_relance;
-                console.log('%cChoice send' + `%c ${data.action} | ${data.value_relance}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
-            }
-        } else {
-            console.log('%cChoice send' + `%c ${data.action}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
-        }
+	if (a_mon_tour == true) {
+		// Prepare les données
+		var data = {
+			action: action,
+		};
+		if (action == 'relance') {
+			var value_relance = Number(document.getElementById('input_relance').value);
+			if (isNaN(value_relance) || value_relance == 0) {
+				// Mauvaise input du client
+				return;
+			} else {
+				data.value_relance = value_relance;
+				console.log(
+					'%cChoice send' + `%c ${data.action} | ${data.value_relance}`,
+					'background: #EA00B0; color: #000000; padding: 0px 5px;',
+					''
+				);
+			}
+		} else {
+			console.log('%cChoice send' + `%c ${data.action}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', '');
+		}
 
-        // Envoie en POST les données
-        $.post('/choice', data, function (data) {
-            // Affiche le resultat
-            if (data.valid == false) {
-                console.log('%cChoice response error' + `%c ${data.error}`, 'background: #EA00B0; color: #000000; padding: 0px 5px;', 'color: #FF0000;');
-                alert_client(data.error);
-            }
-        });
-    } else {
-        alert_client("Ce n'est pas à ton tour de jouer !");
-    }
+		// Envoie en POST les données
+		$.post('/choice', data, function (data) {
+			// Affiche le resultat
+			if (data.valid == false) {
+				console.log(
+					'%cChoice response error' + `%c ${data.error}`,
+					'background: #EA00B0; color: #000000; padding: 0px 5px;',
+					'color: #FF0000;'
+				);
+				alert_client(data.error);
+			}
+		});
+	} else {
+		alert_client("Ce n'est pas à ton tour de jouer !");
+	}
 }
 
 /**
@@ -208,20 +228,26 @@ function player_choose_action(action) {
 function affiche_carte(cartes) {
 	for (var carte of cartes) {
 		var img = document.getElementById(`carte_communes_img_${nbr_cartes_devoile}`);
-		img.src = `public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png`;
-		img.setAttribute('data-bs-title', `${carte.text}`);
+		img.innerHTML = `
+		<img
+			src="public/images/cards/png_80x116/${carte.numero}_${carte.symbole}.png"
+			alt=""
+			id="carte_communes_img_tooltip_${nbr_cartes_devoile}"
+			data-bs-toggle="tooltip"
+			data-bs-placement="bottom"
+			data-bs-title="${carte.text}"
+			data-bs-custom-class="custom-tooltip" />
+		`;
 
 		var card = document.getElementById(`carte_communes_inner_${nbr_cartes_devoile}`);
 		card.classList.add('hide_my_card');
 
+		console.log(`#carte_communes_img_back_${nbr_cartes_devoile}`);
+		bootstrap.Tooltip.getOrCreateInstance(`#carte_communes_img_back_${nbr_cartes_devoile}`).hide();
+		bootstrap.Tooltip.getOrCreateInstance(`#carte_communes_img_tooltip_${nbr_cartes_devoile}`).enable();
+
 		nbr_cartes_devoile++;
 	}
-
-	// Instantiate all tooltips in a docs or StackBlitz
-	document.querySelectorAll('img[data-bs-toggle="tooltip"]').forEach((tooltip) => {
-		var temp = new bootstrap.Tooltip(tooltip);
-		list_tooltips_card.push(temp);
-	});
 }
 
 /**
@@ -244,9 +270,23 @@ function set_winner(liste_usernames, how_win) {
  */
 function restart_global() {
 	for (var i = 1; i < nbr_cartes_devoile; i++) {
-        console.log('y oyo o ');
 		var card = document.getElementById(`carte_communes_inner_${i}`);
 		card.classList.remove('hide_my_card');
+
+		bootstrap.Tooltip.getOrCreateInstance(`#carte_communes_img_${i}`).hide();
+		bootstrap.Tooltip.getOrCreateInstance(`#carte_communes_img_back_${i}`).enable();
+
+		var img = document.getElementById(`carte_communes_img_${i}`);
+		img.innerHTML = `
+		<img
+			src="public/images/cards/png_80x116/back_card.png"
+			alt=""
+			id="carte_communes_img_tooltip_${i}"
+			data-bs-toggle="tooltip"
+			data-bs-placement="bottom"
+			data-bs-title="⁉"
+			data-bs-custom-class="custom-tooltip" />
+		`;
 	}
 	nbr_cartes_devoile = 1;
 
@@ -299,6 +339,7 @@ function alert_client(message, duree = 5000, secousse_infinity = false, color = 
  */
 function update_info_game(message) {
 	$('#info').html(message);
+	zoomAnimation('info', 1000);
 }
 
 /**
@@ -350,6 +391,48 @@ function out_player(username) {
 	div_player.classList.add('out');
 
 	update_action_player(username, 'OUT');
+}
+
+function zoomAnimation(id_element, duration) {
+	// Appliquer l'animation de zoom et dézoom à l'élément avec la durée spécifiée
+	var element = document.getElementById(id_element);
+	element.style.animation = `zoom ${duration}ms forwards`;
+
+	// Supprimer la règle CSS après la durée de l'animation (pour nettoyer)
+	setTimeout(() => {
+		element.style.animation = '';
+	}, duration);
+}
+
+function animateProgressBar(id_progress) {
+	var duration = 60000; // Durée en millisecondes (60 secondes)
+	var startTime = Date.now(); // Heure de début de l'animation
+
+	bar_en_cour = true; 
+
+	var i = 0;
+	var max = 100;
+	var increment = 1; // Valeur d'incrémentation pour atteindre 100%
+	var timer_progress_bar = setInterval(repet, duration / max)
+
+	function repet() {
+		if (bar_en_cour == true) {
+			i++;
+			var width = i * increment; // En pourcentage
+			$(`#myprogress-js-${id_progress} > .myprogress-bar`).attr('style', 'width:' + width + '%;' + `background-color: #0000FF;`);
+
+			var currentTime = Date.now(); // Heure actuelle
+			var elapsedTime = currentTime - startTime; // Temps écoulé depuis le début de l'animation
+
+			if (elapsedTime >= duration) {
+				clearInterval(timer_progress_bar);
+				chargement_en_cour = false;
+				$('#card-defis').show();
+			}
+		} else {
+			clearInterval(timer_progress_bar);
+		}
+	}
 }
 
 /*
@@ -467,6 +550,8 @@ function start() {
 		else if (data.type == 'next_player') {
 			console.log('%cUpdate main player' + `%c ${data.next_player}`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 			update_main_player(data.next_player, 'on');
+			animateProgressBar(data.next_player);
+			last_player_bar = data.next_player;
 		}
 		// Nouveau choix d'un joueur
 		else if (data.type == 'player_choice') {
@@ -478,11 +563,18 @@ function start() {
 				'',
 				''
 			);
+			bar_en_cour = false; 
+			setTimeout(() => {
+				$(`#myprogress-js-${last_player_bar} > .myprogress-bar`).attr('style', 'width: 0%; background-color: #0000FF;');
+			}, 1000);
 			update_info_game(data.message);
 			update_main_player(data.username, 'off');
 			update_argent_player(data.username, data.argent_left);
 			update_action_player(data.username, data.action);
 			update_pot_mise(data.pot, data.mise);
+			if (data.action == 'OUT') {
+				out_player(data.username);
+			}
 		}
 		// Next game
 		else if (data.type == 'game_next_part') {
@@ -542,10 +634,21 @@ function start() {
 			restart_global();
 		}
 		// Reset carte & winner
+		else if (data.type == 'suspence') {
+			console.log('%cSuspence...', 'background: #00AB00; color: #000000; padding: 0px 5px;');
+			update_info_game(data.message);
+		}
+		// Reset carte & winner
 		else if (data.type == 'end') {
 			console.log('%cEND OF GAME:' + `%c${data.username} win`, 'background: #00AB00; color: #000000; padding: 0px 5px;', '');
 			update_info_game(data.message);
 			set_winner([data.username], 'WINNER');
+			alert_client(
+				`Bravo à ${data.username} qui viens de remporter le jeu ! Le jeu se terminera automatiquement dans 1 minute.`,
+				60000,
+				false,
+				'yellow'
+			);
 		}
 		// Autre cas
 		else {

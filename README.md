@@ -54,6 +54,10 @@ Sinon, voici comment **démarrer le site sur son ordinateur personnel** (avec un
 
 4.  Commencer la partie une fois 2 joueurs connectés au minimum (vous pouvez ajouter un second joueur en utilisant un <ins>autre navigateur web</ins> et en créant un <ins>autre compte</ins>)
 
+<br/>
+
+Si jamais vous rencontrer un problème avec le jeu, essayer de relancer la commande `npm run local` pour réinitialiser les problèmes. 
+
 ---
 
 <!-- SCREENSHOT -->

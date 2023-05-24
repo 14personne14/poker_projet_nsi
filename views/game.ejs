@@ -44,7 +44,7 @@
 						<div class="spinner-border" role="status">
 							<span class="visually-hidden">Loading...</span>
 						</div>
-						attente des joueurs
+						en attente des joueurs
 					</div>
 				</div>
 			</div>
@@ -53,11 +53,21 @@
 					<div class="info">
 						<!-- Pot & Mise actuelle -->
 						<div class="row">
-							<div class="col-6 pot_mise">
+							<div
+								class="col-6 pot_mise"
+								data-bs-toggle="tooltip"
+								data-bs-placement="bottom"
+								data-bs-title="Le pot en cour de jeu"
+								data-bs-custom-class="custom-tooltip">
 								<div>POT</div>
 								<div id="valeur_pot"><i class="fa-solid fa-square-xmark"></i></div>
 							</div>
-							<div class="col-6 pot_mise">
+							<div
+								class="col-6 pot_mise"
+								data-bs-toggle="tooltip"
+								data-bs-placement="bottom"
+								data-bs-title="La mise minimum à payer pour rester en jeu"
+								data-bs-custom-class="custom-tooltip">
 								<div>MISE MIN</div>
 								<div id="valeur_mise"><i class="fa-solid fa-square-xmark"></i></div>
 							</div>
@@ -89,19 +99,21 @@
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
+										class="tooltip_back_card"
+										id="carte_communes_img_back_1"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
 										data-bs-title="pas encore dévoilé"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
-								<div class="flip-card-back">
+								<div class="flip-card-back" id="carte_communes_img_1">
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
-										id="carte_communes_img_1"
+										id="carte_communes_img_tooltip_1"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
-										data-bs-title="secret"
+										data-bs-title="⁉"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
 							</div>
@@ -112,19 +124,21 @@
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
+										class="tooltip_back_card"
+										id="carte_communes_img_back_2"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
 										data-bs-title="pas encore dévoilé"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
-								<div class="flip-card-back">
+								<div class="flip-card-back" id="carte_communes_img_2">
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
-										id="carte_communes_img_2"
+										id="carte_communes_img_tooltip_2"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
-										data-bs-title="secret"
+										data-bs-title="⁉"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
 							</div>
@@ -135,19 +149,21 @@
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
+										class="tooltip_back_card"
+										id="carte_communes_img_back_3"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
 										data-bs-title="pas encore dévoilé"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
-								<div class="flip-card-back">
+								<div class="flip-card-back" id="carte_communes_img_3">
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
-										id="carte_communes_img_3"
+										id="carte_communes_img_tooltip_3"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
-										data-bs-title="secret"
+										data-bs-title="⁉"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
 							</div>
@@ -158,19 +174,21 @@
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
+										class="tooltip_back_card"
+										id="carte_communes_img_back_4"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
 										data-bs-title="pas encore dévoilé"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
-								<div class="flip-card-back">
+								<div class="flip-card-back" id="carte_communes_img_4">
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
-										id="carte_communes_img_4"
+										id="carte_communes_img_tooltip_4"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
-										data-bs-title="secret"
+										data-bs-title="⁉"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
 							</div>
@@ -181,19 +199,21 @@
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
+										class="tooltip_back_card"
+										id="carte_communes_img_back_5"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
 										data-bs-title="pas encore dévoilé"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
-								<div class="flip-card-back">
+								<div class="flip-card-back" id="carte_communes_img_5">
 									<img
 										src="public/images/cards/png_80x116/back_card.png"
 										alt=""
-										id="carte_communes_img_5"
+										id="carte_communes_img_tooltip_5"
 										data-bs-toggle="tooltip"
 										data-bs-placement="bottom"
-										data-bs-title="secret"
+										data-bs-title="⁉"
 										data-bs-custom-class="custom-tooltip" />
 								</div>
 							</div>
@@ -274,7 +294,15 @@
 							<div class="d-flex justify-content-center text-center" id="your_card"></div>
 							<div class="d-flex justify-content-center text-center">
 								<div class="collapse collapse-horizontal" id="collapseWidthExample">
-									<div class="probabilite" id="proba"><i class="fa-solid fa-square-xmark"></i></div>
+									<div
+										class="probabilite"
+										id="proba"
+										data-bs-toggle="tooltip"
+										data-bs-placement="bottom"
+										data-bs-title="Probabilité de victoire avec vos cartes"
+										data-bs-custom-class="custom-tooltip">
+										<i class="fa-solid fa-square-xmark"></i> Aucune donnée
+									</div>
 								</div>
 							</div>
 						</div>

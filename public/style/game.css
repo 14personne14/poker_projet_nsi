@@ -55,10 +55,11 @@ input[type='number'] {
 }
 
 .probabilite {
-	padding: 10px;
-	margin: 10px;
-	border-radius: 15px;
+	padding: 5px 10px;
+	margin-top: 140px;
+	border-radius: 5px;
 	background-color: #ffffff;
+	white-space: nowrap;
 }
 
 .custom-tooltip {
@@ -102,10 +103,14 @@ input[type='number'] {
 	width: 100%;
 	margin-bottom: 25px;
 }
+.d-flex .card_invisible {
+	--bs-card-border-width: 0px !important;
+}
 .d-flex .card_of_me {
 	--bs-card-border-width: 3px !important;
 	border-color: #ffdc19 !important;
 }
+
 .abandon div {
 	background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' preserveAspectRatio='none' viewBox='0 0 100 100'><path d='M100 0 L0 100 ' stroke='white' stroke-width='2'/><path d='M0 0 L100 100 ' stroke='white' stroke-width='2'/></svg>");
 	background-repeat: no-repeat;
@@ -156,7 +161,7 @@ input[type='number'] {
 .flip-card {
 	background-color: transparent;
 	width: 100px;
-	height: 130px;
+	height: auto;
 	perspective: 1000px;
 }
 .flip-card-inner {
@@ -221,9 +226,15 @@ input[type='number'] {
 }
 .alert-green {
 	background-color: green !important;
+	color: #ffffff !important;
 }
 .alert-red {
 	background-color: red !important;
+	color: #ffffff !important;
+}
+.alert-yellow {
+	background-color: yellow !important;
+	color: #000000 !important;
 }
 .success_alert {
 	background-color: green;
@@ -261,6 +272,40 @@ input[type='number'] {
 }
 #cartes_communes {
 	height: 150px;
+}
+
+.myprogress {
+	margin: auto;
+	width: 100%;
+}
+
+.myprogress {
+	padding: 4px;
+	background: rgba(0, 0, 0, 0.25);
+	border-radius: 6px;
+	-webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25), 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.myprogress-bar {
+	height: 30px;
+	border-radius: 4px;
+	background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+	background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+	background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+	background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.05));
+	-webkit-transition: 0.4s linear;
+	-moz-transition: 0.4s linear;
+	-o-transition: 0.4s linear;
+	transition: 0.4s linear;
+	-webkit-transition-property: width, background-color;
+	-moz-transition-property: width, background-color;
+	-o-transition-property: width, background-color;
+	transition-property: width, background-color;
+	-webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+	box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+	width: 0%;
+	background-color: rgb(74, 74, 74);
 }
 
 @keyframes boom {
@@ -321,6 +366,20 @@ input[type='number'] {
 	}
 }
 
+@keyframes zoom {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.5);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
 /* --- FOR TELEPHONE --- */
 @media only screen and (max-width: 992px) {
 	.info-text {
@@ -331,7 +390,7 @@ input[type='number'] {
 		--bs-spinner-height: 15px !important;
 	}
 	#cartes_communes img {
-		width: 90%;
+		width: 80%;
 		border-radius: 2px;
 	}
 	#cartes_communes {
