@@ -490,12 +490,7 @@ $.getJSON('/get_user_info', function (data) {
 
 function start() {
 	// Websocket
-	if (window.location.host === 'poker.azerty.tk') {
-		// azerty.tk
-		socket = new WebSocket(`wss://poker.azerty.tk/`); // wss://poker.azerty.tk/
-	} else {
-		socket = new WebSocket(`ws://${window.location.host}/`); // ws://localhost:8101  --or--  ws://seblag.freeboxos.fr:8888
-	}
+	socket = new WebSocket(`wss://poker.docker.ras.univ-angers.fr/`);
 
 	// Ecouter les messages ws
 	socket.addEventListener('message', (event) => {

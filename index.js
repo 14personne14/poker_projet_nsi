@@ -37,7 +37,7 @@ const database = new sqlite3.Database('./database/database.db'); // Connexion à
  * Le port où démarre le serveur [default: 8103]
  * @type {Number}
  */
-const port = 8103;
+const port = 8080;
 
 // ---------------------------- Variables constantes ----------------------------
 
@@ -263,7 +263,7 @@ var sessionParser = sessions({
 	saveUninitialized: true,
 	cookie: {
 		maxAge: 1000 * 60 * 60 * 24 * 10,
-		sameSite: 'strict',
+		sameSite: 'none',
 	},
 });
 app.use(sessionParser);
